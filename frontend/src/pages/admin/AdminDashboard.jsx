@@ -18,7 +18,7 @@ import ProductsTab from './ProductsTab';
 import OrdersTab from './OrdersTab';
 import MessagesTab from './MessagesTab';
 import NewsletterTab from './NewsletterTab';
-import HeroTab from './HeroTab';
+import HeroTab from './frontend_setup/HeroTab';
 import ProductModal from './ProductModal';
 import DeleteModal from './DeleteModal';
 
@@ -32,28 +32,25 @@ export default function AdminDashboard({
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Resolve activeTab from URL pathname (e.g. /admin/products -> 'products')
+  // Resolve activeTab from URL pathname (e.g. /admin/frontend-setup/hero -> 'hero')
   const getTabFromPath = (pathname) => {
-    const segment = pathname.replace(/^\/admin\/?/, '').toLowerCase().split('/')[0];
-    switch (segment) {
-      case 'products':
-        return 'products';
-      case 'orders':
-        return 'orders';
-      case 'messages':
-      case 'inquiries':
-        return 'messages';
-      case 'newsletter':
-      case 'subscribers':
-        return 'newsletter';
-      case 'hero':
-      case 'hero-banner':
-        return 'hero';
-      case 'overview':
-      case '':
-      default:
-        return 'overview';
+    const cleanPath = pathname.toLowerCase().replace(/\/+$/, '');
+    if (
+      cleanPath === '/admin/frontend-setup/hero' ||
+      cleanPath === '/admin/frontend_setup/hero' ||
+      cleanPath === '/admin/frontend-setup' ||
+      cleanPath === '/admin/frontend_setup' ||
+      cleanPath === '/admin/hero' ||
+      cleanPath === '/admin/hero-banner'
+    ) {
+      return 'hero';
     }
+
+    if (cleanPath === '/admin/products') return 'products';
+    if (cleanPath === '/admin/orders') return 'orders';
+    if (cleanPath === '/admin/messages' || cleanPath === '/admin/inquiries') return 'messages';
+    if (cleanPath === '/admin/newsletter' || cleanPath === '/admin/subscribers') return 'newsletter';
+    return 'overview';
   };
 
   const activeTab = getTabFromPath(location.pathname);
@@ -81,7 +78,8 @@ export default function AdminDashboard({
         break;
       case 'hero':
       case 'hero-banner':
-        targetPath = '/admin/hero';
+      case 'frontend-setup/hero':
+        targetPath = '/admin/frontend-setup/hero';
         break;
       default:
         targetPath = `/admin/${tabId}`;

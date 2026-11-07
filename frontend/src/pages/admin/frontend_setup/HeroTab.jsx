@@ -14,7 +14,7 @@ import {
   Save,
   X,
 } from 'lucide-react';
-import { heroImagePresets, defaultHeroSlides } from '../../data/heroSlides';
+import { heroImagePresets, defaultHeroSlides } from '../../../data/heroSlides';
 
 export default function HeroTab({
   heroSlides = [],

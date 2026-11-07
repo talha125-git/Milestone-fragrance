@@ -1,6 +1,6 @@
 git init 
 git add .
 git commit -m "
- add path to  admin dashboard 
+ feat: add admin dashboard and frontend setup components 
 "
 git push -u origin main

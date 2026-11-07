@@ -8,7 +8,7 @@ export { default as MessagesTab } from './MessagesTab';
 export { default as NewsletterTab } from './NewsletterTab';
 export { default as ProductModal } from './ProductModal';
 export { default as DeleteModal } from './DeleteModal';
-export { default as HeroTab } from './HeroTab';
+export { default as HeroTab } from './frontend_setup/HeroTab';
 
 export { default } from './AdminDashboard';
 
