@@ -8,22 +8,17 @@ const router = express.Router();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Destination folders for Products
-const assetsProductimagesDir = path.resolve(__dirname, '../../frontend/src/assets/productimages');
+// Destination folders in public/
 const publicProductimagesDir = path.resolve(__dirname, '../../frontend/public/productimages');
 const backendUploadsDir = path.resolve(__dirname, '../public/productimages');
 
-// Destination folders for Hero Background Images
-const assetsHeroImagesDir = path.resolve(__dirname, '../../frontend/src/assets/hero_bg_imgaes');
 const publicHeroImagesDir = path.resolve(__dirname, '../../frontend/public/hero_bg_imgaes');
 const backendHeroUploadsDir = path.resolve(__dirname, '../public/hero_bg_imgaes');
 
-// Ensure all target directories exist
+// Ensure target directories exist
 [
-  assetsProductimagesDir,
   publicProductimagesDir,
   backendUploadsDir,
-  assetsHeroImagesDir,
   publicHeroImagesDir,
   backendHeroUploadsDir,
 ].forEach((dir) => {
@@ -32,11 +27,11 @@ const backendHeroUploadsDir = path.resolve(__dirname, '../public/hero_bg_imgaes'
   }
 });
 
-// Configure Multer storage
+// Configure Multer storage directly into public/ folders
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const isHero = req.query.type === 'hero' || req.body.type === 'hero';
-    cb(null, isHero ? assetsHeroImagesDir : assetsProductimagesDir);
+    cb(null, isHero ? publicHeroImagesDir : publicProductimagesDir);
   },
   filename: (req, file, cb) => {
     const isHero = req.query.type === 'hero' || req.body.type === 'hero';
@@ -66,7 +61,7 @@ const upload = multer({
 /**
  * POST /api/upload
  * Multi-part form-data file upload (field: 'image')
- * Query or body 'type=hero' routes to assets/hero_bg_imgaes
+ * Query or body 'type=hero' routes directly to public/hero_bg_imgaes
  */
 router.post('/', upload.single('image'), (req, res) => {
   try {
@@ -82,44 +77,39 @@ router.post('/', upload.single('image'), (req, res) => {
     const sourcePath = req.file.path;
 
     if (isHero) {
-      const publicDest = path.join(publicHeroImagesDir, filename);
       const backendDest = path.join(backendHeroUploadsDir, filename);
       try {
-        fs.copyFileSync(sourcePath, publicDest);
         fs.copyFileSync(sourcePath, backendDest);
       } catch (copyErr) {
-        console.warn('[Upload Hero] Notice while syncing to public dirs:', copyErr.message);
+        console.warn('[Upload Hero] Notice while syncing to backend dir:', copyErr.message);
       }
 
       const publicUrl = `/hero_bg_imgaes/${filename}`;
       return res.json({
         success: true,
-        message: 'Background image successfully stored in assets/hero_bg_imgaes',
+        message: 'Background image successfully stored in public/hero_bg_imgaes',
         filename,
         url: publicUrl,
-        assetPath: `assets/hero_bg_imgaes/${filename}`,
+        assetPath: `public/hero_bg_imgaes/${filename}`,
       });
     }
 
     // Default: Product image
-    const publicDest = path.join(publicProductimagesDir, filename);
     const backendDest = path.join(backendUploadsDir, filename);
-
     try {
-      fs.copyFileSync(sourcePath, publicDest);
       fs.copyFileSync(sourcePath, backendDest);
     } catch (copyErr) {
-      console.warn('[Upload Product] Notice while syncing to public dirs:', copyErr.message);
+      console.warn('[Upload Product] Notice while syncing to backend dir:', copyErr.message);
     }
 
     const publicUrl = `/productimages/${filename}`;
 
     res.json({
       success: true,
-      message: 'Product image successfully stored in assets/productimages',
+      message: 'Product image successfully stored in public/productimages',
       filename,
       url: publicUrl,
-      assetPath: `assets/productimages/${filename}`,
+      assetPath: `public/productimages/${filename}`,
     });
   } catch (error) {
     res.status(500).json({
@@ -132,7 +122,7 @@ router.post('/', upload.single('image'), (req, res) => {
 
 /**
  * POST /api/upload/base64
- * Support base64 image data upload
+ * Support base64 image data upload directly into public/ folders
  */
 router.post('/base64', (req, res) => {
   try {
@@ -164,11 +154,9 @@ router.post('/base64', (req, res) => {
     const filename = `${prefix}_${Date.now()}_${cleanBaseName}${ext}`;
 
     if (isHero) {
-      const assetFilePath = path.join(assetsHeroImagesDir, filename);
       const publicFilePath = path.join(publicHeroImagesDir, filename);
       const backendFilePath = path.join(backendHeroUploadsDir, filename);
 
-      fs.writeFileSync(assetFilePath, buffer);
       fs.writeFileSync(publicFilePath, buffer);
       try {
         fs.writeFileSync(backendFilePath, buffer);
@@ -177,18 +165,16 @@ router.post('/base64', (req, res) => {
       const publicUrl = `/hero_bg_imgaes/${filename}`;
       return res.json({
         success: true,
-        message: 'Background image successfully stored in assets/hero_bg_imgaes',
+        message: 'Background image successfully stored in public/hero_bg_imgaes',
         filename,
         url: publicUrl,
-        assetPath: `assets/hero_bg_imgaes/${filename}`,
+        assetPath: `public/hero_bg_imgaes/${filename}`,
       });
     }
 
-    const assetFilePath = path.join(assetsProductimagesDir, filename);
     const publicFilePath = path.join(publicProductimagesDir, filename);
     const backendFilePath = path.join(backendUploadsDir, filename);
 
-    fs.writeFileSync(assetFilePath, buffer);
     fs.writeFileSync(publicFilePath, buffer);
     try {
       fs.writeFileSync(backendFilePath, buffer);
@@ -198,10 +184,10 @@ router.post('/base64', (req, res) => {
 
     res.json({
       success: true,
-      message: 'Product image successfully stored in assets/productimages',
+      message: 'Product image successfully stored in public/productimages',
       filename,
       url: publicUrl,
-      assetPath: `assets/productimages/${filename}`,
+      assetPath: `public/productimages/${filename}`,
     });
   } catch (error) {
     res.status(500).json({

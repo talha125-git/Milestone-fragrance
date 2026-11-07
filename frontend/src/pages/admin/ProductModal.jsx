@@ -44,7 +44,7 @@ export default function ProductModal({
           </div>
 
           <form onSubmit={onSubmit} className="space-y-4">
-            {/* Product Image Upload Section (Stored in assets/productimages) */}
+            {/* Product Image Upload Section (Stored in public/productimages) */}
             <div className="p-4 rounded-xl bg-stone-50 border border-stone-200/90 space-y-3">
               <div className="flex items-center justify-between">
                 <label className="text-[11px] font-bold uppercase tracking-wider text-stone-800 flex items-center gap-1.5">
@@ -52,7 +52,7 @@ export default function ProductModal({
                   <span>Fragrance Bottle Image *</span>
                 </label>
                 <span className="text-[10px] text-stone-500 font-medium">
-                  Stored in: <code className="text-[#b38531] font-mono font-bold bg-white px-1.5 py-0.5 rounded border border-stone-200">assets/productimages/</code>
+                  Stored in: <code className="text-[#b38531] font-mono font-bold bg-white px-1.5 py-0.5 rounded border border-stone-200">public/productimages/</code>
                 </span>
               </div>
 
@@ -103,7 +103,7 @@ export default function ProductModal({
                   </div>
 
                   <p className="text-[11px] text-stone-500 leading-snug">
-                    Choose any perfume image from your computer (PNG, JPG, WEBP). It will be saved into <strong className="text-stone-700 font-semibold">assets/productimages/</strong> and rendered on all product pages.
+                    Choose any perfume image from your computer (PNG, JPG, WEBP). It will be saved into <strong className="text-stone-700 font-semibold">public/productimages/</strong> and rendered on all product pages.
                   </p>
 
                   {/* Preset Buttons */}

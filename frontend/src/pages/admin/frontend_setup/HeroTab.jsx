@@ -69,7 +69,7 @@ export default function HeroTab({
         if (json.url) {
           updateActiveSlide('bgImage', json.url);
           updateActiveSlide('bgKey', null);
-          if (showToast) showToast(`Background image saved in assets/hero_bg_imgaes (${json.filename})`);
+          if (showToast) showToast(`Background image saved in public/hero_bg_imgaes (${json.filename})`);
         }
       } else {
         // Fallback: Read as base64 and send to base64 upload endpoint
@@ -92,9 +92,9 @@ export default function HeroTab({
             if (bRes.ok) {
               const bJson = await bRes.json();
               updateActiveSlide('bgImage', bJson.url);
-              if (showToast) showToast(`Background image saved in assets/hero_bg_imgaes (${bJson.filename})`);
+              if (showToast) showToast(`Background image saved in public/hero_bg_imgaes (${bJson.filename})`);
             }
-          } catch {}
+          } catch { }
         };
         reader.readAsDataURL(file);
       }
@@ -120,7 +120,7 @@ export default function HeroTab({
       }
       try {
         localStorage.setItem('milestone_hero_slides', JSON.stringify(slides));
-      } catch (e) {}
+      } catch (e) { }
 
       if (showToast) {
         showToast('Hero banner settings saved successfully to live storefront!');
@@ -129,7 +129,7 @@ export default function HeroTab({
       if (setHeroSlides) setHeroSlides(slides);
       try {
         localStorage.setItem('milestone_hero_slides', JSON.stringify(slides));
-      } catch (e) {}
+      } catch (e) { }
       if (showToast) showToast('Hero settings saved locally');
     } finally {
       setIsSaving(false);
@@ -166,7 +166,7 @@ export default function HeroTab({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updated),
       });
-    } catch (e) {}
+    } catch (e) { }
 
     if (showToast) showToast(`Slide ${newSlideNumber} added! Customize its image and text below.`);
   };
@@ -193,12 +193,12 @@ export default function HeroTab({
     // 2. Immediately update localStorage
     try {
       localStorage.setItem('milestone_hero_slides', JSON.stringify(updated));
-    } catch (e) {}
+    } catch (e) { }
 
     // 3. Immediately save updated list to backend API and disk
     try {
       if (slideToDelete?.id) {
-        await fetch(`/api/hero/${slideToDelete.id}`, { method: 'DELETE' }).catch(() => {});
+        await fetch(`/api/hero/${slideToDelete.id}`, { method: 'DELETE' }).catch(() => { });
       }
       await fetch('/api/hero', {
         method: 'PUT',
@@ -220,8 +220,8 @@ export default function HeroTab({
     if (setHeroSlides) setHeroSlides(defaultHeroSlides);
     try {
       localStorage.setItem('milestone_hero_slides', JSON.stringify(defaultHeroSlides));
-      await fetch('/api/hero/reset', { method: 'POST' }).catch(() => {});
-    } catch (e) {}
+      await fetch('/api/hero/reset', { method: 'POST' }).catch(() => { });
+    } catch (e) { }
     if (showToast) showToast('Hero banner reset to factory defaults');
   };
 
@@ -276,11 +276,10 @@ export default function HeroTab({
           <div
             key={s.id || idx}
             onClick={() => setSelectedSlideIdx(idx)}
-            className={`flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all cursor-pointer flex-shrink-0 group ${
-              selectedSlideIdx === idx
-                ? 'bg-[#14120f] text-white shadow-md border border-[#dfb76c]'
-                : 'bg-white border border-stone-200 text-stone-600 hover:text-stone-900 hover:bg-stone-50'
-            }`}
+            className={`flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all cursor-pointer flex-shrink-0 group ${selectedSlideIdx === idx
+              ? 'bg-[#14120f] text-white shadow-md border border-[#dfb76c]'
+              : 'bg-white border border-stone-200 text-stone-600 hover:text-stone-900 hover:bg-stone-50'
+              }`}
           >
             <span className="w-2 h-2 rounded-full bg-[#dfb76c]" />
             <span className="font-semibold">Slide {idx + 1}:</span>
@@ -412,14 +411,14 @@ export default function HeroTab({
               <span className="text-[10px] text-stone-500 font-medium">High-Res Landscape</span>
             </div>
 
-            {/* Upload from Computer into assets/hero_bg_imgaes */}
+            {/* Upload from Computer into public/hero_bg_imgaes */}
             <div className="p-4 rounded-xl bg-stone-50 border border-stone-200/90 space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-bold uppercase tracking-wider text-stone-700">
                   Upload Background File
                 </span>
                 <span className="text-[10px] text-stone-500 font-medium">
-                  Stored in: <code className="text-[#b38531] font-mono font-bold bg-white px-1.5 py-0.5 rounded border border-stone-200">assets/hero_bg_imgaes/</code>
+                  Stored in: <code className="text-[#b38531] font-mono font-bold bg-white px-1.5 py-0.5 rounded border border-stone-200">public/hero_bg_imgaes/</code>
                 </span>
               </div>
 
@@ -448,7 +447,7 @@ export default function HeroTab({
               </div>
 
               <p className="text-[11px] text-stone-500 leading-snug">
-                Select any landscape image from your device (PNG, JPG, WEBP). It will be saved directly into <strong className="text-stone-700 font-semibold">assets/hero_bg_imgaes/</strong> and rendered as this slide's background on the storefront.
+                Select any landscape image from your device (PNG, JPG, WEBP). It will be saved directly into <strong className="text-stone-700 font-semibold">public/hero_bg_imgaes/</strong> and rendered as this slide's background on the storefront.
               </p>
             </div>
           </div>

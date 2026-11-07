@@ -203,10 +203,10 @@ export default function AdminDashboard({
           setFormData((prev) => ({
             ...prev,
             image: json.url,
-            assetPath: json.assetPath || `assets/productimages/${json.filename}`,
+            assetPath: json.assetPath || `public/productimages/${json.filename}`,
           }));
-          setUploadedAssetPath(json.assetPath || `assets/productimages/${json.filename}`);
-          showToast(`Image stored in assets/productimages (${json.filename})`);
+          setUploadedAssetPath(json.assetPath || `public/productimages/${json.filename}`);
+          showToast(`Image stored in public/productimages (${json.filename})`);
         }
       } else {
         // Fallback: send as base64 to base64 upload endpoint
@@ -233,7 +233,7 @@ export default function AdminDashboard({
             assetPath: bJson.assetPath,
           }));
           setUploadedAssetPath(bJson.assetPath);
-          showToast(`Image stored in assets/productimages (${bJson.filename})`);
+          showToast(`Image stored in public/productimages (${bJson.filename})`);
         }
       }
     } catch (err) {

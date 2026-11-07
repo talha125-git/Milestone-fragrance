@@ -29,16 +29,12 @@ app.use(
 app.use(express.json({ limit: '25mb' }));
 app.use(express.urlencoded({ extended: true, limit: '25mb' }));
 
-// Static images serving for product images and hero background images
+// Static images serving for product images and hero background images from public
 const publicProductimages = path.resolve(__dirname, '../frontend/public/productimages');
-const assetsProductimages = path.resolve(__dirname, '../frontend/src/assets/productimages');
 app.use('/productimages', express.static(publicProductimages));
-app.use('/productimages', express.static(assetsProductimages));
 
 const publicHeroImages = path.resolve(__dirname, '../frontend/public/hero_bg_imgaes');
-const assetsHeroImages = path.resolve(__dirname, '../frontend/src/assets/hero_bg_imgaes');
 app.use('/hero_bg_imgaes', express.static(publicHeroImages));
-app.use('/hero_bg_imgaes', express.static(assetsHeroImages));
 
 // Request logging in development
 app.use((req, res, next) => {
