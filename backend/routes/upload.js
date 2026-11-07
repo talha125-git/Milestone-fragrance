@@ -8,13 +8,25 @@ const router = express.Router();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Destination folders
+// Destination folders for Products
 const assetsProductimagesDir = path.resolve(__dirname, '../../frontend/src/assets/productimages');
 const publicProductimagesDir = path.resolve(__dirname, '../../frontend/public/productimages');
 const backendUploadsDir = path.resolve(__dirname, '../public/productimages');
 
+// Destination folders for Hero Background Images
+const assetsHeroImagesDir = path.resolve(__dirname, '../../frontend/src/assets/hero_bg_imgaes');
+const publicHeroImagesDir = path.resolve(__dirname, '../../frontend/public/hero_bg_imgaes');
+const backendHeroUploadsDir = path.resolve(__dirname, '../public/hero_bg_imgaes');
+
 // Ensure all target directories exist
-[assetsProductimagesDir, publicProductimagesDir, backendUploadsDir].forEach((dir) => {
+[
+  assetsProductimagesDir,
+  publicProductimagesDir,
+  backendUploadsDir,
+  assetsHeroImagesDir,
+  publicHeroImagesDir,
+  backendHeroUploadsDir,
+].forEach((dir) => {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }
@@ -23,22 +35,25 @@ const backendUploadsDir = path.resolve(__dirname, '../public/productimages');
 // Configure Multer storage
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, assetsProductimagesDir);
+    const isHero = req.query.type === 'hero' || req.body.type === 'hero';
+    cb(null, isHero ? assetsHeroImagesDir : assetsProductimagesDir);
   },
   filename: (req, file, cb) => {
+    const isHero = req.query.type === 'hero' || req.body.type === 'hero';
     const ext = path.extname(file.originalname).toLowerCase() || '.png';
     const baseName = path
       .basename(file.originalname, ext)
       .toLowerCase()
       .replace(/[^a-z0-9_-]/g, '_');
-    const uniqueName = `prod_${Date.now()}_${baseName}${ext}`;
+    const prefix = isHero ? 'hero_bg' : 'prod';
+    const uniqueName = `${prefix}_${Date.now()}_${baseName}${ext}`;
     cb(null, uniqueName);
   },
 });
 
 const upload = multer({
   storage,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+  limits: { fileSize: 15 * 1024 * 1024 }, // 15MB limit
   fileFilter: (req, file, cb) => {
     if (file.mimetype.startsWith('image/')) {
       cb(null, true);
@@ -51,6 +66,7 @@ const upload = multer({
 /**
  * POST /api/upload
  * Multi-part form-data file upload (field: 'image')
+ * Query or body 'type=hero' routes to assets/hero_bg_imgaes
  */
 router.post('/', upload.single('image'), (req, res) => {
   try {
@@ -61,10 +77,31 @@ router.post('/', upload.single('image'), (req, res) => {
       });
     }
 
+    const isHero = req.query.type === 'hero' || req.body.type === 'hero';
     const filename = req.file.filename;
-    const sourcePath = req.file.path; // already in assets/productimages
+    const sourcePath = req.file.path;
 
-    // Also copy to frontend/public/productimages so Vite can serve it immediately at /productimages/<filename>
+    if (isHero) {
+      const publicDest = path.join(publicHeroImagesDir, filename);
+      const backendDest = path.join(backendHeroUploadsDir, filename);
+      try {
+        fs.copyFileSync(sourcePath, publicDest);
+        fs.copyFileSync(sourcePath, backendDest);
+      } catch (copyErr) {
+        console.warn('[Upload Hero] Notice while syncing to public dirs:', copyErr.message);
+      }
+
+      const publicUrl = `/hero_bg_imgaes/${filename}`;
+      return res.json({
+        success: true,
+        message: 'Background image successfully stored in assets/hero_bg_imgaes',
+        filename,
+        url: publicUrl,
+        assetPath: `assets/hero_bg_imgaes/${filename}`,
+      });
+    }
+
+    // Default: Product image
     const publicDest = path.join(publicProductimagesDir, filename);
     const backendDest = path.join(backendUploadsDir, filename);
 
@@ -72,7 +109,7 @@ router.post('/', upload.single('image'), (req, res) => {
       fs.copyFileSync(sourcePath, publicDest);
       fs.copyFileSync(sourcePath, backendDest);
     } catch (copyErr) {
-      console.warn('[Upload] Notice while syncing to public dirs:', copyErr.message);
+      console.warn('[Upload Product] Notice while syncing to public dirs:', copyErr.message);
     }
 
     const publicUrl = `/productimages/${filename}`;
@@ -99,12 +136,13 @@ router.post('/', upload.single('image'), (req, res) => {
  */
 router.post('/base64', (req, res) => {
   try {
-    const { base64Data, filename: rawName } = req.body;
+    const { base64Data, filename: rawName, type } = req.body;
+    const isHero = type === 'hero' || req.query.type === 'hero';
+
     if (!base64Data) {
       return res.status(400).json({ success: false, message: 'base64Data is required' });
     }
 
-    // Extract base64 payload & mime extension
     const matches = base64Data.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
     let ext = '.png';
     let buffer;
@@ -118,11 +156,33 @@ router.post('/base64', (req, res) => {
       buffer = Buffer.from(base64Data, 'base64');
     }
 
-    const cleanBaseName = (rawName || 'fragrance')
+    const cleanBaseName = (rawName || (isHero ? 'hero_bg' : 'fragrance'))
       .replace(/\.[^/.]+$/, '')
       .toLowerCase()
       .replace(/[^a-z0-9_-]/g, '_');
-    const filename = `prod_${Date.now()}_${cleanBaseName}${ext}`;
+    const prefix = isHero ? 'hero_bg' : 'prod';
+    const filename = `${prefix}_${Date.now()}_${cleanBaseName}${ext}`;
+
+    if (isHero) {
+      const assetFilePath = path.join(assetsHeroImagesDir, filename);
+      const publicFilePath = path.join(publicHeroImagesDir, filename);
+      const backendFilePath = path.join(backendHeroUploadsDir, filename);
+
+      fs.writeFileSync(assetFilePath, buffer);
+      fs.writeFileSync(publicFilePath, buffer);
+      try {
+        fs.writeFileSync(backendFilePath, buffer);
+      } catch {}
+
+      const publicUrl = `/hero_bg_imgaes/${filename}`;
+      return res.json({
+        success: true,
+        message: 'Background image successfully stored in assets/hero_bg_imgaes',
+        filename,
+        url: publicUrl,
+        assetPath: `assets/hero_bg_imgaes/${filename}`,
+      });
+    }
 
     const assetFilePath = path.join(assetsProductimagesDir, filename);
     const publicFilePath = path.join(publicProductimagesDir, filename);
@@ -153,4 +213,3 @@ router.post('/base64', (req, res) => {
 });
 
 export default router;
-

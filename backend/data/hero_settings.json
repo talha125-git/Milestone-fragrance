@@ -1,8 +1,8 @@
 [
   {
     "id": "ghanam",
-    "bgKey": "ghanamHeroBg",
-    "bgImage": "/assets/ghanam_rang_hero_bg.png",
+    "bgKey": "professorHeroBg",
+    "bgImage": "/src/assets/professor_hero_bg.png",
     "tag": "GHANAM RANGE • ORIENTAL HERITAGE",
     "titleLine1": "Ghanam Range",
     "titleLine2": "Crafted For Royalty",
@@ -14,7 +14,7 @@
   {
     "id": "believe",
     "bgKey": "believeHeroBg",
-    "bgImage": "/assets/Believe_Hero_bg.png",
+    "bgImage": "/src/assets/Believe_Hero_bg.png",
     "tag": "BELIEVE COLLECTION • FRESH & VIBRANT",
     "titleLine1": "Believe Collection",
     "titleLine2": "Fresh, Vibrant & Pure",
@@ -26,7 +26,7 @@
   {
     "id": "signature",
     "bgKey": "heroBg",
-    "bgImage": "/assets/hero_bg_image.png",
+    "bgImage": "/src/assets/hero_bg_image.png",
     "tag": "SIGNATURE SERIES • PREMIUM FRAGRANCES",
     "titleLine1": "Timeless Scents",
     "titleLine2": "For Every Moment",
@@ -38,13 +38,25 @@
   {
     "id": "professor",
     "bgKey": "professorHeroBg",
-    "bgImage": "/assets/professor_hero_bg.png",
+    "bgImage": "/src/assets/professor_hero_bg.png",
     "tag": "PROFESSOR EDITION • BOLD & SOPHISTICATED",
     "titleLine1": "Professor Edition",
     "titleLine2": "A Scent That Defines Character",
     "description": "Bold, intelligent and sophisticated. Professor blends rich woody notes with black cardamom, smoked leather, and Madagascar amber for a magnetic impression.",
     "notes": "Black Cardamom, Smoked Leather & Amber",
     "product": "Professor Edition",
+    "price": "Rs. 6,499"
+  },
+  {
+    "id": "slide-1794063986881",
+    "bgKey": null,
+    "bgImage": "/hero_bg_imgaes/hero_bg_1794063995671_metallic_gold_leaf_sprig.png",
+    "tag": "NEW ATELIER COLLECTION • SPECIAL RELEASE",
+    "titleLine1": "Artisan Perfumery",
+    "titleLine2": "Pure Extrait De Parfum",
+    "description": "Discover an uncompromising blend of rare woods, warm amber accords, and delicate florals handcrafted to perfection.",
+    "notes": "Amber, Cedarwood & Bourbon Vanilla",
+    "product": "Signature",
     "price": "Rs. 6,499"
   }
 ]

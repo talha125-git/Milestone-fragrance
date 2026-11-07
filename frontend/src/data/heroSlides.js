@@ -69,8 +69,15 @@ export function hydrateHeroSlides(rawSlides) {
   return rawSlides.map((slide) => {
     let resolvedBg = slide.bgImage;
 
-    // Check if matching preset key exists
-    if (slide.bgKey && heroImagePresets[slide.bgKey]) {
+    // If slide has a custom uploaded path or base64
+    if (slide.bgImage && (
+      slide.bgImage.startsWith('/hero_bg_imgaes') ||
+      slide.bgImage.startsWith('/productimages') ||
+      slide.bgImage.startsWith('data:') ||
+      slide.bgImage.startsWith('http')
+    )) {
+      resolvedBg = slide.bgImage;
+    } else if (slide.bgKey && heroImagePresets[slide.bgKey]) {
       resolvedBg = heroImagePresets[slide.bgKey].image;
     } else if (slide.bgImage && heroImagePresets[slide.bgImage]) {
       resolvedBg = heroImagePresets[slide.bgImage].image;

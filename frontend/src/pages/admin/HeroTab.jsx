@@ -37,7 +37,7 @@ export default function HeroTab({
     );
   };
 
-  // Upload image file from computer
+  // Upload image file from computer directly into assets/hero_bg_imgaes
   const handleBgImageUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -46,8 +46,9 @@ export default function HeroTab({
     try {
       const formData = new FormData();
       formData.append('image', file);
+      formData.append('type', 'hero');
 
-      const res = await fetch('/api/upload', {
+      const res = await fetch('/api/upload?type=hero', {
         method: 'POST',
         body: formData,
       });
@@ -57,14 +58,32 @@ export default function HeroTab({
         if (json.url) {
           updateActiveSlide('bgImage', json.url);
           updateActiveSlide('bgKey', null);
-          if (showToast) showToast(`Background uploaded (${json.filename})`);
+          if (showToast) showToast(`Background image saved in assets/hero_bg_imgaes (${json.filename})`);
         }
       } else {
-        // Fallback: Read as base64
+        // Fallback: Read as base64 and send to base64 upload endpoint
         const reader = new FileReader();
-        reader.onload = (ev) => {
-          updateActiveSlide('bgImage', ev.target.result);
+        reader.onload = async (ev) => {
+          const base64Content = ev.target.result;
+          updateActiveSlide('bgImage', base64Content);
           updateActiveSlide('bgKey', null);
+
+          try {
+            const bRes = await fetch('/api/upload/base64?type=hero', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                filename: file.name,
+                base64Data: base64Content,
+                type: 'hero',
+              }),
+            });
+            if (bRes.ok) {
+              const bJson = await bRes.json();
+              updateActiveSlide('bgImage', bJson.url);
+              if (showToast) showToast(`Background image saved in assets/hero_bg_imgaes (${bJson.filename})`);
+            }
+          } catch {}
         };
         reader.readAsDataURL(file);
       }
@@ -324,15 +343,24 @@ export default function HeroTab({
               <span className="text-[10px] text-stone-500 font-medium">High-Res Landscape</span>
             </div>
 
-            {/* Upload from Computer */}
-            <div className="p-3.5 rounded-xl bg-stone-50 border border-stone-200 space-y-2.5">
-              <div className="flex items-center gap-3">
+            {/* Upload from Computer into assets/hero_bg_imgaes */}
+            <div className="p-4 rounded-xl bg-stone-50 border border-stone-200/90 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-stone-700">
+                  Upload Background File
+                </span>
+                <span className="text-[10px] text-stone-500 font-medium">
+                  Stored in: <code className="text-[#b38531] font-mono font-bold bg-white px-1.5 py-0.5 rounded border border-stone-200">assets/hero_bg_imgaes/</code>
+                </span>
+              </div>
+
+              <div className="flex flex-col sm:flex-row items-center gap-3">
                 <label
                   htmlFor="hero-bg-upload"
-                  className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-[#b38531] hover:bg-[#966d21] text-white text-xs font-semibold cursor-pointer shadow-xs transition-all"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-[#b38531] hover:bg-[#966d21] text-white text-xs font-semibold cursor-pointer shadow-xs hover:shadow-md transition-all active:scale-[0.99]"
                 >
                   {isUploading ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
-                  <span>Upload Background Image</span>
+                  <span>{isUploading ? 'Uploading & Saving...' : 'Upload Background Image'}</span>
                 </label>
                 <input
                   id="hero-bg-upload"
@@ -341,43 +369,18 @@ export default function HeroTab({
                   onChange={handleBgImageUpload}
                   className="hidden"
                 />
-                <span className="text-[11px] text-stone-500">PNG, JPG, or WEBP</span>
-              </div>
-            </div>
 
-            {/* Milestone Luxury Preset Images */}
-            <div className="space-y-2">
-              <span className="text-[11px] font-bold text-stone-700 block">
-                Or Choose Milestone Studio Preset:
-              </span>
-              <div className="grid grid-cols-2 gap-2">
-                {Object.entries(heroImagePresets).map(([key, preset]) => {
-                  const isSelected = activeSlide.bgKey === key;
-                  return (
-                    <button
-                      key={key}
-                      type="button"
-                      onClick={() => {
-                        updateActiveSlide('bgKey', key);
-                        updateActiveSlide('bgImage', preset.image);
-                      }}
-                      className={`p-2 rounded-lg border text-left flex items-center gap-2.5 transition-all cursor-pointer ${
-                        isSelected
-                          ? 'border-[#b38531] bg-amber-50/60 ring-1 ring-[#b38531]'
-                          : 'border-stone-200 bg-stone-50 hover:bg-stone-100'
-                      }`}
-                    >
-                      <div className="w-10 h-7 rounded overflow-hidden bg-black flex-shrink-0">
-                        <img src={preset.image} alt={preset.label} className="w-full h-full object-cover" />
-                      </div>
-                      <div className="truncate text-left">
-                        <div className="text-[11px] font-bold text-stone-800 truncate">{preset.label}</div>
-                        <div className="text-[9px] text-stone-500">Preset</div>
-                      </div>
-                    </button>
-                  );
-                })}
+                {activeSlide.bgImage && (
+                  <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1.5 rounded-md truncate max-w-full">
+                    <Check className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
+                    <span className="truncate">Active: {activeSlide.bgImage.split('/').pop()}</span>
+                  </span>
+                )}
               </div>
+
+              <p className="text-[11px] text-stone-500 leading-snug">
+                Select any landscape image from your device (PNG, JPG, WEBP). It will be saved directly into <strong className="text-stone-700 font-semibold">assets/hero_bg_imgaes/</strong> and rendered as this slide's background on the storefront.
+              </p>
             </div>
           </div>
 
