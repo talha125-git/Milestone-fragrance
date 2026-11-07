@@ -1,6 +1,6 @@
 git init 
 git add .
 git commit -m "
-feat: add hero section management and admin tab
+feat: add admin dashboard and header components
 "
 git push -u origin main

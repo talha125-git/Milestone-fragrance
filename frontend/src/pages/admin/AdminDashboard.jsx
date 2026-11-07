@@ -429,7 +429,6 @@ export default function AdminDashboard({
 
   const navItems = [
     { id: 'overview', label: 'Dashboard Overview', icon: LayoutDashboard, badge: null },
-    { id: 'hero', label: 'Home Hero Banner', icon: Sparkles, badge: 'Live' },
     { id: 'products', label: 'Fragrances Catalog', icon: Package, badge: productsList.length },
     { id: 'orders', label: 'Customer Orders', icon: ShoppingBag, badge: orders.length },
     { id: 'messages', label: 'Contact Inquiries', icon: Mail, badge: unreadMessagesCount > 0 ? `${unreadMessagesCount} new` : null },
@@ -467,6 +466,7 @@ export default function AdminDashboard({
         {/* Top Navbar */}
         <AdminHeader
           activeTab={activeTab}
+          setActiveTab={setActiveTab}
           setSidebarOpen={setSidebarOpen}
           loadAllRealData={loadAllRealData}
           isRefreshing={isRefreshing}
