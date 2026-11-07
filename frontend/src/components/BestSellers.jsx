@@ -1,6 +1,6 @@
 import React from 'react';
 import { Heart, ShoppingBag, Star, ArrowRight } from 'lucide-react';
-import { products } from '../data/products';
+import { products as defaultProducts } from '../data/products';
 
 export default function BestSellers({
   onAddToCart,
@@ -8,7 +8,9 @@ export default function BestSellers({
   wishlistIds = [],
   onOpenQuickView,
   onViewAll,
+  products: passedProducts,
 }) {
+  const productList = (passedProducts && passedProducts.length > 0) ? passedProducts : defaultProducts;
   return (
     <section className="w-full bg-[#FAF6F0] text-stone-900 py-14 sm:py-20 border-b border-[#e5ded2]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -32,9 +34,9 @@ export default function BestSellers({
           </button>
         </div>
 
-        {/* 4 Product Cards Grid */}
+        {/* Product Cards Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 justify-center">
-          {products.map((product) => {
+          {productList.map((product) => {
             const isWishlisted = wishlistIds.includes(product.id);
 
             return (

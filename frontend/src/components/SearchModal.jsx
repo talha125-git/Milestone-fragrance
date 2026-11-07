@@ -1,31 +1,37 @@
 import React, { useState } from 'react';
 import { X, Search, ShoppingBag } from 'lucide-react';
-import { products } from '../data/products';
+import { products as defaultProducts } from '../data/products';
 
 export default function SearchModal({
   isOpen,
   onClose,
   onOpenQuickView,
   onAddToCart,
+  products: passedProducts,
 }) {
   const [query, setQuery] = useState('');
 
   if (!isOpen) return null;
 
+  const productList = (passedProducts && passedProducts.length > 0) ? passedProducts : defaultProducts;
+
   const filtered = query.trim()
-    ? products.filter((p) => {
+    ? productList.filter((p) => {
         const q = query.toLowerCase();
+        const top = Array.isArray(p.topNotes) ? p.topNotes : [];
+        const heart = Array.isArray(p.heartNotes) ? p.heartNotes : [];
+        const base = Array.isArray(p.baseNotes) ? p.baseNotes : [];
         return (
-          p.name.toLowerCase().includes(q) ||
-          p.tagline.toLowerCase().includes(q) ||
-          p.type.toLowerCase().includes(q) ||
-          p.gender.toLowerCase().includes(q) ||
-          p.topNotes.some((n) => n.toLowerCase().includes(q)) ||
-          p.heartNotes.some((n) => n.toLowerCase().includes(q)) ||
-          p.baseNotes.some((n) => n.toLowerCase().includes(q))
+          (p.name && p.name.toLowerCase().includes(q)) ||
+          (p.tagline && p.tagline.toLowerCase().includes(q)) ||
+          (p.type && p.type.toLowerCase().includes(q)) ||
+          (p.gender && p.gender.toLowerCase().includes(q)) ||
+          top.some((n) => n.toLowerCase().includes(q)) ||
+          heart.some((n) => n.toLowerCase().includes(q)) ||
+          base.some((n) => n.toLowerCase().includes(q))
         );
       })
-    : products;
+    : productList;
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">

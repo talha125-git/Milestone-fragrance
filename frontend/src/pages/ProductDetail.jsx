@@ -16,7 +16,7 @@ import {
   Wind,
   Share2,
 } from 'lucide-react';
-import { products } from '../data/products';
+import { products as defaultProducts } from '../data/products';
 
 export default function ProductDetail({
   product,
@@ -26,15 +26,18 @@ export default function ProductDetail({
   wishlist = [],
   onSelectProduct,
   onNavigate,
+  products: passedProducts,
 }) {
   const { id } = useParams();
   const navigate = useNavigate();
 
+  const productList = (passedProducts && passedProducts.length > 0) ? passedProducts : defaultProducts;
+
   // Look up product by URL param :id, or fallback to passed prop or first product
   const currentProduct =
-    (id && products.find((p) => p.id.toLowerCase() === id.toLowerCase())) ||
+    (id && productList.find((p) => p.id.toLowerCase() === id.toLowerCase())) ||
     product ||
-    products[0];
+    productList[0];
 
   const effectiveIsWishlisted =
     isWishlisted !== undefined
@@ -98,8 +101,8 @@ export default function ProductDetail({
   };
 
   // Related products (all except current one)
-  const relatedProducts = products
-    .filter((p) => p.id !== currentProduct.id)
+  const relatedProducts = productList
+    .filter((p) => p.id !== currentProduct?.id)
     .slice(0, 3);
 
   return (

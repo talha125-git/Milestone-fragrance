@@ -1,19 +1,23 @@
 import React, { useState } from 'react';
 import { Star, Heart, ShoppingBag, SlidersHorizontal } from 'lucide-react';
-import { products } from '../data/products';
+import { products as defaultProducts } from '../data/products';
 
 export default function Women({
   onAddToCart,
   onToggleWishlist,
-  wishlistIds,
+  wishlistIds = [],
   onOpenQuickView,
+  products: passedProducts,
 }) {
   const [selectedFilter, setSelectedFilter] = useState('all');
   const [sortBy, setSortBy] = useState('featured');
 
-  const womenProducts = products.filter(
-    (p) => p.gender === 'Women' || p.gender === 'Unisex'
-  );
+  const productList = (passedProducts && passedProducts.length > 0) ? passedProducts : defaultProducts;
+
+  const womenProducts = productList.filter((p) => {
+    const g = p.gender ? p.gender.toLowerCase() : '';
+    return g === 'women' || g === 'unisex';
+  });
 
   const filtered = womenProducts.filter((p) => {
     if (selectedFilter === 'all') return true;

@@ -33,13 +33,38 @@ export default function CartDrawer({
     }
   };
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     setIsCheckingOut(true);
+
+    try {
+      await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customer: 'Valued Customer',
+          email: 'customer@milestone.pk',
+          phone: '+92 300 1234567',
+          city: 'Lahore, Pakistan',
+          items: cart.map((item) => ({
+            id: item.id,
+            name: item.name,
+            qty: item.quantity,
+            size: item.size || '50ml',
+            price: item.price,
+          })),
+          total: finalTotal,
+          payment: 'Cash on Delivery',
+        }),
+      });
+    } catch {
+      // Offline fallback
+    }
+
     setTimeout(() => {
       setIsCheckingOut(false);
       setOrderComplete(true);
       onClearCart();
-    }, 1500);
+    }, 1200);
   };
 
   return (

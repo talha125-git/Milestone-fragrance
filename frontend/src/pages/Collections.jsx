@@ -1,7 +1,7 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Star, Heart, ShoppingBag, Sparkles } from 'lucide-react';
-import { products, fragranceTypes } from '../data/products';
+import { products as defaultProducts, fragranceTypes } from '../data/products';
 
 export default function Collections({
   onAddToCart,
@@ -10,9 +10,12 @@ export default function Collections({
   onOpenQuickView,
   selectedType = 'all',
   setSelectedType,
+  products: passedProducts,
 }) {
   const { type } = useParams();
   const navigate = useNavigate();
+
+  const productList = (passedProducts && passedProducts.length > 0) ? passedProducts : defaultProducts;
 
   // If URL has :type param, prioritize it; otherwise use selectedType prop
   const currentFilter = (type || selectedType || 'all').toLowerCase();
@@ -26,9 +29,9 @@ export default function Collections({
     }
   };
 
-  const filtered = products.filter((p) => {
+  const filtered = productList.filter((p) => {
     if (currentFilter === 'all') return true;
-    return p.type.toLowerCase() === currentFilter;
+    return (p.type || '').toLowerCase() === currentFilter;
   });
 
   return (
@@ -57,7 +60,7 @@ export default function Collections({
                 : 'bg-[#181410] text-stone-300 hover:text-white border border-stone-800'
             }`}
           >
-            All Collections ({products.length})
+            All Collections ({productList.length})
           </button>
           {fragranceTypes.map((t) => (
             <button

@@ -7,7 +7,7 @@ import FeaturedFragrance from '../components/FeaturedFragrance';
 import OurStory from '../components/OurStory';
 import Testimonials from '../components/Testimonials';
 import Newsletter from '../components/Newsletter';
-import { products } from '../data/products';
+import { products as defaultProducts } from '../data/products';
 
 export default function Home({
   onAddToCart,
@@ -17,14 +17,17 @@ export default function Home({
   onNavigate,
   onSelectGender,
   onSelectType,
+  products: passedProducts,
 }) {
+  const productList = (passedProducts && passedProducts.length > 0) ? passedProducts : defaultProducts;
+
   return (
     <main className="w-full">
       {/* 1. Hero Section */}
       <Hero
         onShopNow={(productId) => {
           if (productId && onOpenQuickView) {
-            const match = products.find((p) => p.id === productId);
+            const match = productList.find((p) => p.id === productId);
             if (match) {
               onOpenQuickView(match);
               return;
@@ -51,13 +54,14 @@ export default function Home({
         wishlistIds={wishlistIds}
         onOpenQuickView={onOpenQuickView}
         onViewAll={() => onNavigate('collections')}
+        products={productList}
       />
 
       {/* 5. Featured Fragrance: Professor */}
       <FeaturedFragrance
         onShopProfessor={() => {
           if (onOpenQuickView) {
-            const professor = products.find((p) => p.id === 'professor');
+            const professor = productList.find((p) => p.id === 'professor');
             if (professor) {
               onOpenQuickView(professor);
               return;

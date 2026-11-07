@@ -14,13 +14,45 @@ import Collections from './pages/Collections';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import ProductDetail from './pages/ProductDetail';
+import Login from './pages/Login';
+import AdminDashboard from './pages/AdminDashboard';
 import { products } from './data/products';
 
 export default function App() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [selectedProduct, setSelectedProduct] = useState(() => products[0]);
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(() => {
+    return (
+      localStorage.getItem('milestone_admin_auth') === 'true' ||
+      sessionStorage.getItem('milestone_admin_auth') === 'true'
+    );
+  });
+
+  const [allProducts, setAllProducts] = useState(() => {
+    try {
+      const saved = localStorage.getItem('milestone_products');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed.map((p) => {
+            const defaultMatch = products.find((dp) => dp.id === p.id);
+            return {
+              ...p,
+              image: (p.image && !p.image.startsWith('data:') && !p.image.startsWith('/productimages') && defaultMatch)
+                ? defaultMatch.image
+                : (p.image || defaultMatch?.image || '/productimages/prod_1794047286007_chiaroscuro_portrait_in_shadow.png'),
+            };
+          });
+        }
+      }
+    } catch (e) {
+      console.warn('Error reading stored products:', e);
+    }
+    return products;
+  });
+
+  const [selectedProduct, setSelectedProduct] = useState(() => allProducts[0] || products[0]);
   const [selectedCollectionType, setSelectedCollectionType] = useState('all');
   const [cart, setCart] = useState(() => {
     try {
@@ -44,6 +76,42 @@ export default function App() {
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
+
+  // Sync products with backend on mount
+  useEffect(() => {
+    const fetchBackendProducts = async () => {
+      try {
+        const res = await fetch('/api/products');
+        if (res.ok) {
+          const json = await res.json();
+          if (json.data && Array.isArray(json.data) && json.data.length > 0) {
+            const merged = json.data.map((p) => {
+              const defaultMatch = products.find((dp) => dp.id === p.id);
+              return {
+                ...p,
+                image: (p.image && !p.image.startsWith('data:') && !p.image.startsWith('/productimages') && defaultMatch)
+                  ? defaultMatch.image
+                  : (p.image || defaultMatch?.image || '/productimages/prod_1794047286007_chiaroscuro_portrait_in_shadow.png'),
+              };
+            });
+            setAllProducts(merged);
+            localStorage.setItem('milestone_products', JSON.stringify(merged));
+          }
+        }
+      } catch (err) {
+        // Backend offline or fallback
+      }
+    };
+    fetchBackendProducts();
+  }, []);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('milestone_products', JSON.stringify(allProducts));
+    } catch (e) {
+      console.error(e);
+    }
+  }, [allProducts]);
 
   useEffect(() => {
     try {
@@ -150,6 +218,7 @@ export default function App() {
 
   const totalCartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
   const isHome = location.pathname === '/';
+  const isAdminRoute = location.pathname === '/login' || location.pathname.startsWith('/admin');
 
   return (
     <div className="min-h-screen bg-[#0d0c0a] text-stone-200 font-sans flex flex-col relative selection:bg-[#dfb76c] selection:text-black">
@@ -161,19 +230,21 @@ export default function App() {
         </div>
       )}
 
-      {/* Global Header */}
-      <Header
-        currentPage={location.pathname}
-        setCurrentPage={handleNavigate}
-        cartCount={totalCartCount}
-        setIsCartOpen={setIsCartOpen}
-        wishlistCount={wishlist.length}
-        setIsWishlistOpen={setIsWishlistOpen}
-        setIsSearchOpen={setIsSearchOpen}
-      />
+      {/* Global Header (Hidden on Admin / Login Portal) */}
+      {!isAdminRoute && (
+        <Header
+          currentPage={location.pathname}
+          setCurrentPage={handleNavigate}
+          cartCount={totalCartCount}
+          setIsCartOpen={setIsCartOpen}
+          wishlistCount={wishlist.length}
+          setIsWishlistOpen={setIsWishlistOpen}
+          setIsSearchOpen={setIsSearchOpen}
+        />
+      )}
 
       {/* Page Routing */}
-      <div className={`flex-1 ${isHome ? '' : 'pt-24 sm:pt-28'}`}>
+      <div className={`flex-1 ${isHome || isAdminRoute ? '' : 'pt-24 sm:pt-28'}`}>
         <Routes>
           <Route
             path="/"
@@ -190,6 +261,7 @@ export default function App() {
                   navigate(`/collections/${encodeURIComponent(t.toLowerCase())}`);
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
+                products={allProducts}
               />
             }
           />
@@ -202,6 +274,7 @@ export default function App() {
                 onToggleWishlist={handleToggleWishlist}
                 wishlistIds={wishlist.map((w) => w.id)}
                 onOpenQuickView={handleViewProduct}
+                products={allProducts}
               />
             }
           />
@@ -214,6 +287,7 @@ export default function App() {
                 onToggleWishlist={handleToggleWishlist}
                 wishlistIds={wishlist.map((w) => w.id)}
                 onOpenQuickView={handleViewProduct}
+                products={allProducts}
               />
             }
           />
@@ -226,6 +300,7 @@ export default function App() {
                 onToggleWishlist={handleToggleWishlist}
                 wishlistIds={wishlist.map((w) => w.id)}
                 onOpenQuickView={handleViewProduct}
+                products={allProducts}
               />
             }
           />
@@ -240,6 +315,7 @@ export default function App() {
                 onOpenQuickView={handleViewProduct}
                 selectedType={selectedCollectionType}
                 setSelectedType={setSelectedCollectionType}
+                products={allProducts}
               />
             }
           />
@@ -254,6 +330,7 @@ export default function App() {
                 onOpenQuickView={handleViewProduct}
                 selectedType={selectedCollectionType}
                 setSelectedType={setSelectedCollectionType}
+                products={allProducts}
               />
             }
           />
@@ -268,6 +345,7 @@ export default function App() {
                 wishlist={wishlist}
                 onSelectProduct={handleViewProduct}
                 onNavigate={handleNavigate}
+                products={allProducts}
               />
             }
           />
@@ -283,6 +361,7 @@ export default function App() {
                 wishlist={wishlist}
                 onSelectProduct={handleViewProduct}
                 onNavigate={handleNavigate}
+                products={allProducts}
               />
             }
           />
@@ -297,6 +376,49 @@ export default function App() {
             element={<Contact />}
           />
 
+          {/* Admin Login Portal Route - Accessed ONLY by direct path /login */}
+          <Route
+            path="/login"
+            element={
+              isAdminAuthenticated ? (
+                <Navigate to="/admin" replace />
+              ) : (
+                <Login onLoginSuccess={() => setIsAdminAuthenticated(true)} />
+              )
+            }
+          />
+
+          {/* Protected Admin Dashboard Route */}
+          <Route
+            path="/admin"
+            element={
+              isAdminAuthenticated ? (
+                <AdminDashboard
+                  onLogout={() => setIsAdminAuthenticated(false)}
+                  productsList={allProducts}
+                  onProductsChange={setAllProducts}
+                />
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            }
+          />
+
+          <Route
+            path="/admin/*"
+            element={
+              isAdminAuthenticated ? (
+                <AdminDashboard
+                  onLogout={() => setIsAdminAuthenticated(false)}
+                  productsList={allProducts}
+                  onProductsChange={setAllProducts}
+                />
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            }
+          />
+
           <Route
             path="*"
             element={<Navigate to="/" replace />}
@@ -304,39 +426,46 @@ export default function App() {
         </Routes>
       </div>
 
-      {/* Global Footer */}
-      <Footer onNavigate={handleNavigate} />
+      {/* Global Footer (Hidden on Admin / Login Portal) */}
+      {!isAdminRoute && <Footer onNavigate={handleNavigate} />}
 
       {/* Slide-out Cart Drawer */}
-      <CartDrawer
-        isOpen={isCartOpen}
-        onClose={() => setIsCartOpen(false)}
-        cart={cart}
-        onUpdateQuantity={handleUpdateQuantity}
-        onRemoveItem={handleRemoveItem}
-        onClearCart={handleClearCart}
-        onSelectProduct={handleViewProduct}
-      />
+      {!isAdminRoute && (
+        <CartDrawer
+          isOpen={isCartOpen}
+          onClose={() => setIsCartOpen(false)}
+          cart={cart}
+          onUpdateQuantity={handleUpdateQuantity}
+          onRemoveItem={handleRemoveItem}
+          onClearCart={handleClearCart}
+          onSelectProduct={handleViewProduct}
+        />
+      )}
 
       {/* Slide-out Wishlist Drawer */}
-      <WishlistDrawer
-        isOpen={isWishlistOpen}
-        onClose={() => setIsWishlistOpen(false)}
-        wishlist={wishlist}
-        onRemoveFromWishlist={(id) => {
-          setWishlist((prev) => prev.filter((item) => item.id !== id));
-        }}
-        onAddToCart={handleAddToCart}
-        onSelectProduct={handleViewProduct}
-      />
+      {!isAdminRoute && (
+        <WishlistDrawer
+          isOpen={isWishlistOpen}
+          onClose={() => setIsWishlistOpen(false)}
+          wishlist={wishlist}
+          onRemoveFromWishlist={(id) => {
+            setWishlist((prev) => prev.filter((item) => item.id !== id));
+          }}
+          onAddToCart={handleAddToCart}
+          onSelectProduct={handleViewProduct}
+        />
+      )}
 
       {/* Search Modal */}
-      <SearchModal
-        isOpen={isSearchOpen}
-        onClose={() => setIsSearchOpen(false)}
-        onOpenQuickView={handleViewProduct}
-        onAddToCart={handleAddToCart}
-      />
+      {!isAdminRoute && (
+        <SearchModal
+          isOpen={isSearchOpen}
+          onClose={() => setIsSearchOpen(false)}
+          onOpenQuickView={handleViewProduct}
+          onAddToCart={handleAddToCart}
+          products={allProducts}
+        />
+      )}
     </div>
   );
 }

@@ -1,12 +1,19 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import productsRouter from './routes/products.js';
 import categoriesRouter from './routes/categories.js';
 import newsletterRouter from './routes/newsletter.js';
 import contactRouter from './routes/contact.js';
+import ordersRouter from './routes/orders.js';
+import uploadRouter from './routes/upload.js';
 
 dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -18,7 +25,14 @@ app.use(
     credentials: true,
   })
 );
-app.use(express.json());
+app.use(express.json({ limit: '25mb' }));
+app.use(express.urlencoded({ extended: true, limit: '25mb' }));
+
+// Static images serving for product images
+const publicProductimages = path.resolve(__dirname, '../frontend/public/productimages');
+const assetsProductimages = path.resolve(__dirname, '../frontend/src/assets/productimages');
+app.use('/productimages', express.static(publicProductimages));
+app.use('/productimages', express.static(assetsProductimages));
 
 // Request logging in development
 app.use((req, res, next) => {
@@ -35,6 +49,29 @@ app.use('/api/products', productsRouter);
 app.use('/api/categories', categoriesRouter);
 app.use('/api/newsletter', newsletterRouter);
 app.use('/api/contact', contactRouter);
+app.use('/api/orders', ordersRouter);
+app.use('/api/upload', uploadRouter);
+
+// Admin Authentication Route
+app.post('/api/admin/login', (req, res) => {
+  const { username, password } = req.body;
+  if (username === 'admin' && password === 'admin123') {
+    return res.json({
+      success: true,
+      message: 'Admin authentication successful',
+      token: `milestone_jwt_${Date.now()}`,
+      user: {
+        username: 'admin',
+        name: 'Milestone Administrator',
+        role: 'superadmin',
+      },
+    });
+  }
+  return res.status(401).json({
+    success: false,
+    message: 'Invalid username or password',
+  });
+});
 
 // Health Check Endpoint
 app.get('/api/health', (req, res) => {

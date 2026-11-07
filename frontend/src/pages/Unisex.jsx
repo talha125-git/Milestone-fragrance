@@ -1,16 +1,19 @@
 import React from 'react';
 import { Star, Heart, ShoppingBag } from 'lucide-react';
-import { products } from '../data/products';
+import { products as defaultProducts } from '../data/products';
 
 export default function Unisex({
   onAddToCart,
   onToggleWishlist,
-  wishlistIds,
+  wishlistIds = [],
   onOpenQuickView,
+  products: passedProducts,
 }) {
-  const unisexProducts = products.filter(
-    (p) => p.gender === 'Unisex' || p.gender === 'Men' || p.gender === 'Women'
-  );
+  const productList = (passedProducts && passedProducts.length > 0) ? passedProducts : defaultProducts;
+  const unisexProducts = productList.filter((p) => {
+    const g = p.gender ? p.gender.toLowerCase() : '';
+    return g === 'unisex' || g === 'men' || g === 'women';
+  });
 
   return (
     <div className="w-full bg-[#0d0c0a] text-stone-200 py-10 sm:py-16">

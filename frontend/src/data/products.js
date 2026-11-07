@@ -99,7 +99,27 @@ export const products = [
     bestSeller: true,
     inStock: true,
   },
- 
+  {
+    id: 'talha',
+    name: 'Talha',
+    subtitle: 'wawoc',
+    tagline: 'wawoc',
+    description: 'Artisanal perfume crafted with the finest natural extracts.',
+    price: 999,
+    originalPrice: 2999,
+    rating: 5,
+    reviewsCount: 1,
+    image: '/productimages/prod_1794047286007_chiaroscuro_portrait_in_shadow.png',
+    gender: 'Unisex',
+    type: 'Sweet',
+    concentration: 'Eau De Parfum',
+    size: '50ml / 1.7 fl.oz',
+    topNotes: ['Italian Bergamot', 'Cardamom'],
+    heartNotes: ['Smoky Cedarwood', 'Golden Ambergris'],
+    baseNotes: ['Rich Agarwood', 'Bourbon Vanilla'],
+    bestSeller: false,
+    inStock: true,
+  },
 ];
 
 export const fragranceTypes = [
