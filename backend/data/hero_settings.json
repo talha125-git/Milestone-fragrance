@@ -1,0 +1,50 @@
+[
+  {
+    "id": "ghanam",
+    "bgKey": "ghanamHeroBg",
+    "bgImage": "/assets/ghanam_rang_hero_bg.png",
+    "tag": "GHANAM RANGE • ORIENTAL HERITAGE",
+    "titleLine1": "Ghanam Range",
+    "titleLine2": "Crafted For Royalty",
+    "description": "A rich oriental scent with a modern touch. Blended with exquisite Persian saffron, Damascus rose, and rare royal Cambodian oud.",
+    "notes": "Saffron, Amber & Cambodian Oud",
+    "product": "Ghanam Royal Reserve",
+    "price": "Rs. 6,499"
+  },
+  {
+    "id": "believe",
+    "bgKey": "believeHeroBg",
+    "bgImage": "/assets/Believe_Hero_bg.png",
+    "tag": "BELIEVE COLLECTION • FRESH & VIBRANT",
+    "titleLine1": "Believe Collection",
+    "titleLine2": "Fresh, Vibrant & Pure",
+    "description": "Fresh, vibrant and long-lasting. An invigorating splash of Mediterranean citrus and sea salt, harmoniously grounded by aromatic bay leaf and amber.",
+    "notes": "Marine Accord, Mandarin & Ambergris",
+    "product": "Believe Pour Homme & Femme",
+    "price": "Rs. 6,499"
+  },
+  {
+    "id": "signature",
+    "bgKey": "heroBg",
+    "bgImage": "/assets/hero_bg_image.png",
+    "tag": "SIGNATURE SERIES • PREMIUM FRAGRANCES",
+    "titleLine1": "Timeless Scents",
+    "titleLine2": "For Every Moment",
+    "description": "Discover the art of fragrance. Crafted for those who leave a lasting impression. A refined balance of warm woods, golden amber, and Italian bergamot.",
+    "notes": "Warm Woods & Amber • Cedarwood & Oud",
+    "product": "Signature art. 023",
+    "price": "Rs. 6,499"
+  },
+  {
+    "id": "professor",
+    "bgKey": "professorHeroBg",
+    "bgImage": "/assets/professor_hero_bg.png",
+    "tag": "PROFESSOR EDITION • BOLD & SOPHISTICATED",
+    "titleLine1": "Professor Edition",
+    "titleLine2": "A Scent That Defines Character",
+    "description": "Bold, intelligent and sophisticated. Professor blends rich woody notes with black cardamom, smoked leather, and Madagascar amber for a magnetic impression.",
+    "notes": "Black Cardamom, Smoked Leather & Amber",
+    "product": "Professor Edition",
+    "price": "Rs. 6,499"
+  }
+]

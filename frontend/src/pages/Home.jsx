@@ -18,6 +18,7 @@ export default function Home({
   onSelectGender,
   onSelectType,
   products: passedProducts,
+  heroSlides,
 }) {
   const productList = (passedProducts && passedProducts.length > 0) ? passedProducts : defaultProducts;
 
@@ -25,6 +26,7 @@ export default function Home({
     <main className="w-full">
       {/* 1. Hero Section */}
       <Hero
+        slides={heroSlides}
         onShopNow={(productId) => {
           if (productId && onOpenQuickView) {
             const match = productList.find((p) => p.id === productId);

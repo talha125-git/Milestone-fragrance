@@ -9,6 +9,7 @@ import newsletterRouter from './routes/newsletter.js';
 import contactRouter from './routes/contact.js';
 import ordersRouter from './routes/orders.js';
 import uploadRouter from './routes/upload.js';
+import heroRouter from './routes/hero.js';
 
 dotenv.config();
 
@@ -51,6 +52,7 @@ app.use('/api/newsletter', newsletterRouter);
 app.use('/api/contact', contactRouter);
 app.use('/api/orders', ordersRouter);
 app.use('/api/upload', uploadRouter);
+app.use('/api/hero', heroRouter);
 
 // Admin Authentication Route
 app.post('/api/admin/login', (req, res) => {

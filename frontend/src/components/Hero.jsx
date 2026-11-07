@@ -1,57 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowRight, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
-import { ghanamHeroBg, believeHeroBg, heroBg, professorHeroBg } from '../assets';
+import { defaultHeroSlides, hydrateHeroSlides } from '../data/heroSlides';
 
-export default function Hero({ onShopNow }) {
+export default function Hero({ onShopNow, slides: passedSlides }) {
   const [activeSlide, setActiveSlide] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
 
-  const slides = [
-    {
-      id: 'ghanam',
-      bgImage: ghanamHeroBg,
-      tag: 'GHANAM RANGE • ORIENTAL HERITAGE',
-      titleLine1: 'Ghanam Range',
-      titleLine2: 'Crafted For Royalty',
-      description: 'A rich oriental scent with a modern touch. Blended with exquisite Persian saffron, Damascus rose, and rare royal Cambodian oud.',
-      notes: 'Saffron, Amber & Cambodian Oud',
-      product: 'Ghanam Royal Reserve',
-      price: 'Rs. 6,499',
-    },
-    {
-      id: 'believe',
-      bgImage: believeHeroBg,
-      tag: 'BELIEVE COLLECTION • FRESH & VIBRANT',
-      titleLine1: 'Believe Collection',
-      titleLine2: 'Fresh, Vibrant & Pure',
-      description: 'Fresh, vibrant and long-lasting. An invigorating splash of Mediterranean citrus and sea salt, harmoniously grounded by aromatic bay leaf and amber.',
-      notes: 'Marine Accord, Mandarin & Ambergris',
-      product: 'Believe Pour Homme & Femme',
-      price: 'Rs. 6,499',
-    },
-    {
-      id: 'signature',
-      bgImage: heroBg,
-      tag: 'SIGNATURE SERIES • PREMIUM FRAGRANCES',
-      titleLine1: 'Timeless Scents',
-      titleLine2: 'For Every Moment',
-      description: 'Discover the art of fragrance. Crafted for those who leave a lasting impression. A refined balance of warm woods, golden amber, and Italian bergamot.',
-      notes: 'Warm Woods & Amber • Cedarwood & Oud',
-      product: 'Signature art. 023',
-      price: 'Rs. 6,499',
-    },
-    {
-      id: 'professor',
-      bgImage: professorHeroBg,
-      tag: 'PROFESSOR EDITION • BOLD & SOPHISTICATED',
-      titleLine1: 'Professor Edition',
-      titleLine2: 'A Scent That Defines Character',
-      description: 'Bold, intelligent and sophisticated. Professor blends rich woody notes with black cardamom, smoked leather, and Madagascar amber for a magnetic impression.',
-      notes: 'Black Cardamom, Smoked Leather & Amber',
-      product: 'Professor Edition',
-      price: 'Rs. 6,499',
-    },
-  ];
+  const slides = (passedSlides && passedSlides.length > 0)
+    ? hydrateHeroSlides(passedSlides)
+    : defaultHeroSlides;
+
+  // Reset active slide index if slides change length
+  useEffect(() => {
+    if (activeSlide >= slides.length) {
+      setActiveSlide(0);
+    }
+  }, [slides.length]);
 
   useEffect(() => {
     if (isHovered) return;

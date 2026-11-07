@@ -17,10 +17,17 @@ import ProductsTab from './ProductsTab';
 import OrdersTab from './OrdersTab';
 import MessagesTab from './MessagesTab';
 import NewsletterTab from './NewsletterTab';
+import HeroTab from './HeroTab';
 import ProductModal from './ProductModal';
 import DeleteModal from './DeleteModal';
 
-export default function AdminDashboard({ onLogout, productsList: initialProductsList, onProductsChange }) {
+export default function AdminDashboard({
+  onLogout,
+  productsList: initialProductsList,
+  onProductsChange,
+  heroSlides,
+  onHeroSlidesChange,
+}) {
   // Active Navigation Tab: 'overview' | 'products' | 'orders' | 'messages' | 'newsletter'
   const [activeTab, setActiveTab] = useState('overview');
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -422,6 +429,7 @@ export default function AdminDashboard({ onLogout, productsList: initialProducts
 
   const navItems = [
     { id: 'overview', label: 'Dashboard Overview', icon: LayoutDashboard, badge: null },
+    { id: 'hero', label: 'Home Hero Banner', icon: Sparkles, badge: 'Live' },
     { id: 'products', label: 'Fragrances Catalog', icon: Package, badge: productsList.length },
     { id: 'orders', label: 'Customer Orders', icon: ShoppingBag, badge: orders.length },
     { id: 'messages', label: 'Contact Inquiries', icon: Mail, badge: unreadMessagesCount > 0 ? `${unreadMessagesCount} new` : null },
@@ -513,6 +521,15 @@ export default function AdminDashboard({ onLogout, productsList: initialProducts
             <NewsletterTab
               subscribers={subscribers}
               setSubscribers={setSubscribers}
+              showToast={showToast}
+            />
+          )}
+
+          {activeTab === 'hero' && (
+            <HeroTab
+              heroSlides={heroSlides}
+              setHeroSlides={onHeroSlidesChange}
+              productsList={productsList}
               showToast={showToast}
             />
           )}

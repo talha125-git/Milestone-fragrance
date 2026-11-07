@@ -1,6 +1,6 @@
 git init 
 git add .
 git commit -m "
-feat: implement frontend application routing and admin dashboard structure
+make hero section dynamic 
 "
 git push -u origin main

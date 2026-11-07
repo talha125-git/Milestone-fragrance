@@ -17,6 +17,7 @@ import ProductDetail from './pages/ProductDetail';
 import Login from './pages/Login';
 import AdminDashboard from './pages/admin';
 import { products } from './data/products';
+import { defaultHeroSlides, hydrateHeroSlides } from './data/heroSlides';
 
 export default function App() {
   const navigate = useNavigate();
@@ -50,6 +51,21 @@ export default function App() {
       console.warn('Error reading stored products:', e);
     }
     return products;
+  });
+
+  const [heroSlides, setHeroSlides] = useState(() => {
+    try {
+      const saved = localStorage.getItem('milestone_hero_slides');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return hydrateHeroSlides(parsed);
+        }
+      }
+    } catch (e) {
+      console.warn('Error reading stored hero slides:', e);
+    }
+    return defaultHeroSlides;
   });
 
   const [selectedProduct, setSelectedProduct] = useState(() => allProducts[0] || products[0]);
@@ -112,6 +128,34 @@ export default function App() {
       console.error(e);
     }
   }, [allProducts]);
+
+  // Sync hero banner slides with backend on mount
+  useEffect(() => {
+    const fetchHeroSlides = async () => {
+      try {
+        const res = await fetch('/api/hero');
+        if (res.ok) {
+          const json = await res.json();
+          if (json.data && Array.isArray(json.data) && json.data.length > 0) {
+            const hydrated = hydrateHeroSlides(json.data);
+            setHeroSlides(hydrated);
+            localStorage.setItem('milestone_hero_slides', JSON.stringify(hydrated));
+          }
+        }
+      } catch (err) {
+        // Fallback to local
+      }
+    };
+    fetchHeroSlides();
+  }, []);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('milestone_hero_slides', JSON.stringify(heroSlides));
+    } catch (e) {
+      console.error(e);
+    }
+  }, [heroSlides]);
 
   useEffect(() => {
     try {
@@ -262,6 +306,7 @@ export default function App() {
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
                 products={allProducts}
+                heroSlides={heroSlides}
               />
             }
           />
@@ -397,6 +442,8 @@ export default function App() {
                   onLogout={() => setIsAdminAuthenticated(false)}
                   productsList={allProducts}
                   onProductsChange={setAllProducts}
+                  heroSlides={heroSlides}
+                  onHeroSlidesChange={setHeroSlides}
                 />
               ) : (
                 <Navigate to="/login" replace />
@@ -412,6 +459,8 @@ export default function App() {
                   onLogout={() => setIsAdminAuthenticated(false)}
                   productsList={allProducts}
                   onProductsChange={setAllProducts}
+                  heroSlides={heroSlides}
+                  onHeroSlidesChange={setHeroSlides}
                 />
               ) : (
                 <Navigate to="/login" replace />
