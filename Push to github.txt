@@ -1,6 +1,6 @@
 git init 
 git add .
 git commit -m "
-feat: add hero banner configuration backend and frontend management UI
+feat: add hero section management and admin tab
 "
 git push -u origin main

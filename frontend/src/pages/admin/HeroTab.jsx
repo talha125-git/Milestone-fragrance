@@ -24,9 +24,7 @@ export default function HeroTab({
 }) {
   const [slides, setSlides] = useState(() => {
     const list = heroSlides && heroSlides.length > 0 ? heroSlides : defaultHeroSlides;
-    return list.filter(
-      (s) => s.id !== 'slide-1794063986881' && !s.titleLine1?.toLowerCase().includes('artisan perfumery')
-    );
+    return list.filter((s) => s.id !== 'slide-1794063986881');
   });
   const [selectedSlideIdx, setSelectedSlideIdx] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
@@ -35,13 +33,9 @@ export default function HeroTab({
   // Sync state whenever parent heroSlides updates
   useEffect(() => {
     if (heroSlides && heroSlides.length > 0) {
-      const filtered = heroSlides.filter(
-        (s) => s.id !== 'slide-1794063986881' && !s.titleLine1?.toLowerCase().includes('artisan perfumery')
-      );
+      const filtered = heroSlides.filter((s) => s.id !== 'slide-1794063986881');
       setSlides(filtered);
-      if (selectedSlideIdx >= filtered.length) {
-        setSelectedSlideIdx(Math.max(0, filtered.length - 1));
-      }
+      setSelectedSlideIdx((prev) => (prev >= filtered.length ? Math.max(0, filtered.length - 1) : prev));
     }
   }, [heroSlides]);
 
@@ -144,12 +138,13 @@ export default function HeroTab({
 
   // Add new slide
   const handleAddSlide = async () => {
+    const newSlideNumber = slides.length + 1;
     const newSlide = {
       id: `slide-${Date.now()}`,
       bgKey: null,
       bgImage: heroImagePresets.heroBg.image,
       tag: 'NEW ATELIER COLLECTION • SPECIAL RELEASE',
-      titleLine1: 'Artisan Perfumery',
+      titleLine1: `New Fragrance ${newSlideNumber}`,
       titleLine2: 'Pure Extrait De Parfum',
       description: 'Discover an uncompromising blend of rare woods, warm amber accords, and delicate florals handcrafted to perfection.',
       notes: 'Amber, Cedarwood & Bourbon Vanilla',
@@ -160,7 +155,10 @@ export default function HeroTab({
     setSlides(updated);
     setSelectedSlideIdx(updated.length - 1);
 
-    if (setHeroSlides) setHeroSlides(updated);
+    if (setHeroSlides) {
+      setHeroSlides(updated);
+    }
+
     try {
       localStorage.setItem('milestone_hero_slides', JSON.stringify(updated));
       await fetch('/api/hero', {
@@ -170,7 +168,7 @@ export default function HeroTab({
       });
     } catch (e) {}
 
-    if (showToast) showToast('New hero slide created and saved');
+    if (showToast) showToast(`Slide ${newSlideNumber} added! Customize its image and text below.`);
   };
 
   // Delete current slide immediately from state, localStorage, and backend
