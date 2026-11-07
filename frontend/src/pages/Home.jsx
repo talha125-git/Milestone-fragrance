@@ -27,9 +27,14 @@ export default function Home({
       {/* 1. Hero Section */}
       <Hero
         slides={heroSlides}
-        onShopNow={(productId) => {
-          if (productId && onOpenQuickView) {
-            const match = productList.find((p) => p.id === productId);
+        onShopNow={(target) => {
+          if (target && onOpenQuickView) {
+            const match = productList.find(
+              (p) =>
+                p.id === target ||
+                p.name === target ||
+                p.name.toLowerCase() === String(target).toLowerCase()
+            );
             if (match) {
               onOpenQuickView(match);
               return;

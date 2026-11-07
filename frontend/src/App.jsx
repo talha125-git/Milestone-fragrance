@@ -59,7 +59,14 @@ export default function App() {
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          return hydrateHeroSlides(parsed);
+          // Remove deleted 5th slide if cached in browser storage
+          const cleaned = parsed.filter(
+            (s) => s.id !== 'slide-1794063986881' && !s.titleLine1?.toLowerCase().includes('artisan perfumery')
+          );
+          if (cleaned.length > 0) {
+            localStorage.setItem('milestone_hero_slides', JSON.stringify(cleaned));
+            return hydrateHeroSlides(cleaned);
+          }
         }
       }
     } catch (e) {

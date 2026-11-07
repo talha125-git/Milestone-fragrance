@@ -1,6 +1,6 @@
 git init 
 git add .
 git commit -m "
-make hero section dynamic 2
+feat: add hero banner configuration backend and frontend management UI
 "
 git push -u origin main

@@ -89,6 +89,16 @@ const saveHeroSlides = () => {
  * Fetch all hero banner slides
  */
 router.get('/', (req, res) => {
+  try {
+    if (fs.existsSync(heroFilePath)) {
+      const raw = fs.readFileSync(heroFilePath, 'utf-8');
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        slides = parsed;
+      }
+    }
+  } catch (e) {}
+
   res.json({
     success: true,
     count: slides.length,

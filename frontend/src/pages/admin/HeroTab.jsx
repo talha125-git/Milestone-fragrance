@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Sparkles,
   Upload,
@@ -12,6 +12,7 @@ import {
   Image as ImageIcon,
   Layers,
   Save,
+  X,
 } from 'lucide-react';
 import { heroImagePresets, defaultHeroSlides } from '../../data/heroSlides';
 
@@ -22,11 +23,27 @@ export default function HeroTab({
   showToast,
 }) {
   const [slides, setSlides] = useState(() => {
-    return heroSlides && heroSlides.length > 0 ? heroSlides : defaultHeroSlides;
+    const list = heroSlides && heroSlides.length > 0 ? heroSlides : defaultHeroSlides;
+    return list.filter(
+      (s) => s.id !== 'slide-1794063986881' && !s.titleLine1?.toLowerCase().includes('artisan perfumery')
+    );
   });
   const [selectedSlideIdx, setSelectedSlideIdx] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+
+  // Sync state whenever parent heroSlides updates
+  useEffect(() => {
+    if (heroSlides && heroSlides.length > 0) {
+      const filtered = heroSlides.filter(
+        (s) => s.id !== 'slide-1794063986881' && !s.titleLine1?.toLowerCase().includes('artisan perfumery')
+      );
+      setSlides(filtered);
+      if (selectedSlideIdx >= filtered.length) {
+        setSelectedSlideIdx(Math.max(0, filtered.length - 1));
+      }
+    }
+  }, [heroSlides]);
 
   const activeSlide = slides[selectedSlideIdx] || slides[0] || defaultHeroSlides[0];
 
@@ -126,10 +143,10 @@ export default function HeroTab({
   };
 
   // Add new slide
-  const handleAddSlide = () => {
+  const handleAddSlide = async () => {
     const newSlide = {
       id: `slide-${Date.now()}`,
-      bgKey: 'heroBg',
+      bgKey: null,
       bgImage: heroImagePresets.heroBg.image,
       tag: 'NEW ATELIER COLLECTION • SPECIAL RELEASE',
       titleLine1: 'Artisan Perfumery',
@@ -142,19 +159,59 @@ export default function HeroTab({
     const updated = [...slides, newSlide];
     setSlides(updated);
     setSelectedSlideIdx(updated.length - 1);
-    if (showToast) showToast('New hero slide created');
+
+    if (setHeroSlides) setHeroSlides(updated);
+    try {
+      localStorage.setItem('milestone_hero_slides', JSON.stringify(updated));
+      await fetch('/api/hero', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updated),
+      });
+    } catch (e) {}
+
+    if (showToast) showToast('New hero slide created and saved');
   };
 
-  // Delete current slide
-  const handleDeleteSlide = (idxToDelete) => {
+  // Delete current slide immediately from state, localStorage, and backend
+  const handleDeleteSlide = async (idxToDelete) => {
     if (slides.length <= 1) {
-      if (showToast) showToast('At least one hero slide must remain', 'info');
+      if (showToast) showToast('At least one hero slide must remain in carousel', 'info');
       return;
     }
+
+    const slideToDelete = slides[idxToDelete];
     const updated = slides.filter((_, idx) => idx !== idxToDelete);
+    const newIdx = Math.max(0, Math.min(selectedSlideIdx, updated.length - 1));
+
     setSlides(updated);
-    setSelectedSlideIdx(Math.max(0, idxToDelete - 1));
-    if (showToast) showToast('Slide removed from carousel', 'info');
+    setSelectedSlideIdx(newIdx);
+
+    // 1. Immediately update parent App.jsx state
+    if (setHeroSlides) {
+      setHeroSlides(updated);
+    }
+
+    // 2. Immediately update localStorage
+    try {
+      localStorage.setItem('milestone_hero_slides', JSON.stringify(updated));
+    } catch (e) {}
+
+    // 3. Immediately save updated list to backend API and disk
+    try {
+      if (slideToDelete?.id) {
+        await fetch(`/api/hero/${slideToDelete.id}`, { method: 'DELETE' }).catch(() => {});
+      }
+      await fetch('/api/hero', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updated),
+      });
+      if (showToast) showToast('Slide deleted successfully and removed from storefront!');
+    } catch (err) {
+      console.warn('Backend delete sync error:', err);
+      if (showToast) showToast('Slide removed from carousel', 'info');
+    }
   };
 
   // Reset to factory defaults
@@ -218,10 +275,10 @@ export default function HeroTab({
       {/* Slide Navigation Tabs */}
       <div className="flex items-center gap-2 overflow-x-auto pb-1">
         {slides.map((s, idx) => (
-          <button
+          <div
             key={s.id || idx}
             onClick={() => setSelectedSlideIdx(idx)}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-medium transition-all cursor-pointer flex-shrink-0 ${
+            className={`flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all cursor-pointer flex-shrink-0 group ${
               selectedSlideIdx === idx
                 ? 'bg-[#14120f] text-white shadow-md border border-[#dfb76c]'
                 : 'bg-white border border-stone-200 text-stone-600 hover:text-stone-900 hover:bg-stone-50'
@@ -229,8 +286,21 @@ export default function HeroTab({
           >
             <span className="w-2 h-2 rounded-full bg-[#dfb76c]" />
             <span className="font-semibold">Slide {idx + 1}:</span>
-            <span className="truncate max-w-[120px]">{s.titleLine1 || 'Fragrance'}</span>
-          </button>
+            <span className="truncate max-w-[110px]">{s.titleLine1 || 'Fragrance'}</span>
+            {slides.length > 1 && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDeleteSlide(idx);
+                }}
+                title={`Delete Slide ${idx + 1}`}
+                className="opacity-40 hover:opacity-100 hover:text-red-400 p-0.5 rounded cursor-pointer transition-all ml-1"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
         ))}
 
         <button
@@ -316,16 +386,17 @@ export default function HeroTab({
 
           {/* Delete slide button */}
           <div className="flex items-center justify-between pt-2">
-            <span className="text-xs text-stone-500">
+            <span className="text-xs text-stone-500 font-medium">
               Slide {selectedSlideIdx + 1} of {slides.length}
             </span>
             {slides.length > 1 && (
               <button
+                type="button"
                 onClick={() => handleDeleteSlide(selectedSlideIdx)}
-                className="inline-flex items-center gap-1.5 text-xs text-red-600 hover:text-red-700 font-semibold p-1.5 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-red-200 bg-red-50/80 hover:bg-red-100 text-xs font-semibold text-red-600 hover:text-red-700 transition-all cursor-pointer active:scale-95 shadow-2xs"
               >
                 <Trash2 className="w-3.5 h-3.5" />
-                <span>Delete Slide</span>
+                <span>Delete Slide {selectedSlideIdx + 1}</span>
               </button>
             )}
           </div>
@@ -481,12 +552,12 @@ export default function HeroTab({
                 Target Product On Click ("Shop Now")
               </label>
               <select
-                value={activeSlide.id || ''}
-                onChange={(e) => updateActiveSlide('id', e.target.value)}
+                value={activeSlide.product || activeSlide.id || ''}
+                onChange={(e) => updateActiveSlide('product', e.target.value)}
                 className="w-full bg-stone-50 border border-stone-200 text-stone-900 text-xs rounded-lg p-2.5 focus:outline-none focus:border-[#b38531] cursor-pointer"
               >
                 {productsList.map((p) => (
-                  <option key={p.id} value={p.id}>
+                  <option key={p.id} value={p.name}>
                     {p.name} ({p.gender} • Rs. {p.price})
                   </option>
                 ))}
