@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
   Package,
@@ -28,8 +29,66 @@ export default function AdminDashboard({
   heroSlides,
   onHeroSlidesChange,
 }) {
-  // Active Navigation Tab: 'overview' | 'products' | 'orders' | 'messages' | 'newsletter'
-  const [activeTab, setActiveTab] = useState('overview');
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Resolve activeTab from URL pathname (e.g. /admin/products -> 'products')
+  const getTabFromPath = (pathname) => {
+    const segment = pathname.replace(/^\/admin\/?/, '').toLowerCase().split('/')[0];
+    switch (segment) {
+      case 'products':
+        return 'products';
+      case 'orders':
+        return 'orders';
+      case 'messages':
+      case 'inquiries':
+        return 'messages';
+      case 'newsletter':
+      case 'subscribers':
+        return 'newsletter';
+      case 'hero':
+      case 'hero-banner':
+        return 'hero';
+      case 'overview':
+      case '':
+      default:
+        return 'overview';
+    }
+  };
+
+  const activeTab = getTabFromPath(location.pathname);
+
+  // Navigate to appropriate URL path when a tab is requested
+  const setActiveTab = (tabId) => {
+    let targetPath = '/admin/overview';
+    switch (tabId) {
+      case 'overview':
+        targetPath = '/admin/overview';
+        break;
+      case 'products':
+        targetPath = '/admin/products';
+        break;
+      case 'orders':
+        targetPath = '/admin/orders';
+        break;
+      case 'messages':
+      case 'inquiries':
+        targetPath = '/admin/messages';
+        break;
+      case 'newsletter':
+      case 'subscribers':
+        targetPath = '/admin/newsletter';
+        break;
+      case 'hero':
+      case 'hero-banner':
+        targetPath = '/admin/hero';
+        break;
+      default:
+        targetPath = `/admin/${tabId}`;
+    }
+    navigate(targetPath);
+  };
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -428,11 +487,11 @@ export default function AdminDashboard({
   const unreadMessagesCount = messages.filter((m) => !m.replied).length;
 
   const navItems = [
-    { id: 'overview', label: 'Dashboard Overview', icon: LayoutDashboard, badge: null },
-    { id: 'products', label: 'Fragrances Catalog', icon: Package, badge: productsList.length },
-    { id: 'orders', label: 'Customer Orders', icon: ShoppingBag, badge: orders.length },
-    { id: 'messages', label: 'Contact Inquiries', icon: Mail, badge: unreadMessagesCount > 0 ? `${unreadMessagesCount} new` : null },
-    { id: 'newsletter', label: 'VIP Subscribers', icon: Users, badge: subscribers.length },
+    { id: 'overview', path: '/admin/overview', label: 'Dashboard Overview', icon: LayoutDashboard, badge: null },
+    { id: 'products', path: '/admin/products', label: 'Fragrances Catalog', icon: Package, badge: productsList.length },
+    { id: 'orders', path: '/admin/orders', label: 'Customer Orders', icon: ShoppingBag, badge: orders.length },
+    { id: 'messages', path: '/admin/messages', label: 'Contact Inquiries', icon: Mail, badge: unreadMessagesCount > 0 ? `${unreadMessagesCount} new` : null },
+    { id: 'newsletter', path: '/admin/newsletter', label: 'VIP Subscribers', icon: Users, badge: subscribers.length },
   ];
 
   return (

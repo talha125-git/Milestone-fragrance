@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Menu,
   RefreshCw,
@@ -95,18 +96,16 @@ export default function AdminHeader({
             type="button"
             onClick={() => setIsDropdownOpen((prev) => !prev)}
             aria-expanded={isDropdownOpen}
-            className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all shadow-xs cursor-pointer select-none ${
-              activeTab === 'hero' || isDropdownOpen
+            className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all shadow-xs cursor-pointer select-none ${activeTab === 'hero' || isDropdownOpen
                 ? 'bg-[#b38531] text-white shadow-md ring-2 ring-[#b38531]/25'
                 : 'bg-[#b38531] hover:bg-[#966d21] text-white hover:shadow-md'
-            }`}
+              }`}
           >
             <LayoutTemplate className="w-3.5 h-3.5" />
             <span>Frontend Setup</span>
             <ChevronDown
-              className={`w-3.5 h-3.5 transition-transform duration-200 ${
-                isDropdownOpen ? 'rotate-180' : ''
-              }`}
+              className={`w-3.5 h-3.5 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''
+                }`}
             />
           </button>
 
@@ -119,25 +118,23 @@ export default function AdminHeader({
 
               <div className="p-1.5 space-y-1">
                 {/* Home Hero Banner Item */}
-                <button
-                  type="button"
+                <Link
+                  to="/admin/frontend-setup/hero"
                   onClick={() => {
                     if (setActiveTab) setActiveTab('hero');
                     setIsDropdownOpen(false);
                   }}
-                  className={`w-full flex items-center justify-between p-2.5 rounded-lg text-left transition-colors cursor-pointer ${
-                    activeTab === 'hero'
+                  className={`w-full flex items-center justify-between p-2.5 rounded-lg text-left transition-colors cursor-pointer select-none ${activeTab === 'hero'
                       ? 'bg-amber-50/90 text-[#966d21] font-semibold border border-amber-200/80 shadow-2xs'
                       : 'hover:bg-stone-50 text-stone-700'
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center gap-2.5">
                     <div
-                      className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                        activeTab === 'hero'
+                      className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${activeTab === 'hero'
                           ? 'bg-[#b38531] text-white shadow-2xs'
                           : 'bg-amber-50 text-[#b38531]'
-                      }`}
+                        }`}
                     >
                       <Sparkles className="w-4 h-4" />
                     </div>
@@ -156,7 +153,7 @@ export default function AdminHeader({
                       Live
                     </span>
                   )}
-                </button>
+                </Link>
               </div>
 
               {/* View Live Storefront Quick Link */}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { X, ExternalLink, ArrowUpRight, LogOut } from 'lucide-react';
 import { logo } from '../../assets';
 
@@ -68,14 +68,16 @@ export default function AdminSidebar({
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;
+              const targetPath = item.path || `/admin/${item.id}`;
               return (
-                <button
+                <Link
                   key={item.id}
+                  to={targetPath}
                   onClick={() => {
-                    setActiveTab(item.id);
+                    if (setActiveTab) setActiveTab(item.id);
                     setSidebarOpen(false);
                   }}
-                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-medium transition-all cursor-pointer select-none ${
                     isActive
                       ? 'bg-[#dfb76c] text-[#0d0c0a] font-bold shadow-md shadow-[#dfb76c]/15'
                       : 'text-stone-300 hover:text-white hover:bg-white/[0.06]'
@@ -97,7 +99,7 @@ export default function AdminSidebar({
                       {item.badge}
                     </span>
                   )}
-                </button>
+                </Link>
               );
             })}
           </div>
