@@ -1,4 +1,6 @@
 git init 
 git add .
-git commit -m "feat: initialize backend and frontend application structure with product data and api routes"
+git commit -m "
+feat: implement frontend application routing and admin dashboard structure
+"
 git push -u origin main

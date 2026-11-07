@@ -15,7 +15,7 @@ import About from './pages/About';
 import Contact from './pages/Contact';
 import ProductDetail from './pages/ProductDetail';
 import Login from './pages/Login';
-import AdminDashboard from './pages/AdminDashboard';
+import AdminDashboard from './pages/admin';
 import { products } from './data/products';
 
 export default function App() {
