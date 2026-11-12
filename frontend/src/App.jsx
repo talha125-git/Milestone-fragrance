@@ -15,6 +15,7 @@ import Collections from './pages/Collections';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import ProductDetail from './pages/ProductDetail';
+import Checkout from './pages/Checkout';
 import Login from './pages/Login';
 import AdminDashboard from './pages/admin';
 import { products } from './data/products';
@@ -459,6 +460,21 @@ export default function App() {
           <Route
             path="/contact"
             element={<Contact />}
+          />
+
+          <Route
+            path="/checkout"
+            element={
+              <Checkout
+                cart={cart}
+                onClearCart={handleClearCart}
+                onUpdateQuantity={handleUpdateQuantity}
+                onRemoveItem={handleRemoveItem}
+                onOrderSuccess={(order) => {
+                  showToast(`Order ${order.id} placed successfully!`);
+                }}
+              />
+            }
           />
 
           {/* Admin Login Portal Route - Accessed ONLY by direct path /login */}

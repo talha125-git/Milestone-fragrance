@@ -127,40 +127,50 @@ export default function OverviewTab({
                 </tr>
               </thead>
               <tbody className="divide-y divide-stone-100">
-                {orders.slice(0, 4).map((o) => (
-                  <tr key={o.id} className="hover:bg-stone-50/70 transition-colors">
-                    <td className="py-3.5 font-bold text-[#b38531]">{o.id}</td>
-                    <td className="py-3.5">
-                      <div className="font-semibold text-stone-900">{o.customer}</div>
-                      <div className="text-[10px] text-stone-500">{o.city}</div>
-                    </td>
-                    <td className="py-3.5 text-stone-600">
-                      {o.items?.map((it, i) => (
-                        <span key={i} className="inline-block mr-2">
-                          {it.qty}x {it.name}
-                        </span>
-                      ))}
-                    </td>
-                    <td className="py-3.5 font-bold text-stone-900">
-                      Rs. {Number(o.total).toLocaleString()}
-                    </td>
-                    <td className="py-3.5">
-                      <span
-                        className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-                          o.status === 'Delivered'
-                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                            : o.status === 'Shipped'
-                            ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                            : o.status === 'Processing'
-                            ? 'bg-amber-50 text-amber-700 border border-amber-200'
-                            : 'bg-stone-100 text-stone-600 border border-stone-200'
-                        }`}
-                      >
-                        {o.status}
-                      </span>
+                {orders.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="py-8 text-center text-stone-400">
+                      <Package className="w-7 h-7 mx-auto text-stone-300 mb-1.5" />
+                      <p className="text-xs font-medium text-stone-600">No orders placed yet</p>
+                      <p className="text-[11px] text-stone-400">Live orders placed from the checkout page will appear here.</p>
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  orders.slice(0, 4).map((o) => (
+                    <tr key={o.id} className="hover:bg-stone-50/70 transition-colors">
+                      <td className="py-3.5 font-bold text-[#b38531]">{o.id}</td>
+                      <td className="py-3.5">
+                        <div className="font-semibold text-stone-900">{o.customer}</div>
+                        <div className="text-[10px] text-stone-500">{o.city}</div>
+                      </td>
+                      <td className="py-3.5 text-stone-600">
+                        {o.items?.map((it, i) => (
+                          <span key={i} className="inline-block mr-2 font-medium">
+                            {it.qty}x {it.name} <span className="text-stone-400 text-[10px]">({it.size})</span>
+                          </span>
+                        ))}
+                      </td>
+                      <td className="py-3.5 font-bold text-stone-900">
+                        Rs. {Number(o.total).toLocaleString()}
+                      </td>
+                      <td className="py-3.5">
+                        <span
+                          className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                            o.status === 'Delivered'
+                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                              : o.status === 'Shipped'
+                              ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                              : o.status === 'Processing'
+                              ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                              : 'bg-stone-100 text-stone-600 border border-stone-200'
+                          }`}
+                        >
+                          {o.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

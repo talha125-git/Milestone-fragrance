@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight, CheckCircle } from 'lucide-react';
 
 export default function CartDrawer({
@@ -10,6 +11,7 @@ export default function CartDrawer({
   onClearCart,
   onSelectProduct,
 }) {
+  const navigate = useNavigate();
   const [coupon, setCoupon] = useState('');
   const [appliedDiscount, setAppliedDiscount] = useState(0);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
@@ -278,18 +280,14 @@ export default function CartDrawer({
 
               {/* Checkout Button */}
               <button
-                onClick={handleCheckout}
-                disabled={isCheckingOut}
-                className="w-full bg-[#dfb76c] hover:bg-[#caa053] text-[#0d0c0a] font-semibold text-xs sm:text-sm py-3 rounded-md transition-colors flex items-center justify-center gap-2 focus:outline-none cursor-pointer disabled:opacity-50"
+                onClick={() => {
+                  onClose();
+                  navigate('/checkout');
+                }}
+                className="w-full bg-[#dfb76c] hover:bg-[#caa053] active:scale-[0.99] text-[#0d0c0a] font-bold text-xs sm:text-sm py-3.5 rounded-lg transition-all flex items-center justify-center gap-2 focus:outline-none cursor-pointer shadow-md hover:shadow-lg"
               >
-                {isCheckingOut ? (
-                  <span>Processing Order...</span>
-                ) : (
-                  <>
-                    <span>Proceed to Checkout</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </>
-                )}
+                <span>Proceed to Checkout</span>
+                <ArrowRight className="w-4 h-4" />
               </button>
             </div>
           )}

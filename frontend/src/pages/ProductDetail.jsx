@@ -15,6 +15,7 @@ import {
   Clock,
   Wind,
   Share2,
+  Zap,
 } from 'lucide-react';
 import { products as defaultProducts } from '../data/products';
 
@@ -101,6 +102,18 @@ export default function ProductDetail({
     );
     setAdded(true);
     setTimeout(() => setAdded(false), 2200);
+  };
+
+  const handleBuyNow = () => {
+    onAddToCart(
+      {
+        ...currentProduct,
+        size: selectedSize.toUpperCase(),
+        price: currentPrice,
+      },
+      quantity
+    );
+    navigate('/checkout');
   };
 
   const handleShare = () => {
@@ -467,6 +480,18 @@ export default function ProductDetail({
                 <Heart className={`w-4 h-4 ${effectiveIsWishlisted ? 'fill-red-500' : ''}`} />
               </button>
             </div>
+
+            {/* Buy Now Button Directly Below Add to Cart */}
+            {currentProduct.inStock !== false && (
+              <button
+                type="button"
+                onClick={handleBuyNow}
+                className="w-full bg-gradient-to-r from-[#dfb76c] via-[#f5d99b] to-[#dfb76c] hover:brightness-110 active:scale-[0.99] text-[#120f0b] font-bold text-xs sm:text-sm tracking-wider uppercase py-3.5 px-6 rounded-lg flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-xl cursor-pointer"
+              >
+                <Zap className="w-4 h-4 fill-current" />
+                <span>Buy Now — Rs. {(currentPrice * quantity).toLocaleString()}</span>
+              </button>
+            )}
 
             {/* Trust & Guarantee Badges */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-4 border-t border-[#221e1a] text-xs text-stone-400">

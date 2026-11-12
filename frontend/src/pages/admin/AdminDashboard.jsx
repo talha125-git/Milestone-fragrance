@@ -122,7 +122,24 @@ export default function AdminDashboard({
     }
   }, [initialProductsList]);
 
-  const [orders, setOrders] = useState([]);
+  const [orders, setOrders] = useState(() => {
+    try {
+      const saved = localStorage.getItem('milestone_orders');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          const cleaned = parsed.filter(
+            (o) => !['ORD-8942', 'ORD-8941', 'ORD-8940', 'ORD-8939', 'ORD-8938'].includes(o.id)
+          );
+          localStorage.setItem('milestone_orders', JSON.stringify(cleaned));
+          return cleaned;
+        }
+      }
+      return [];
+    } catch {
+      return [];
+    }
+  });
   const [messages, setMessages] = useState([]);
   const [subscribers, setSubscribers] = useState([]);
 
@@ -287,11 +304,31 @@ export default function AdminDashboard({
         if (ordRes.ok) {
           const ordJson = await ordRes.json();
           if (ordJson.data && Array.isArray(ordJson.data)) {
-            setOrders(ordJson.data);
+            const cleaned = ordJson.data.filter(
+              (o) => !['ORD-8942', 'ORD-8941', 'ORD-8940', 'ORD-8939', 'ORD-8938'].includes(o.id)
+            );
+            setOrders(cleaned);
+            try {
+              localStorage.setItem('milestone_orders', JSON.stringify(cleaned));
+            } catch {}
           }
+        } else {
+          try {
+            const saved = JSON.parse(localStorage.getItem('milestone_orders') || '[]');
+            const cleaned = saved.filter(
+              (o) => !['ORD-8942', 'ORD-8941', 'ORD-8940', 'ORD-8939', 'ORD-8938'].includes(o.id)
+            );
+            setOrders(cleaned);
+          } catch {}
         }
       } catch {
-        // Fallback
+        try {
+          const saved = JSON.parse(localStorage.getItem('milestone_orders') || '[]');
+          const cleaned = saved.filter(
+            (o) => !['ORD-8942', 'ORD-8941', 'ORD-8940', 'ORD-8939', 'ORD-8938'].includes(o.id)
+          );
+          setOrders(cleaned);
+        } catch {}
       }
 
       // 3. Fetch Real Newsletter Subscribers
@@ -499,9 +536,13 @@ export default function AdminDashboard({
 
   // Update Order Status
   const handleOrderStatusChange = (orderId, newStatus) => {
-    setOrders((prev) =>
-      prev.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o))
-    );
+    setOrders((prev) => {
+      const updated = prev.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o));
+      try {
+        localStorage.setItem('milestone_orders', JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
 
     fetch(`/api/orders/${orderId}`, {
       method: 'PUT',
@@ -510,6 +551,24 @@ export default function AdminDashboard({
     }).catch(() => {});
 
     showToast(`Order ${orderId} updated to ${newStatus}`);
+  };
+
+  // Delete Order
+  const handleDeleteOrder = (orderId) => {
+    if (!window.confirm(`Are you sure you want to remove order ${orderId}?`)) return;
+    setOrders((prev) => {
+      const updated = prev.filter((o) => o.id !== orderId);
+      try {
+        localStorage.setItem('milestone_orders', JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+
+    fetch(`/api/orders/${orderId}`, {
+      method: 'DELETE',
+    }).catch(() => {});
+
+    showToast(`Order ${orderId} removed`, 'info');
   };
 
   // Filtered Products
@@ -608,6 +667,7 @@ export default function AdminDashboard({
             <OrdersTab
               orders={orders}
               handleOrderStatusChange={handleOrderStatusChange}
+              handleDeleteOrder={handleDeleteOrder}
             />
           )}
 

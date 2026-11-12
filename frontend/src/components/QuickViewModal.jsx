@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { X, Star, Heart, ShoppingBag, Check, ShieldCheck, Truck, RotateCcw } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { X, Star, Heart, ShoppingBag, Check, ShieldCheck, Truck, RotateCcw, Zap } from 'lucide-react';
 
 export default function QuickViewModal({
   product,
@@ -8,6 +9,7 @@ export default function QuickViewModal({
   onToggleWishlist,
   isWishlisted,
 }) {
+  const navigate = useNavigate();
   const [selectedSize, setSelectedSize] = useState('100ml');
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
@@ -251,6 +253,26 @@ export default function QuickViewModal({
                   <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-red-500' : ''}`} />
                 </button>
               </div>
+
+              {/* Buy Now Button */}
+              {product.inStock !== false && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onAddToCart({
+                      ...product,
+                      size: selectedSize.toUpperCase(),
+                      price: currentPrice,
+                    }, quantity);
+                    onClose();
+                    navigate('/checkout');
+                  }}
+                  className="w-full bg-gradient-to-r from-[#dfb76c] via-[#f5d99b] to-[#dfb76c] hover:brightness-110 active:scale-[0.99] text-black font-bold text-xs uppercase tracking-wider py-2.5 px-4 rounded flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md"
+                >
+                  <Zap className="w-3.5 h-3.5 fill-current" />
+                  <span>Buy Now • Rs. {(currentPrice * quantity).toLocaleString()}</span>
+                </button>
+              )}
 
               {/* Guarantees */}
               <div className="grid grid-cols-3 gap-2 pt-3 border-t border-stone-800/80 text-[11px] text-stone-400">
