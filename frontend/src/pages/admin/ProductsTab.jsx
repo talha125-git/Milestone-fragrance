@@ -118,6 +118,7 @@ export default function ProductsTab({
                   <td className="py-3.5 px-4">
                     <button
                       onClick={() => handleToggleStock(p)}
+                      title="Click to instantly toggle stock status"
                       className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold transition-all cursor-pointer ${
                         p.inStock
                           ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100'
@@ -125,7 +126,7 @@ export default function ProductsTab({
                       }`}
                     >
                       <span className={`w-1.5 h-1.5 rounded-full ${p.inStock ? 'bg-emerald-500' : 'bg-rose-500'}`} />
-                      <span>{p.inStock ? 'In Stock' : 'Out of Stock'}</span>
+                      <span>{p.inStock ? `In Stock (${p.stockQuantity !== undefined ? p.stockQuantity : 'Avail'})` : 'Out of Stock'}</span>
                     </button>
                   </td>
 

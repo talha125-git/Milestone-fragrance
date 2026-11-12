@@ -157,11 +157,17 @@ export default function NewArrivals({
                       loading="lazy"
                     />
 
-                    {/* NEW ARRIVAL Badge */}
-                    <span className="absolute top-2 left-2 bg-[#dfb76c] text-[#0d0c0a] font-bold text-[9px] uppercase px-2 py-0.5 rounded shadow-sm flex items-center gap-1 tracking-wider">
-                      <Sparkles className="w-2.5 h-2.5" />
-                      <span>New Arrival</span>
-                    </span>
+                    {/* NEW ARRIVAL / OUT OF STOCK Badge */}
+                    {product.inStock === false ? (
+                      <span className="absolute top-2 left-2 bg-rose-600 text-white font-bold text-[9px] uppercase px-2 py-0.5 rounded shadow-sm tracking-wider">
+                        Out of Stock
+                      </span>
+                    ) : (
+                      <span className="absolute top-2 left-2 bg-[#dfb76c] text-[#0d0c0a] font-bold text-[9px] uppercase px-2 py-0.5 rounded shadow-sm flex items-center gap-1 tracking-wider">
+                        <Sparkles className="w-2.5 h-2.5" />
+                        <span>New Arrival</span>
+                      </span>
+                    )}
 
                     {/* Fragrance Family Badge */}
                     <span className="absolute bottom-2 left-2 bg-black/80 text-[#dfb76c] text-[10px] uppercase font-semibold px-2 py-0.5 rounded backdrop-blur-xs">
@@ -206,13 +212,23 @@ export default function NewArrivals({
                     </div>
 
                     {/* Add to Cart Button */}
-                    <button
-                      onClick={() => onAddToCart(product)}
-                      className="w-full bg-[#1e1913] hover:bg-[#dfb76c] hover:text-black text-white text-xs font-semibold py-2.5 rounded-md flex items-center justify-center gap-2 transition-all cursor-pointer"
-                    >
-                      <ShoppingBag className="w-3.5 h-3.5" />
-                      <span>Add to Cart</span>
-                    </button>
+                    {product.inStock === false ? (
+                      <button
+                        disabled
+                        className="w-full bg-stone-900 text-stone-500 text-xs font-semibold py-2.5 rounded-md flex items-center justify-center gap-2 border border-stone-800 cursor-not-allowed opacity-70"
+                      >
+                        <ShoppingBag className="w-3.5 h-3.5" />
+                        <span>Out of Stock</span>
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => onAddToCart(product)}
+                        className="w-full bg-[#1e1913] hover:bg-[#dfb76c] hover:text-black text-white text-xs font-semibold py-2.5 rounded-md flex items-center justify-center gap-2 transition-all cursor-pointer"
+                      >
+                        <ShoppingBag className="w-3.5 h-3.5" />
+                        <span>Add to Cart</span>
+                      </button>
+                    )}
                   </div>
                 </div>
               );

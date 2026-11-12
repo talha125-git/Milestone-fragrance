@@ -187,6 +187,14 @@ export default function ProductDetail({
                     <span>New Arrival</span>
                   </span>
                 )}
+                {currentProduct.inStock === false && (
+                  <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px] z-20 flex flex-col items-center justify-center text-white">
+                    <span className="bg-rose-600 text-white font-bold text-xs uppercase px-3.5 py-1.5 rounded-full shadow-lg tracking-wider mb-1">
+                      Sold Out
+                    </span>
+                    <span className="text-[11px] text-stone-300 font-medium">Currently Out of Stock</span>
+                  </div>
+                )}
                 <img
                   src={currentProduct.image}
                   alt={currentProduct.name}
@@ -202,17 +210,19 @@ export default function ProductDetail({
             <div className="grid grid-cols-3 gap-3 w-full max-w-[500px] mt-6 text-center">
               <div className="bg-[#14120f] border border-[#262018] rounded-xl p-3 flex flex-col items-center justify-center">
                 <Clock className="w-4 h-4 text-[#dfb76c] mb-1" />
-                <span className="text-[11px] font-semibold text-white">12+ Hours</span>
+                <span className="text-[11px] font-semibold text-white">{currentProduct.longevity || '12+ Hours'}</span>
                 <span className="text-[10px] text-stone-400">Longevity</span>
               </div>
               <div className="bg-[#14120f] border border-[#262018] rounded-xl p-3 flex flex-col items-center justify-center">
                 <Wind className="w-4 h-4 text-[#dfb76c] mb-1" />
-                <span className="text-[11px] font-semibold text-white">Strong Sillage</span>
+                <span className="text-[11px] font-semibold text-white">{currentProduct.sillage || 'Strong Sillage'}</span>
                 <span className="text-[10px] text-stone-400">Projection</span>
               </div>
               <div className="bg-[#14120f] border border-[#262018] rounded-xl p-3 flex flex-col items-center justify-center">
                 <Droplets className="w-4 h-4 text-[#dfb76c] mb-1" />
-                <span className="text-[11px] font-semibold text-white">25%+ Extrait</span>
+                <span className="text-[11px] font-semibold text-white">
+                  {currentProduct.concentration === 'Extrait De Parfum' ? '30%+ Extrait' : '25%+ Extrait'}
+                </span>
                 <span className="text-[10px] text-stone-400">Oil Quality</span>
               </div>
             </div>
@@ -221,11 +231,29 @@ export default function ProductDetail({
           {/* Right Column: Product Information & Purchase Area */}
           <div className="lg:col-span-6 text-left space-y-6">
             <div>
-              <div className="inline-flex items-center gap-1.5 text-[#dfb76c] text-[11px] sm:text-xs font-semibold tracking-[0.22em] uppercase mb-2">
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>
-                  {currentProduct.gender} Collection • {currentProduct.type}
-                </span>
+              <div className="flex flex-wrap items-center gap-2 mb-2">
+                <div className="inline-flex items-center gap-1.5 text-[#dfb76c] text-[11px] sm:text-xs font-semibold tracking-[0.22em] uppercase">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>
+                    {currentProduct.gender} Collection • {currentProduct.type}
+                  </span>
+                </div>
+                {currentProduct.isNewArrival && (
+                  <span className="bg-[#dfb76c] text-[#0d0c0a] font-bold text-[10px] uppercase px-2 py-0.5 rounded shadow-sm tracking-wider">
+                    ★ New Arrival
+                  </span>
+                )}
+                {currentProduct.inStock !== false ? (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] font-semibold">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span>In Stock</span>
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-rose-500/15 border border-rose-500/40 text-rose-400 text-[10px] font-bold">
+                    <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+                    <span>Out of Stock</span>
+                  </span>
+                )}
               </div>
 
               <h1 className="text-3xl sm:text-5xl font-serif text-white font-normal leading-tight">
@@ -338,10 +366,11 @@ export default function ProductDetail({
             {/* Quantity Selector & Add to Cart Action */}
             <div className="flex items-center gap-3 pt-2">
               {/* Quantity */}
-              <div className="flex items-center border border-[#262018] rounded-lg bg-[#14120f]">
+              <div className={`flex items-center border border-[#262018] rounded-lg bg-[#14120f] ${currentProduct.inStock === false ? 'opacity-50 pointer-events-none' : ''}`}>
                 <button
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="px-3.5 py-3 text-stone-400 hover:text-white transition-colors cursor-pointer"
+                  disabled={currentProduct.inStock === false}
+                  className="px-3.5 py-3 text-stone-400 hover:text-white transition-colors cursor-pointer disabled:cursor-not-allowed"
                   aria-label="Decrease quantity"
                 >
                   -
@@ -351,30 +380,41 @@ export default function ProductDetail({
                 </span>
                 <button
                   onClick={() => setQuantity(quantity + 1)}
-                  className="px-3.5 py-3 text-stone-400 hover:text-white transition-colors cursor-pointer"
+                  disabled={currentProduct.inStock === false}
+                  className="px-3.5 py-3 text-stone-400 hover:text-white transition-colors cursor-pointer disabled:cursor-not-allowed"
                   aria-label="Increase quantity"
                 >
                   +
                 </button>
               </div>
 
-              {/* Add to Cart CTA */}
-              <button
-                onClick={handleAdd}
-                className="flex-1 bg-[#dfb76c] hover:bg-[#caa053] active:scale-[0.99] text-[#0d0c0a] font-semibold text-xs sm:text-sm py-3.5 px-6 rounded-lg flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg focus:outline-none cursor-pointer"
-              >
-                {added ? (
-                  <>
-                    <Check className="w-4 h-4 stroke-[2.5]" />
-                    <span>Added to Cart!</span>
-                  </>
-                ) : (
-                  <>
-                    <ShoppingBag className="w-4 h-4" />
-                    <span>Add to Cart • Rs. {(currentPrice * quantity).toLocaleString()}</span>
-                  </>
-                )}
-              </button>
+              {/* Add to Cart CTA with Out of Stock State */}
+              {currentProduct.inStock === false ? (
+                <button
+                  disabled
+                  className="flex-1 bg-stone-800 text-stone-500 border border-stone-700/80 font-semibold text-xs sm:text-sm py-3.5 px-6 rounded-lg flex items-center justify-center gap-2 cursor-not-allowed opacity-80"
+                >
+                  <ShoppingBag className="w-4 h-4" />
+                  <span>Out of Stock • Sold Out</span>
+                </button>
+              ) : (
+                <button
+                  onClick={handleAdd}
+                  className="flex-1 bg-[#dfb76c] hover:bg-[#caa053] active:scale-[0.99] text-[#0d0c0a] font-semibold text-xs sm:text-sm py-3.5 px-6 rounded-lg flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg focus:outline-none cursor-pointer"
+                >
+                  {added ? (
+                    <>
+                      <Check className="w-4 h-4 stroke-[2.5]" />
+                      <span>Added to Cart!</span>
+                    </>
+                  ) : (
+                    <>
+                      <ShoppingBag className="w-4 h-4" />
+                      <span>Add to Cart • Rs. {(currentPrice * quantity).toLocaleString()}</span>
+                    </>
+                  )}
+                </button>
+              )}
 
               {/* Wishlist Button */}
               <button
@@ -394,11 +434,11 @@ export default function ProductDetail({
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-4 border-t border-[#221e1a] text-xs text-stone-400">
               <div className="flex items-center gap-2">
                 <Truck className="w-4 h-4 text-[#dfb76c] flex-shrink-0" />
-                <span>Free Shipping &gt; Rs. 5,000</span>
+                <span>{currentPrice >= 5000 ? 'Free Shipping (Qualified)' : 'Free Shipping > Rs. 5,000'}</span>
               </div>
               <div className="flex items-center gap-2">
                 <ShieldCheck className="w-4 h-4 text-[#dfb76c] flex-shrink-0" />
-                <span>100% Authentic Extrait</span>
+                <span>100% Authentic {currentProduct.concentration || 'Extrait'}</span>
               </div>
               <div className="flex items-center gap-2">
                 <RotateCcw className="w-4 h-4 text-[#dfb76c] flex-shrink-0" />
@@ -445,26 +485,71 @@ export default function ProductDetail({
 
           <div className="max-w-3xl mx-auto text-left text-xs sm:text-sm text-stone-300 leading-relaxed bg-[#14120f] border border-[#262018] rounded-2xl p-6 sm:p-8">
             {activeTab === 'notes' && (
-              <div className="space-y-4">
-                <h3 className="font-serif text-lg text-white font-normal">
-                  The Scent Story of {currentProduct.name}
-                </h3>
-                <p>
-                  Handcrafted with over 25% fragrance oil concentration,{' '}
-                  <strong className="text-white font-medium">{currentProduct.name}</strong> opens with an immediate, radiant projection and evolves gracefully through a multidimensional heart into a deep, velvety dry-down that lingers effortlessly on skin and garments for 12+ hours.
-                </p>
+              <div className="space-y-5">
+                <div>
+                  <h3 className="font-serif text-lg text-white font-normal mb-2">
+                    The Scent Story of {currentProduct.name}
+                  </h3>
+                  <p className="text-stone-300 leading-relaxed">
+                    {currentProduct.description ||
+                      `${currentProduct.name} is handcrafted with over 25% fragrance oil concentration. It opens with an immediate radiant projection and evolves gracefully through multidimensional notes into a deep, velvety dry-down that lingers effortlessly on skin and garments for 12+ hours.`}
+                  </p>
+                </div>
+
+                {/* Dynamic Olfactory Architecture Pyramid */}
+                <div className="space-y-3 pt-4 border-t border-[#262018]">
+                  <h4 className="text-xs uppercase font-bold text-[#dfb76c] tracking-wider">
+                    Olfactory Note Architecture
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div className="bg-[#1c1813] border border-[#2e261c] rounded-xl p-3">
+                      <span className="text-[10px] uppercase font-bold text-stone-400 block mb-1">
+                        Top Notes (Opening)
+                      </span>
+                      <p className="text-white text-xs font-medium">
+                        {Array.isArray(currentProduct.topNotes)
+                          ? currentProduct.topNotes.join(', ')
+                          : currentProduct.topNotes || 'Bergamot, Cardamom'}
+                      </p>
+                    </div>
+
+                    <div className="bg-[#1c1813] border border-[#2e261c] rounded-xl p-3">
+                      <span className="text-[10px] uppercase font-bold text-stone-400 block mb-1">
+                        Heart Notes (Core)
+                      </span>
+                      <p className="text-white text-xs font-medium">
+                        {Array.isArray(currentProduct.heartNotes)
+                          ? currentProduct.heartNotes.join(', ')
+                          : currentProduct.heartNotes || 'Cedarwood, Amber'}
+                      </p>
+                    </div>
+
+                    <div className="bg-[#1c1813] border border-[#2e261c] rounded-xl p-3">
+                      <span className="text-[10px] uppercase font-bold text-stone-400 block mb-1">
+                        Base Notes (Dry-down)
+                      </span>
+                      <p className="text-white text-xs font-medium">
+                        {Array.isArray(currentProduct.baseNotes)
+                          ? currentProduct.baseNotes.join(', ')
+                          : currentProduct.baseNotes || 'Agarwood, Vanilla'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Specification Grid */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-3 border-t border-[#262018] text-xs">
                   <div>
                     <span className="text-stone-400 block text-[10px] uppercase">Concentration</span>
-                    <span className="text-[#dfb76c] font-semibold">{currentProduct.concentration}</span>
+                    <span className="text-[#dfb76c] font-semibold">{currentProduct.concentration || 'Eau De Parfum'}</span>
                   </div>
                   <div>
                     <span className="text-stone-400 block text-[10px] uppercase">Olfactory Family</span>
                     <span className="text-[#dfb76c] font-semibold">{currentProduct.type}</span>
                   </div>
                   <div>
-                    <span className="text-stone-400 block text-[10px] uppercase">Optimal Wear</span>
-                    <span className="text-[#dfb76c] font-semibold">Day to Evening</span>
+                    <span className="text-stone-400 block text-[10px] uppercase">Longevity</span>
+                    <span className="text-[#dfb76c] font-semibold">{currentProduct.longevity || '12+ Hours'}</span>
                   </div>
                   <div>
                     <span className="text-stone-400 block text-[10px] uppercase">Gender Profile</span>
@@ -477,27 +562,56 @@ export default function ProductDetail({
             {activeTab === 'usage' && (
               <div className="space-y-4">
                 <h3 className="font-serif text-lg text-white font-normal">
-                  Mastering Your Application
+                  How to Apply & Wear {currentProduct.name}
                 </h3>
-                <p>
-                  For optimal sillage and longevity, apply your perfume onto pulse points where natural body warmth activates the fragrance molecules:
-                </p>
-                <ul className="list-disc list-inside space-y-2 text-stone-300">
-                  <li>Hold the bottle 5–7 inches away and spray onto the sides of the neck, collarbone, and wrists.</li>
-                  <li>Avoid rubbing wrists together after spraying — rubbing bruises delicate top notes.</li>
-                  <li>For an extended scent trail, lightly spritz outerwear, scarves, or hair.</li>
-                </ul>
+                {currentProduct.howToApply ? (
+                  <p className="text-stone-300 leading-relaxed whitespace-pre-line">
+                    {currentProduct.howToApply}
+                  </p>
+                ) : (
+                  <>
+                    <p>
+                      For optimal sillage and enduring longevity with{' '}
+                      <strong className="text-white">{currentProduct.name}</strong> ({currentProduct.type} family):
+                    </p>
+                    <ul className="list-disc list-inside space-y-2 text-stone-300">
+                      <li>
+                        Hold the flacon 5–7 inches away and spray directly onto pulse points where body warmth activates the perfume oils: sides of the neck, collarbone, and wrists.
+                      </li>
+                      <li>
+                        Never rub wrists together after spraying — friction bruises delicate top notes and accelerates evaporation.
+                      </li>
+                      <li>
+                        For an extended, magnetic scent aura, lightly spritz outerwear, jacket lapels, scarves, or hair.
+                      </li>
+                    </ul>
+                  </>
+                )}
               </div>
             )}
 
             {activeTab === 'craft' && (
               <div className="space-y-4">
                 <h3 className="font-serif text-lg text-white font-normal">
-                  The Milestone Perfumery Standard
+                  The Milestone Perfumery Standard: {currentProduct.name}
                 </h3>
-                <p>
-                  Every bottle of Milestone Fragrance is compounded using sustainably harvested botanical extracts and grade-A French aroma compounds. Aged for 6 weeks in stainless steel maturation vats before filtration, our perfumes achieve smooth roundness and remarkable skin affinity without synthetic harshness.
-                </p>
+                {currentProduct.craftStory ? (
+                  <p className="text-stone-300 leading-relaxed whitespace-pre-line">
+                    {currentProduct.craftStory}
+                  </p>
+                ) : (
+                  <p>
+                    Every flacon of <strong className="text-white">{currentProduct.name}</strong> is compounded using sustainably harvested botanical essences and grade-A French aroma compounds, highlighting natural{' '}
+                    <span className="text-[#dfb76c]">
+                      {Array.isArray(currentProduct.topNotes) ? currentProduct.topNotes[0] : 'bergamot'}
+                    </span>{' '}
+                    and rich{' '}
+                    <span className="text-[#dfb76c]">
+                      {Array.isArray(currentProduct.baseNotes) ? currentProduct.baseNotes[0] : 'amber'}
+                    </span>
+                    . Matured for 6 weeks in stainless steel temperature-controlled vats before artisanal filtration, our perfumes achieve smooth roundness and remarkable skin affinity without synthetic harshness.
+                  </p>
+                )}
               </div>
             )}
           </div>

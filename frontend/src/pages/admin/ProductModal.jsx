@@ -241,6 +241,19 @@ export default function ProductModal({
 
             <div>
               <label className="block text-[11px] font-bold uppercase tracking-wider text-stone-700 mb-1">
+                Full Fragrance Description / Scent Story
+              </label>
+              <textarea
+                rows={3}
+                placeholder="A masterpiece created for the discerning connoisseur. Envelops you in warm amber and cedarwood..."
+                value={formData.description || ''}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                className="w-full bg-stone-50 border border-stone-200 text-stone-900 text-xs rounded-lg p-2.5 focus:outline-none focus:border-[#b38531] focus:bg-white resize-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-bold uppercase tracking-wider text-stone-700 mb-1">
                 Top Notes (Comma separated)
               </label>
               <input
@@ -275,17 +288,84 @@ export default function ProductModal({
               />
             </div>
 
-            <div className="flex flex-wrap items-center gap-6 pt-2">
-              <label className="flex items-center gap-2 text-xs font-semibold text-stone-700 cursor-pointer">
+            {/* Performance Specifications */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-stone-700 mb-1">
+                  Longevity
+                </label>
                 <input
-                  type="checkbox"
-                  checked={formData.inStock}
-                  onChange={(e) => setFormData({ ...formData, inStock: e.target.checked })}
-                  className="rounded border-stone-300 text-[#b38531] focus:ring-0 cursor-pointer"
+                  type="text"
+                  placeholder="e.g. 12+ Hours"
+                  value={formData.longevity || '12+ Hours'}
+                  onChange={(e) => setFormData({ ...formData, longevity: e.target.value })}
+                  className="w-full bg-stone-50 border border-stone-200 text-stone-900 text-xs rounded-lg p-2.5 focus:outline-none focus:border-[#b38531]"
                 />
-                <span>Available In Stock</span>
-              </label>
+              </div>
 
+              <div>
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-stone-700 mb-1">
+                  Sillage & Projection
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. Strong Sillage"
+                  value={formData.sillage || 'Strong Sillage'}
+                  onChange={(e) => setFormData({ ...formData, sillage: e.target.value })}
+                  className="w-full bg-stone-50 border border-stone-200 text-stone-900 text-xs rounded-lg p-2.5 focus:outline-none focus:border-[#b38531]"
+                />
+              </div>
+            </div>
+
+            {/* Dedicated Stock & Inventory Box */}
+            <div className="p-4 rounded-xl bg-stone-50 border border-stone-200 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-stone-800">
+                  Inventory & Stock Status *
+                </span>
+                <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${formData.inStock ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-red-100 text-red-800 border border-red-300'}`}>
+                  {formData.inStock ? '● In Stock' : '✕ Out of Stock'}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[11px] font-semibold text-stone-600 mb-1">
+                    Availability Option
+                  </label>
+                  <select
+                    value={formData.inStock ? 'true' : 'false'}
+                    onChange={(e) => setFormData({ ...formData, inStock: e.target.value === 'true' })}
+                    className="w-full bg-white border border-stone-200 text-stone-900 text-xs rounded-lg p-2.5 focus:outline-none focus:border-[#b38531] cursor-pointer font-medium"
+                  >
+                    <option value="true">✓ In Stock (Available for Purchase)</option>
+                    <option value="false">✕ Out of Stock (Mark as Sold Out)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-semibold text-stone-600 mb-1">
+                    Stock Quantity (Units)
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={formData.stockQuantity !== undefined ? formData.stockQuantity : 25}
+                    onChange={(e) => {
+                      const val = Number(e.target.value);
+                      setFormData({
+                        ...formData,
+                        stockQuantity: val,
+                        inStock: val > 0 ? formData.inStock : false,
+                      });
+                    }}
+                    className="w-full bg-white border border-stone-200 text-stone-900 text-xs rounded-lg p-2.5 focus:outline-none focus:border-[#b38531]"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-6 pt-1">
               <label className="flex items-center gap-2 text-xs font-semibold text-stone-700 cursor-pointer">
                 <input
                   type="checkbox"
@@ -293,7 +373,7 @@ export default function ProductModal({
                   onChange={(e) => setFormData({ ...formData, bestSeller: e.target.checked })}
                   className="rounded border-stone-300 text-[#b38531] focus:ring-0 cursor-pointer"
                 />
-                <span>Mark as Bestseller</span>
+                <span>★ Mark as Bestseller</span>
               </label>
 
               <label className="flex items-center gap-2 text-xs font-semibold text-stone-700 cursor-pointer">

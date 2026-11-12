@@ -54,11 +54,15 @@ export default function Unisex({
                     alt={product.name}
                     className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
                   />
-                  {product.isNewArrival && (
+                  {product.inStock === false ? (
+                    <span className="absolute top-2 left-2 bg-rose-600 text-white font-bold text-[9px] uppercase px-2 py-0.5 rounded shadow-sm tracking-wider">
+                      Out of Stock
+                    </span>
+                  ) : product.isNewArrival ? (
                     <span className="absolute top-2 left-2 bg-[#dfb76c] text-[#0d0c0a] font-bold text-[9px] uppercase px-2 py-0.5 rounded shadow-sm tracking-wider">
                       ★ New Arrival
                     </span>
-                  )}
+                  ) : null}
                 </div>
 
                 <div className="flex-1 flex flex-col justify-between">
@@ -85,13 +89,23 @@ export default function Unisex({
                     </div>
                   </div>
 
-                  <button
-                    onClick={() => onAddToCart(product)}
-                    className="w-full bg-[#1e1913] hover:bg-[#dfb76c] hover:text-black text-white text-xs font-semibold py-2.5 rounded-md flex items-center justify-center gap-2 transition-all cursor-pointer"
-                  >
-                    <ShoppingBag className="w-3.5 h-3.5" />
-                    <span>Add to Cart</span>
-                  </button>
+                  {product.inStock === false ? (
+                    <button
+                      disabled
+                      className="w-full bg-stone-900 text-stone-500 text-xs font-semibold py-2.5 rounded-md flex items-center justify-center gap-2 border border-stone-800 cursor-not-allowed opacity-70"
+                    >
+                      <ShoppingBag className="w-3.5 h-3.5" />
+                      <span>Out of Stock</span>
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => onAddToCart(product)}
+                      className="w-full bg-[#1e1913] hover:bg-[#dfb76c] hover:text-black text-white text-xs font-semibold py-2.5 rounded-md flex items-center justify-center gap-2 transition-all cursor-pointer"
+                    >
+                      <ShoppingBag className="w-3.5 h-3.5" />
+                      <span>Add to Cart</span>
+                    </button>
+                  )}
                 </div>
               </div>
             );

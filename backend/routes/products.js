@@ -196,9 +196,14 @@ router.post('/', (req, res) => {
       heartNotes,
       baseNotes,
       inStock,
+      stockQuantity,
       bestSeller,
       isNewArrival,
       image,
+      longevity,
+      sillage,
+      howToApply,
+      craftStory,
     } = req.body;
 
     if (!name || !price) {
@@ -231,6 +236,11 @@ router.post('/', (req, res) => {
       bestSeller: Boolean(bestSeller),
       isNewArrival: Boolean(isNewArrival),
       inStock: inStock !== undefined ? Boolean(inStock) : true,
+      stockQuantity: stockQuantity !== undefined ? Number(stockQuantity) : 25,
+      longevity: longevity || '12+ Hours',
+      sillage: sillage || 'Strong Sillage',
+      howToApply: howToApply || '',
+      craftStory: craftStory || '',
     };
 
     products.push(newProduct);

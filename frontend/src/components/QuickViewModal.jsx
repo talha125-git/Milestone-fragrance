@@ -56,11 +56,15 @@ export default function QuickViewModal({
               <span className="absolute top-4 left-4 bg-black/80 text-[#dfb76c] text-[10px] font-semibold tracking-wider uppercase px-2.5 py-1 rounded">
                 {product.concentration}
               </span>
-              {product.isNewArrival && (
+              {product.inStock === false ? (
+                <span className="absolute top-4 right-4 bg-rose-600 text-white font-bold text-[10px] uppercase px-2.5 py-1 rounded shadow-md tracking-wider">
+                  Out of Stock
+                </span>
+              ) : product.isNewArrival ? (
                 <span className="absolute top-4 right-4 bg-[#dfb76c] text-[#0d0c0a] font-bold text-[10px] uppercase px-2.5 py-1 rounded shadow-md tracking-wider">
                   ★ New Arrival
                 </span>
-              )}
+              ) : null}
             </div>
 
             {/* Product Details */}
@@ -166,20 +170,29 @@ export default function QuickViewModal({
                   </button>
                 </div>
 
-                <button
-                  onClick={handleAdd}
-                  className="flex-1 bg-[#dfb76c] hover:bg-[#cda153] text-black font-semibold text-xs sm:text-sm py-2.5 px-4 rounded flex items-center justify-center gap-2 transition-colors cursor-pointer"
-                >
-                  {added ? (
-                    <>
-                      <Check className="w-4 h-4" /> Added to Cart!
-                    </>
-                  ) : (
-                    <>
-                      <ShoppingBag className="w-4 h-4" /> Add to Cart
-                    </>
-                  )}
-                </button>
+                {product.inStock === false ? (
+                  <button
+                    disabled
+                    className="flex-1 bg-stone-800 text-stone-500 font-semibold text-xs sm:text-sm py-2.5 px-4 rounded flex items-center justify-center gap-2 border border-stone-700 cursor-not-allowed opacity-75"
+                  >
+                    <ShoppingBag className="w-4 h-4" /> Out of Stock
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleAdd}
+                    className="flex-1 bg-[#dfb76c] hover:bg-[#cda153] text-black font-semibold text-xs sm:text-sm py-2.5 px-4 rounded flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                  >
+                    {added ? (
+                      <>
+                        <Check className="w-4 h-4" /> Added to Cart!
+                      </>
+                    ) : (
+                      <>
+                        <ShoppingBag className="w-4 h-4" /> Add to Cart
+                      </>
+                    )}
+                  </button>
+                )}
 
                 <button
                   onClick={() => onToggleWishlist(product)}

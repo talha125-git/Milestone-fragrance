@@ -152,10 +152,15 @@ export default function AdminDashboard({
     heartNotes: 'Smoky Cedarwood, Golden Ambergris',
     baseNotes: 'Rich Agarwood (Oud), Bourbon Vanilla',
     inStock: true,
+    stockQuantity: 25,
     bestSeller: false,
     isNewArrival: true,
     image: prodSignature,
     assetPath: '',
+    longevity: '12+ Hours',
+    sillage: 'Strong Sillage',
+    howToApply: '',
+    craftStory: '',
   };
   const [formData, setFormData] = useState(defaultForm);
 
@@ -359,10 +364,15 @@ export default function AdminDashboard({
       heartNotes: Array.isArray(product.heartNotes) ? product.heartNotes.join(', ') : '',
       baseNotes: Array.isArray(product.baseNotes) ? product.baseNotes.join(', ') : '',
       inStock: product.inStock !== undefined ? product.inStock : true,
+      stockQuantity: product.stockQuantity !== undefined ? product.stockQuantity : 25,
       bestSeller: Boolean(product.bestSeller),
       isNewArrival: Boolean(product.isNewArrival),
       image: product.image || prodSignature,
       assetPath: product.assetPath || '',
+      longevity: product.longevity || '12+ Hours',
+      sillage: product.sillage || 'Strong Sillage',
+      howToApply: product.howToApply || '',
+      craftStory: product.craftStory || '',
     });
     setSelectedImageFile(null);
     setImagePreview(product.image || prodSignature);
