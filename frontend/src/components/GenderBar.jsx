@@ -12,7 +12,6 @@ export default function GenderBar({ onSelectGender }) {
       subtitle: 'Bold & Classic',
       image: manImg,
       alt: 'Luxury Fragrance For Him - Bold and Classic',
-      objectPos: 'object-bottom',
     },
     {
       id: 'women',
@@ -20,7 +19,6 @@ export default function GenderBar({ onSelectGender }) {
       subtitle: 'Elegant & Floral',
       image: womanImg,
       alt: 'Luxury Fragrance For Her - Elegant and Floral',
-      objectPos: 'object-bottom',
     },
     {
       id: 'unisex',
@@ -28,7 +26,6 @@ export default function GenderBar({ onSelectGender }) {
       subtitle: 'For Everyone',
       image: unisexImg,
       alt: 'Luxury Unisex Fragrance - For Everyone',
-      objectPos: 'object-bottom',
     },
   ];
 
@@ -49,11 +46,11 @@ export default function GenderBar({ onSelectGender }) {
                 }
               }}
               aria-label={`Shop ${cat.title} - ${cat.subtitle}`}
-              className="group relative flex items-center justify-between overflow-hidden bg-[#0b0a09] hover:bg-[#110f0d] transition-colors duration-300 cursor-pointer min-h-[160px] sm:min-h-[175px] md:min-h-[180px] lg:min-h-[210px] xl:min-h-[230px]"
+              className="group relative flex items-center justify-between overflow-hidden bg-[#0b0a09] hover:bg-[#110f0d] transition-colors duration-300 cursor-pointer min-h-[260px] sm:min-h-[290px] md:min-h-[320px] lg:min-h-[360px] xl:min-h-[390px]"
             >
               {/* Subtle vertical golden divider between columns on desktop */}
               {idx > 0 && (
-                <div className="hidden md:block absolute left-0 top-1/2 -translate-y-1/2 h-28 w-[1px] bg-gradient-to-b from-transparent via-[#dfb76c]/25 to-transparent pointer-events-none z-20" />
+                <div className="hidden md:block absolute left-0 top-1/2 -translate-y-1/2 h-36 w-[1px] bg-gradient-to-b from-transparent via-[#dfb76c]/30 to-transparent pointer-events-none z-20" />
               )}
 
               {/* Horizontal divider for mobile only */}
@@ -62,32 +59,32 @@ export default function GenderBar({ onSelectGender }) {
               )}
 
               {/* Warm luxury spotlight glow behind character */}
-              <div className="absolute right-4 sm:right-8 top-1/2 -translate-y-1/2 w-48 h-48 bg-[#dfb76c]/10 rounded-full blur-3xl pointer-events-none group-hover:bg-[#dfb76c]/18 transition-all duration-500" />
+              <div className="absolute right-6 sm:right-10 top-1/2 -translate-y-1/2 w-56 h-56 bg-[#dfb76c]/12 rounded-full blur-3xl pointer-events-none group-hover:bg-[#dfb76c]/20 transition-all duration-500" />
 
-              {/* Right: Transparent Cutout Model Photo */}
-              <div className="absolute right-0 bottom-0 top-0 w-[55%] sm:w-[50%] md:w-[54%] lg:w-[52%] xl:w-[48%] overflow-hidden pointer-events-none flex items-end justify-end">
+              {/* Right: Full-height Model Photo (never cropped, head and hair 100% visible) */}
+              <div className="absolute right-0 bottom-0 top-3 sm:top-4 md:top-5 w-[60%] sm:w-[56%] md:w-[62%] lg:w-[58%] xl:w-[55%] overflow-hidden pointer-events-none flex items-end justify-end">
                 <img
                   src={cat.image}
                   alt={cat.alt}
-                  className={`w-full h-full object-cover sm:object-contain md:object-cover ${cat.objectPos} transition-transform duration-700 ease-out group-hover:scale-105`}
+                  className="h-full w-auto max-w-full object-contain object-bottom transition-transform duration-700 ease-out group-hover:scale-105"
                   loading="lazy"
                 />
                 {/* Soft gradient fade on the left edge for seamless text blend */}
-                <div className="absolute inset-y-0 left-0 w-16 sm:w-24 bg-gradient-to-r from-[#0b0a09] via-[#0b0a09]/70 to-transparent pointer-events-none" />
+                <div className="absolute inset-y-0 left-0 w-20 sm:w-28 bg-gradient-to-r from-[#0b0a09] via-[#0b0a09]/80 to-transparent pointer-events-none z-10" />
               </div>
 
               {/* Left: Luxury Typography, Gold Accent Underline, and Button */}
-              <div className="relative z-10 pl-6 sm:pl-8 lg:pl-10 xl:pl-14 py-6 max-w-[55%] sm:max-w-[52%] flex flex-col items-start justify-center">
+              <div className="relative z-10 pl-6 sm:pl-8 lg:pl-10 xl:pl-14 py-6 max-w-[52%] sm:max-w-[48%] flex flex-col items-start justify-center">
                 {/* Title */}
-                <h3 className="text-xl sm:text-2xl lg:text-[26px] xl:text-[28px] font-sans font-bold text-white tracking-tight leading-none group-hover:text-white transition-colors">
+                <h3 className="text-2xl sm:text-3xl lg:text-[32px] xl:text-[34px] font-sans font-bold text-white tracking-tight leading-none group-hover:text-white transition-colors">
                   {cat.title}
                 </h3>
 
                 {/* Gold Underline Accent matching user's design */}
-                <div className="w-7 sm:w-8 h-[2px] bg-[#dfb76c] my-2 sm:my-2.5 transition-all duration-300 group-hover:w-12 group-hover:bg-[#f0c87d]" />
+                <div className="w-8 sm:w-10 h-[2px] bg-[#dfb76c] my-2.5 sm:my-3 transition-all duration-300 group-hover:w-14 group-hover:bg-[#f0c87d]" />
 
                 {/* Subtitle */}
-                <p className="text-xs sm:text-sm text-[#c8ad7f] font-normal tracking-wide mb-3 sm:mb-4 line-clamp-1">
+                <p className="text-xs sm:text-sm text-[#c8ad7f] font-normal tracking-wide mb-4 sm:mb-5 line-clamp-1">
                   {cat.subtitle}
                 </p>
 
@@ -95,10 +92,10 @@ export default function GenderBar({ onSelectGender }) {
                 <button
                   type="button"
                   tabIndex={-1}
-                  className="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-1 sm:py-1.5 rounded-full border border-[#dfb76c]/70 text-[#dfb76c] text-[10px] sm:text-xs font-semibold tracking-wider uppercase transition-all duration-300 group-hover:bg-[#dfb76c] group-hover:text-[#0b0a09] group-hover:border-[#dfb76c] shadow-xs active:scale-95 cursor-pointer"
+                  className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full border border-[#dfb76c]/70 text-[#dfb76c] text-[11px] sm:text-xs font-semibold tracking-wider uppercase transition-all duration-300 group-hover:bg-[#dfb76c] group-hover:text-[#0b0a09] group-hover:border-[#dfb76c] shadow-xs active:scale-95 cursor-pointer"
                 >
                   <span>SHOP NOW</span>
-                  <ArrowRight className="w-3 h-3 transition-transform duration-300 group-hover:translate-x-1" />
+                  <ArrowRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-1" />
                 </button>
               </div>
 
