@@ -605,9 +605,9 @@ export default function Checkout({
                           <span className="text-xs sm:text-sm font-bold text-white block">
                             Direct Bank Transfer / Raast
                           </span>
-                          <span className="text-[11px] text-stone-400 block mt-0.5">
+                          {/* <span className="text-[11px] text-stone-400 block mt-0.5">
                             Meezan Bank, HBL, Bank Alfalah, Raast & JazzCash instant transfer.
-                          </span>
+                          </span> */}
                         </div>
                       </div>
                       <div className="w-4 h-4 rounded-full border border-stone-500 flex items-center justify-center flex-shrink-0">

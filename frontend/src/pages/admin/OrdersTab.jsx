@@ -14,6 +14,11 @@ import {
   Truck,
   CreditCard,
   Banknote,
+  ChevronDown,
+  ChevronUp,
+  Copy,
+  ExternalLink,
+  MessageCircle,
 } from 'lucide-react';
 
 export default function OrdersTab({
@@ -23,7 +28,27 @@ export default function OrdersTab({
 }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [expandedOrderIds, setExpandedOrderIds] = useState(new Set());
+  const [copiedId, setCopiedId] = useState(null);
+
+  // Toggle order dropdown expansion
+  const toggleExpandOrder = (orderId) => {
+    setExpandedOrderIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(orderId)) {
+        next.delete(orderId);
+      } else {
+        next.add(orderId);
+      }
+      return next;
+    });
+  };
+
+  const handleCopy = (text) => {
+    navigator.clipboard?.writeText(text);
+    setCopiedId(text);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
 
   // Filter orders by query and status
   const filteredOrders = orders.filter((o) => {
@@ -53,7 +78,7 @@ export default function OrdersTab({
               </span>
             </h3>
             <p className="text-xs text-stone-500">
-              Live customer orders from checkout with dynamic sizes, address & courier dispatch details.
+              Click on any order or the <strong>Order Details ∨</strong> dropdown to view complete delivery address, contact & item breakdown.
             </p>
           </div>
 
@@ -97,19 +122,19 @@ export default function OrdersTab({
         </div>
       </div>
 
-      {/* Orders Table */}
+      {/* Orders Table with Expandable Dropdown Rows */}
       <div className="bg-white border border-stone-200/90 rounded-xl shadow-xs overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead>
               <tr className="bg-stone-50/80 border-b border-stone-200 text-stone-500 uppercase tracking-wider text-[10px] font-semibold">
-                <th className="py-3.5 px-4">Order Ref & Date</th>
-                <th className="py-3.5 px-4">Customer Details</th>
-                <th className="py-3.5 px-4">Purchased Fragrance(s)</th>
-                <th className="py-3.5 px-4">Total Amount</th>
-                <th className="py-3.5 px-4">Payment</th>
-                <th className="py-3.5 px-4">Status</th>
-                <th className="py-3.5 px-4 text-right">Actions</th>
+                <th className="py-3.5 px-4">ORDER REF & DATE</th>
+                <th className="py-3.5 px-4">CUSTOMER DETAILS</th>
+                <th className="py-3.5 px-4">PURCHASED FRAGRANCE(S)</th>
+                <th className="py-3.5 px-4">TOTAL AMOUNT</th>
+                <th className="py-3.5 px-4">PAYMENT</th>
+                <th className="py-3.5 px-4">STATUS</th>
+                <th className="py-3.5 px-4 text-right">ACTIONS</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-100">
@@ -126,284 +151,363 @@ export default function OrdersTab({
                   </td>
                 </tr>
               ) : (
-                filteredOrders.map((o) => (
-                  <tr key={o.id} className="hover:bg-stone-50/70 transition-colors">
-                    {/* Order ID & Date */}
-                    <td className="py-3.5 px-4">
-                      <div className="font-bold text-[#b38531] font-mono">{o.id}</div>
-                      <div className="text-[10px] text-stone-400">{o.date || 'Recent'}</div>
-                    </td>
-
-                    {/* Customer Info */}
-                    <td className="py-3.5 px-4">
-                      <div className="font-bold text-stone-900">{o.customer}</div>
-                      <div className="text-[11px] text-stone-500">{o.phone}</div>
-                      <div className="text-[10px] text-stone-400 flex items-center gap-1 mt-0.5">
-                        <MapPin className="w-3 h-3 text-stone-400 flex-shrink-0" />
-                        <span className="truncate max-w-[150px]">{o.city}</span>
-                      </div>
-                    </td>
-
-                    {/* Fragrance Items */}
-                    <td className="py-3.5 px-4">
-                      <div className="space-y-1">
-                        {o.items?.map((it, idx) => (
-                          <div key={idx} className="font-medium text-stone-800 flex items-center gap-1.5">
-                            <span className="font-bold text-stone-900">{it.qty}x</span>
-                            <span>{it.name}</span>
-                            <span className="text-[10px] font-bold text-[#b38531] bg-amber-50 px-1.5 py-0.2 rounded border border-amber-200">
-                              {it.size || '100ML'}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </td>
-
-                    {/* Total Amount */}
-                    <td className="py-3.5 px-4">
-                      <div className="font-bold text-stone-900 text-sm">
-                        Rs. {Number(o.total).toLocaleString()}
-                      </div>
-                      {o.discount > 0 && (
-                        <div className="text-[10px] text-emerald-600 font-semibold">
-                          Saved Rs. {Number(o.discount).toLocaleString()}
-                        </div>
-                      )}
-                    </td>
-
-                    {/* Payment Method */}
-                    <td className="py-3.5 px-4">
-                      <span className="inline-flex items-center gap-1 text-[11px] font-medium text-stone-700 bg-stone-100 px-2 py-0.5 rounded">
-                        <Banknote className="w-3 h-3 text-stone-500" />
-                        <span>{o.payment || 'Cash on Delivery'}</span>
-                      </span>
-                    </td>
-
-                    {/* Status Dropdown */}
-                    <td className="py-3.5 px-4">
-                      <select
-                        value={o.status || 'Pending'}
-                        onChange={(e) => handleOrderStatusChange(o.id, e.target.value)}
-                        className={`text-xs font-semibold rounded-lg px-2.5 py-1 focus:outline-none cursor-pointer border ${
-                          o.status === 'Delivered'
-                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                            : o.status === 'Shipped'
-                            ? 'bg-blue-50 text-blue-700 border-blue-200'
-                            : o.status === 'Processing'
-                            ? 'bg-amber-50 text-amber-700 border-amber-200'
-                            : o.status === 'Cancelled'
-                            ? 'bg-rose-50 text-rose-700 border-rose-200'
-                            : 'bg-stone-100 text-stone-700 border-stone-200'
+                filteredOrders.map((o) => {
+                  const isExpanded = expandedOrderIds.has(o.id);
+                  return (
+                    <React.Fragment key={o.id}>
+                      {/* Main Table Row */}
+                      <tr
+                        onClick={() => toggleExpandOrder(o.id)}
+                        className={`transition-colors cursor-pointer select-none ${
+                          isExpanded
+                            ? 'bg-amber-50/40 border-l-4 border-l-[#b38531]'
+                            : 'hover:bg-stone-50/80 border-l-4 border-l-transparent'
                         }`}
                       >
-                        <option value="Pending">Pending</option>
-                        <option value="Processing">Processing</option>
-                        <option value="Shipped">Shipped</option>
-                        <option value="Delivered">Delivered</option>
-                        <option value="Cancelled">Cancelled</option>
-                      </select>
-                    </td>
+                        {/* Order ID & Date with Toggle Chevron */}
+                        <td className="py-3.5 px-4">
+                          <div className="flex items-center gap-2">
+                            <span
+                              className={`p-1 rounded-md transition-transform ${
+                                isExpanded ? 'bg-amber-100 text-[#b38531] rotate-180' : 'text-stone-400'
+                              }`}
+                            >
+                              <ChevronDown className="w-3.5 h-3.5" />
+                            </span>
+                            <div>
+                              <div className="font-bold text-[#b38531] font-mono">{o.id}</div>
+                              <div className="text-[10px] text-stone-400">{o.date || 'Recent'}</div>
+                            </div>
+                          </div>
+                        </td>
 
-                    {/* Actions */}
-                    <td className="py-3.5 px-4 text-right">
-                      <div className="flex items-center justify-end gap-1.5">
-                        <button
-                          type="button"
-                          onClick={() => setSelectedOrder(o)}
-                          title="View complete customer & shipping details"
-                          className="p-1.5 text-stone-500 hover:text-[#b38531] hover:bg-stone-100 rounded-lg transition-colors cursor-pointer"
-                        >
-                          <Eye className="w-4 h-4" />
-                        </button>
-                        {handleDeleteOrder && (
-                          <button
-                            type="button"
-                            onClick={() => handleDeleteOrder(o.id)}
-                            title="Delete order"
-                            className="p-1.5 text-stone-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))
+                        {/* Customer Info */}
+                        <td className="py-3.5 px-4">
+                          <div className="font-bold text-stone-900">{o.customer}</div>
+                          <div className="text-[11px] text-stone-500">{o.phone}</div>
+                          <div className="text-[10px] text-stone-400 flex items-center gap-1 mt-0.5">
+                            <MapPin className="w-3 h-3 text-stone-400 flex-shrink-0" />
+                            <span className="truncate max-w-[150px]">{o.city}</span>
+                          </div>
+                        </td>
+
+                        {/* Fragrance Items */}
+                        <td className="py-3.5 px-4">
+                          <div className="space-y-1">
+                            {o.items?.map((it, idx) => (
+                              <div key={idx} className="font-medium text-stone-800 flex items-center gap-1.5">
+                                <span className="font-bold text-stone-900">{it.qty}x</span>
+                                <span>{it.name}</span>
+                                <span className="text-[10px] font-bold text-[#b38531] bg-amber-50 px-1.5 py-0.2 rounded border border-amber-200">
+                                  {it.size || '100ML'}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </td>
+
+                        {/* Total Amount */}
+                        <td className="py-3.5 px-4">
+                          <div className="font-bold text-stone-900 text-sm">
+                            Rs. {Number(o.total).toLocaleString()}
+                          </div>
+                          {o.discount > 0 && (
+                            <div className="text-[10px] text-emerald-600 font-semibold">
+                              Saved Rs. {Number(o.discount).toLocaleString()}
+                            </div>
+                          )}
+                        </td>
+
+                        {/* Payment Method */}
+                        <td className="py-3.5 px-4">
+                          <span className="inline-flex items-center gap-1 text-[11px] font-medium text-stone-700 bg-stone-100 px-2 py-0.5 rounded">
+                            <Banknote className="w-3 h-3 text-stone-500" />
+                            <span>{o.payment || 'Cash on Delivery'}</span>
+                          </span>
+                        </td>
+
+                        {/* Status Dropdown */}
+                        <td className="py-3.5 px-4" onClick={(e) => e.stopPropagation()}>
+                          <div className="relative inline-block">
+                            <select
+                              value={o.status || 'Pending'}
+                              onChange={(e) => handleOrderStatusChange(o.id, e.target.value)}
+                              className={`text-xs font-semibold rounded-lg px-2.5 py-1.5 pr-7 focus:outline-none cursor-pointer border appearance-none transition-all ${
+                                o.status === 'Delivered'
+                                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
+                                  : o.status === 'Shipped'
+                                  ? 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100'
+                                  : o.status === 'Processing'
+                                  ? 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100'
+                                  : o.status === 'Cancelled'
+                                  ? 'bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100'
+                                  : 'bg-stone-50 text-stone-700 border-stone-200 hover:bg-stone-100'
+                              }`}
+                            >
+                              <option value="Pending">Pending</option>
+                              <option value="Processing">Processing</option>
+                              <option value="Shipped">Shipped</option>
+                              <option value="Delivered">Delivered</option>
+                              <option value="Cancelled">Cancelled</option>
+                            </select>
+                            <ChevronDown className="w-3.5 h-3.5 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-current opacity-70" />
+                          </div>
+                        </td>
+
+                        {/* Actions: Dropdown Button & Delete */}
+                        <td className="py-3.5 px-4 text-right" onClick={(e) => e.stopPropagation()}>
+                          <div className="flex items-center justify-end gap-2">
+                            {/* Dropdown Toggle Button Styled Like the Status Dropdown */}
+                            <button
+                              type="button"
+                              onClick={() => toggleExpandOrder(o.id)}
+                              title="Click to toggle order details dropdown"
+                              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer border shadow-xs ${
+                                isExpanded
+                                  ? 'bg-[#b38531] text-white border-[#b38531]'
+                                  : 'bg-amber-50 hover:bg-amber-100 text-[#b38531] border-amber-200'
+                              }`}
+                            >
+                              <Eye className="w-3.5 h-3.5" />
+                              <span>{isExpanded ? 'Hide Details' : 'Details'}</span>
+                              <ChevronDown
+                                className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                                  isExpanded ? 'rotate-180' : ''
+                                }`}
+                              />
+                            </button>
+
+                            {handleDeleteOrder && (
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteOrder(o.id)}
+                                title="Delete order"
+                                className="p-1.5 text-stone-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer border border-transparent hover:border-rose-200"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+
+                      {/* Expandable Order Details Dropdown Panel */}
+                      {isExpanded && (
+                        <tr className="bg-amber-50/25 border-b border-stone-200/90 transition-all">
+                          <td colSpan={7} className="p-3 sm:p-5">
+                            <div className="bg-white rounded-xl border border-stone-200 shadow-sm p-4 sm:p-6 space-y-5 animate-in fade-in slide-in-from-top-2 duration-200 text-stone-900">
+                              {/* Dropdown Panel Top Bar */}
+                              <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-stone-100">
+                                <div className="flex items-center gap-2.5">
+                                  <div className="w-8 h-8 rounded-lg bg-amber-50 border border-amber-200 text-[#b38531] flex items-center justify-center font-bold">
+                                    <Package className="w-4 h-4" />
+                                  </div>
+                                  <div>
+                                    <div className="flex items-center gap-2">
+                                      <h4 className="font-serif text-sm sm:text-base font-bold text-stone-900">
+                                        Order Manifest: {o.id}
+                                      </h4>
+                                      <button
+                                        type="button"
+                                        onClick={() => handleCopy(o.id)}
+                                        title="Copy Order ID"
+                                        className="text-[10px] text-stone-400 hover:text-[#b38531] flex items-center gap-1 font-mono"
+                                      >
+                                        <Copy className="w-3 h-3" />
+                                        <span>{copiedId === o.id ? 'Copied!' : 'Copy'}</span>
+                                      </button>
+                                    </div>
+                                    <span className="text-[11px] text-stone-400">
+                                      Placed on {o.date || 'Recent'} • Customer: <strong>{o.customer}</strong>
+                                    </span>
+                                  </div>
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                  <button
+                                    type="button"
+                                    onClick={() => toggleExpandOrder(o.id)}
+                                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-amber-50 hover:bg-amber-100 text-[#b38531] border border-amber-200 text-xs font-semibold cursor-pointer"
+                                  >
+                                    <ChevronUp className="w-3.5 h-3.5" />
+                                    <span>Collapse Details</span>
+                                  </button>
+                                </div>
+                              </div>
+
+                              {/* Three Columns: Customer & Address | Items | Financials */}
+                              <div className="grid grid-cols-1 md:grid-cols-3 gap-5 text-xs">
+                                {/* 1. Customer & Shipping Destination */}
+                                <div className="bg-stone-50/70 p-4 rounded-xl border border-stone-200/80 space-y-2.5">
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400">
+                                      Customer & Courier Dispatch
+                                    </span>
+                                    {o.phone && (
+                                      <a
+                                        href={`https://wa.me/${o.phone.replace(/[^0-9]/g, '')}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded hover:bg-emerald-100"
+                                      >
+                                        <MessageCircle className="w-3 h-3" />
+                                        <span>WhatsApp</span>
+                                      </a>
+                                    )}
+                                  </div>
+
+                                  <div className="space-y-1">
+                                    <p className="font-bold text-stone-900 text-sm">{o.customer}</p>
+                                    <p className="flex items-center gap-1.5 text-stone-600">
+                                      <Phone className="w-3.5 h-3.5 text-[#b38531] flex-shrink-0" />
+                                      <a href={`tel:${o.phone}`} className="hover:underline font-semibold text-stone-800">
+                                        {o.phone}
+                                      </a>
+                                    </p>
+                                    {o.email && (
+                                      <p className="flex items-center gap-1.5 text-stone-600">
+                                        <Mail className="w-3.5 h-3.5 text-stone-400 flex-shrink-0" />
+                                        <span>{o.email}</span>
+                                      </p>
+                                    )}
+                                  </div>
+
+                                  <div className="pt-2 border-t border-stone-200/80 space-y-1">
+                                    <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400 block">
+                                      Delivery Address:
+                                    </span>
+                                    <p className="text-stone-800 font-medium">
+                                      {o.address || 'Standard Delivery Address'}
+                                    </p>
+                                    <p className="text-stone-500 font-semibold">
+                                      {o.city} {o.postalCode ? `• Postal: ${o.postalCode}` : ''}
+                                    </p>
+                                  </div>
+
+                                  {o.notes && (
+                                    <div className="p-2.5 rounded-lg bg-amber-50/70 border border-amber-200 text-[11px] text-amber-900">
+                                      <strong className="block text-[10px] uppercase font-bold text-[#b38531]">
+                                        Special Customer Note:
+                                      </strong>
+                                      <span>"{o.notes}"</span>
+                                    </div>
+                                  )}
+                                </div>
+
+                                {/* 2. Purchased Items & Bottle Sizes */}
+                                <div className="space-y-2">
+                                  <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400 block">
+                                    Fragrances In This Order ({o.items?.length || 0})
+                                  </span>
+                                  <div className="border border-stone-200 rounded-xl divide-y divide-stone-100 overflow-hidden bg-white">
+                                    {o.items?.map((it, idx) => (
+                                      <div key={idx} className="p-3 flex items-center justify-between text-xs hover:bg-stone-50/50">
+                                        <div className="flex items-center gap-2.5">
+                                          {it.image ? (
+                                            <div className="w-11 h-11 rounded-lg bg-stone-50 border border-stone-200 p-0.5 flex-shrink-0 flex items-center justify-center">
+                                              <img src={it.image} alt={it.name} className="w-full h-full object-contain" />
+                                            </div>
+                                          ) : (
+                                            <div className="w-11 h-11 rounded-lg bg-amber-50 border border-amber-200 text-[#b38531] flex items-center justify-center font-bold">
+                                              {idx + 1}
+                                            </div>
+                                          )}
+                                          <div>
+                                            <div className="font-bold text-stone-900 font-serif">{it.name}</div>
+                                            <div className="flex items-center gap-1.5 text-[11px] text-stone-500 mt-0.5">
+                                              <span className="font-bold text-[#b38531] bg-amber-50 px-1.5 py-0.2 rounded border border-amber-200 text-[10px] uppercase">
+                                                {it.size || '100ML'}
+                                              </span>
+                                              <span>•</span>
+                                              <span>Rs. {Number(it.price).toLocaleString()}</span>
+                                            </div>
+                                          </div>
+                                        </div>
+
+                                        <div className="text-right">
+                                          <div className="text-stone-400 text-[11px]">Qty: {it.qty}</div>
+                                          <div className="font-bold text-stone-900 text-xs">
+                                            Rs. {(Number(it.price) * (it.qty || 1)).toLocaleString()}
+                                          </div>
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+
+                                {/* 3. Payment & Financial Summary */}
+                                <div className="bg-amber-50/40 border border-amber-200/90 rounded-xl p-4 space-y-3">
+                                  <span className="text-[10px] font-bold uppercase tracking-wider text-stone-600 block">
+                                    Financial Summary & Payment
+                                  </span>
+
+                                  <div className="space-y-1.5 text-xs text-stone-600">
+                                    <div className="flex justify-between">
+                                      <span>Items Subtotal:</span>
+                                      <span className="font-semibold text-stone-800">
+                                        Rs. {Number(o.subtotal || o.total).toLocaleString()}
+                                      </span>
+                                    </div>
+
+                                    {o.discount > 0 && (
+                                      <div className="flex justify-between text-emerald-700 font-semibold">
+                                        <span>Discount {o.couponCode ? `(${o.couponCode})` : ''}:</span>
+                                        <span>- Rs. {Number(o.discount).toLocaleString()}</span>
+                                      </div>
+                                    )}
+
+                                    <div className="flex justify-between">
+                                      <span>Express Courier:</span>
+                                      <span className="font-semibold text-stone-800">
+                                        {o.shipping === 0 ? 'FREE' : `Rs. ${o.shipping}`}
+                                      </span>
+                                    </div>
+
+                                    <div className="flex justify-between text-sm font-bold text-stone-900 pt-2 border-t border-amber-200">
+                                      <span>Grand Total:</span>
+                                      <span className="text-base text-[#b38531] font-serif">
+                                        Rs. {Number(o.total).toLocaleString()}
+                                      </span>
+                                    </div>
+                                  </div>
+
+                                  <div className="pt-2 border-t border-amber-200/70 flex items-center justify-between text-xs">
+                                    <span className="text-stone-500 text-[11px]">Payment Mode:</span>
+                                    <span className="font-bold text-stone-800 inline-flex items-center gap-1 bg-white px-2 py-0.5 rounded border border-amber-200">
+                                      <Banknote className="w-3.5 h-3.5 text-[#b38531]" />
+                                      <span>{o.payment || 'Cash on Delivery'}</span>
+                                    </span>
+                                  </div>
+
+                                  {/* Quick Status inside dropdown */}
+                                  <div className="pt-2 border-t border-amber-200/70 flex items-center justify-between gap-2">
+                                    <span className="text-[11px] font-bold text-stone-600">Current Status:</span>
+                                    <select
+                                      value={o.status || 'Pending'}
+                                      onChange={(e) => handleOrderStatusChange(o.id, e.target.value)}
+                                      className="text-xs font-bold rounded-lg px-2.5 py-1 bg-white border border-stone-300 text-stone-800 cursor-pointer focus:outline-none focus:border-[#b38531]"
+                                    >
+                                      <option value="Pending">Pending</option>
+                                      <option value="Processing">Processing</option>
+                                      <option value="Shipped">Shipped</option>
+                                      <option value="Delivered">Delivered</option>
+                                      <option value="Cancelled">Cancelled</option>
+                                    </select>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
+                  );
+                })
               )}
             </tbody>
           </table>
         </div>
       </div>
-
-      {/* Order Details Modal */}
-      {selectedOrder && (
-        <div className="fixed inset-0 z-50 overflow-y-auto">
-          <div
-            onClick={() => setSelectedOrder(null)}
-            className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
-          />
-
-          <div className="relative min-h-screen flex items-center justify-center p-4">
-            <div className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-stone-200 p-6 space-y-6 text-stone-900">
-              {/* Header */}
-              <div className="flex items-center justify-between pb-4 border-b border-stone-200">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-serif text-lg font-bold text-stone-900">
-                      Order Details: {selectedOrder.id}
-                    </h3>
-                    <span
-                      className={`text-xs font-bold px-2.5 py-0.5 rounded-full border ${
-                        selectedOrder.status === 'Delivered'
-                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                          : selectedOrder.status === 'Shipped'
-                          ? 'bg-blue-50 text-blue-700 border-blue-200'
-                          : selectedOrder.status === 'Processing'
-                          ? 'bg-amber-50 text-amber-700 border-amber-200'
-                          : selectedOrder.status === 'Cancelled'
-                          ? 'bg-rose-50 text-rose-700 border-rose-200'
-                          : 'bg-stone-100 text-stone-700 border-stone-200'
-                      }`}
-                    >
-                      {selectedOrder.status}
-                    </span>
-                  </div>
-                  <p className="text-xs text-stone-500 mt-0.5">Placed on {selectedOrder.date}</p>
-                </div>
-
-                <button
-                  onClick={() => setSelectedOrder(null)}
-                  className="p-1 text-stone-400 hover:text-stone-700 rounded-full hover:bg-stone-100 transition-colors"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              {/* Customer & Address Details */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                <div className="bg-stone-50 p-4 rounded-xl border border-stone-200/80 space-y-2">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400 block">
-                    Customer Information
-                  </span>
-                  <p className="text-sm font-bold text-stone-900">{selectedOrder.customer}</p>
-                  <p className="flex items-center gap-1.5 text-stone-600">
-                    <Mail className="w-3.5 h-3.5 text-stone-400" />
-                    <span>{selectedOrder.email}</span>
-                  </p>
-                  <p className="flex items-center gap-1.5 text-[#b38531] font-semibold">
-                    <Phone className="w-3.5 h-3.5" />
-                    <span>{selectedOrder.phone}</span>
-                  </p>
-                </div>
-
-                <div className="bg-stone-50 p-4 rounded-xl border border-stone-200/80 space-y-2">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400 block">
-                    Delivery Address
-                  </span>
-                  <p className="font-semibold text-stone-800">{selectedOrder.address || 'Standard Address'}</p>
-                  <p className="text-stone-600">
-                    {selectedOrder.city} {selectedOrder.postalCode ? `(${selectedOrder.postalCode})` : ''}
-                  </p>
-                  {selectedOrder.notes && (
-                    <div className="mt-2 pt-2 border-t border-stone-200 text-[11px] text-stone-500">
-                      <strong>Delivery Note:</strong> {selectedOrder.notes}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Purchased Items */}
-              <div className="space-y-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400 block">
-                  Purchased Fragrances
-                </span>
-                <div className="border border-stone-200 rounded-xl divide-y divide-stone-100 overflow-hidden">
-                  {selectedOrder.items?.map((it, idx) => (
-                    <div key={idx} className="p-3 flex items-center justify-between text-xs">
-                      <div className="flex items-center gap-3">
-                        {it.image && (
-                          <div className="w-10 h-10 rounded bg-stone-100 p-1 flex-shrink-0 flex items-center justify-center">
-                            <img src={it.image} alt={it.name} className="w-full h-full object-contain" />
-                          </div>
-                        )}
-                        <div>
-                          <div className="font-bold text-stone-900">{it.name}</div>
-                          <div className="text-[11px] text-stone-500 flex items-center gap-2">
-                            <span className="font-bold text-[#b38531]">{it.size || '100ML'}</span>
-                            <span>•</span>
-                            <span>Unit: Rs. {Number(it.price).toLocaleString()}</span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-stone-500 text-[11px]">Qty: {it.qty}</div>
-                        <div className="font-bold text-stone-900">
-                          Rs. {(Number(it.price) * it.qty).toLocaleString()}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Payment & Total Breakdown */}
-              <div className="bg-amber-50/50 border border-amber-200/80 rounded-xl p-4 text-xs space-y-2">
-                <div className="flex justify-between text-stone-600">
-                  <span>Subtotal:</span>
-                  <span>Rs. {Number(selectedOrder.subtotal || selectedOrder.total).toLocaleString()}</span>
-                </div>
-                {selectedOrder.discount > 0 && (
-                  <div className="flex justify-between text-emerald-700 font-medium">
-                    <span>Discount ({selectedOrder.couponCode || 'Promo'}):</span>
-                    <span>- Rs. {Number(selectedOrder.discount).toLocaleString()}</span>
-                  </div>
-                )}
-                <div className="flex justify-between text-stone-600">
-                  <span>Courier Delivery:</span>
-                  <span>{selectedOrder.shipping === 0 ? 'FREE' : `Rs. ${selectedOrder.shipping}`}</span>
-                </div>
-                <div className="flex justify-between text-sm font-bold text-stone-900 pt-2 border-t border-amber-200">
-                  <span>Total Order Amount:</span>
-                  <span className="text-base text-[#b38531]">Rs. {Number(selectedOrder.total).toLocaleString()}</span>
-                </div>
-                <div className="text-[11px] text-stone-500 pt-1">
-                  Payment Method: <strong className="text-stone-800">{selectedOrder.payment}</strong>
-                </div>
-              </div>
-
-              {/* Status Update & Close */}
-              <div className="flex items-center justify-between pt-2">
-                <div className="flex items-center gap-2 text-xs">
-                  <span className="font-bold text-stone-700">Update Status:</span>
-                  <select
-                    value={selectedOrder.status}
-                    onChange={(e) => {
-                      const newStatus = e.target.value;
-                      handleOrderStatusChange(selectedOrder.id, newStatus);
-                      setSelectedOrder((o) => ({ ...o, status: newStatus }));
-                    }}
-                    className="bg-stone-50 border border-stone-300 rounded-lg px-2.5 py-1.5 text-xs font-semibold cursor-pointer"
-                  >
-                    <option value="Pending">Pending</option>
-                    <option value="Processing">Processing</option>
-                    <option value="Shipped">Shipped</option>
-                    <option value="Delivered">Delivered</option>
-                    <option value="Cancelled">Cancelled</option>
-                  </select>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => setSelectedOrder(null)}
-                  className="px-5 py-2 bg-stone-900 hover:bg-stone-800 text-white text-xs font-semibold rounded-lg transition-colors cursor-pointer"
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
