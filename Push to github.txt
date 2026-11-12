@@ -1,23 +1,4 @@
-# ==========================================
-# GitHub Push Instructions for Milestone Fragrance
-# ==========================================
-
-# STEP 1: Create the repository on GitHub
-# Go to: https://github.com/new
-# - Repository name: Milestone_Fragnance  (or Milestone_Fragrance)
-# - Choose Public or Private
-# - Do NOT check "Add a README", ".gitignore", or "license" (leave them empty)
-# - Click "Create repository"
-
-# STEP 2 (Optional - only if your repository name differs from Milestone_Fragnance):
-# git remote set-url origin https://github.com/talha125-git/<YOUR_EXACT_REPO_NAME>.git
-
-# STEP 3: Push code to GitHub
-git push -u origin main
-
-# ==========================================
-# For future daily updates / commits:
-# ==========================================
+git init
 git add .
 git commit -m "feat: your update message"
-git push
+git push -u origin main
