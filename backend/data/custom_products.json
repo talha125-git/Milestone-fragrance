@@ -26,8 +26,10 @@
       "Rich Agarwood",
       "Vanilla"
     ],
-    "bestSeller": false,
-    "inStock": true
+    "bestSeller": true,
+    "inStock": true,
+    "isNewArrival": true,
+    "assetPath": ""
   },
   {
     "id": "mssm",
