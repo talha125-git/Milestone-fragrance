@@ -1,5 +1,8 @@
 import React from 'react';
 import { ArrowRight } from 'lucide-react';
+import manImg from '../assets/man.png';
+import womanImg from '../assets/woman.png';
+import unisexImg from '../assets/unisex.png';
 
 export default function GenderBar({ onSelectGender }) {
   const categories = [
@@ -7,30 +10,33 @@ export default function GenderBar({ onSelectGender }) {
       id: 'men',
       title: 'For Him',
       subtitle: 'Bold & Classic',
-      image: '/gender_man_clean.png',
+      image: manImg,
       alt: 'Luxury Fragrance For Him - Bold and Classic',
+      objectPos: 'object-bottom',
     },
     {
       id: 'women',
       title: 'For Her',
       subtitle: 'Elegant & Floral',
-      image: '/gender_woman_clean.png',
+      image: womanImg,
       alt: 'Luxury Fragrance For Her - Elegant and Floral',
+      objectPos: 'object-bottom',
     },
     {
       id: 'unisex',
       title: 'Unisex',
       subtitle: 'For Everyone',
-      image: '/gender_couple_clean.png',
+      image: unisexImg,
       alt: 'Luxury Unisex Fragrance - For Everyone',
+      objectPos: 'object-bottom',
     },
   ];
 
   return (
     <section className="w-full bg-[#0b0a09] border-y border-[#201a14] relative select-none">
       <div className="w-full max-w-[1920px] mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-[#2a2218]">
-          {categories.map((cat) => (
+        <div className="grid grid-cols-1 md:grid-cols-3">
+          {categories.map((cat, idx) => (
             <div
               key={cat.id}
               onClick={() => onSelectGender && onSelectGender(cat.id)}
@@ -43,24 +49,37 @@ export default function GenderBar({ onSelectGender }) {
                 }
               }}
               aria-label={`Shop ${cat.title} - ${cat.subtitle}`}
-              className="group relative flex items-center justify-between overflow-hidden bg-[#0b0a09] hover:bg-[#100e0c] transition-colors duration-300 cursor-pointer min-h-[150px] sm:min-h-[165px] md:min-h-[160px] lg:min-h-[180px] xl:min-h-[195px]"
+              className="group relative flex items-center justify-between overflow-hidden bg-[#0b0a09] hover:bg-[#110f0d] transition-colors duration-300 cursor-pointer min-h-[160px] sm:min-h-[175px] md:min-h-[180px] lg:min-h-[210px] xl:min-h-[230px]"
             >
-              {/* Right: Character Model Photo */}
-              <div className="absolute right-0 top-0 bottom-0 w-[56%] sm:w-[52%] md:w-[54%] lg:w-[50%] overflow-hidden pointer-events-none">
+              {/* Subtle vertical golden divider between columns on desktop */}
+              {idx > 0 && (
+                <div className="hidden md:block absolute left-0 top-1/2 -translate-y-1/2 h-28 w-[1px] bg-gradient-to-b from-transparent via-[#dfb76c]/25 to-transparent pointer-events-none z-20" />
+              )}
+
+              {/* Horizontal divider for mobile only */}
+              {idx > 0 && (
+                <div className="md:hidden absolute top-0 left-6 right-6 h-[1px] bg-[#221c16] pointer-events-none" />
+              )}
+
+              {/* Warm luxury spotlight glow behind character */}
+              <div className="absolute right-4 sm:right-8 top-1/2 -translate-y-1/2 w-48 h-48 bg-[#dfb76c]/10 rounded-full blur-3xl pointer-events-none group-hover:bg-[#dfb76c]/18 transition-all duration-500" />
+
+              {/* Right: Transparent Cutout Model Photo */}
+              <div className="absolute right-0 bottom-0 top-0 w-[55%] sm:w-[50%] md:w-[54%] lg:w-[52%] xl:w-[48%] overflow-hidden pointer-events-none flex items-end justify-end">
                 <img
                   src={cat.image}
                   alt={cat.alt}
-                  className="w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
+                  className={`w-full h-full object-cover sm:object-contain md:object-cover ${cat.objectPos} transition-transform duration-700 ease-out group-hover:scale-105`}
                   loading="lazy"
                 />
-                {/* Dark gradient fade on the left edge for perfect seamless text blend */}
-                <div className="absolute inset-y-0 left-0 w-16 sm:w-24 bg-gradient-to-r from-[#0b0a09] to-transparent pointer-events-none" />
+                {/* Soft gradient fade on the left edge for seamless text blend */}
+                <div className="absolute inset-y-0 left-0 w-16 sm:w-24 bg-gradient-to-r from-[#0b0a09] via-[#0b0a09]/70 to-transparent pointer-events-none" />
               </div>
 
-              {/* Left: Real HTML Typography, Gold Underline, and Button */}
-              <div className="relative z-10 pl-6 sm:pl-8 lg:pl-10 xl:pl-12 py-5 max-w-[56%] sm:max-w-[54%] flex flex-col items-start justify-center">
+              {/* Left: Luxury Typography, Gold Accent Underline, and Button */}
+              <div className="relative z-10 pl-6 sm:pl-8 lg:pl-10 xl:pl-14 py-6 max-w-[55%] sm:max-w-[52%] flex flex-col items-start justify-center">
                 {/* Title */}
-                <h3 className="text-xl sm:text-2xl lg:text-[25px] xl:text-[27px] font-sans font-bold text-white tracking-tight leading-none group-hover:text-white transition-colors">
+                <h3 className="text-xl sm:text-2xl lg:text-[26px] xl:text-[28px] font-sans font-bold text-white tracking-tight leading-none group-hover:text-white transition-colors">
                   {cat.title}
                 </h3>
 
@@ -83,8 +102,8 @@ export default function GenderBar({ onSelectGender }) {
                 </button>
               </div>
 
-              {/* Subtle luxury gold rim light on hover */}
-              <div className="absolute inset-0 border border-transparent group-hover:border-[#dfb76c]/30 transition-colors duration-300 pointer-events-none" />
+              {/* Subtle luxury gold rim light on card hover */}
+              <div className="absolute inset-0 border border-transparent group-hover:border-[#dfb76c]/25 transition-colors duration-300 pointer-events-none" />
             </div>
           ))}
         </div>
