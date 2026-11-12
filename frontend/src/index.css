@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 15s linear infinite;
+}
+
+
+@layer base {
+  :root {
+    --font-serif: 'Playfair Display', Georgia, serif;
+    --font-cormorant: 'Cormorant Garamond', Georgia, serif;
+    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  }
+}
+
+.font-serif {
+  font-family: 'Playfair Display', Georgia, serif;
+}
+
+.font-cormorant {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+}
+
+.font-sans {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0d0c0a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2a2620;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #dfb76c;
+}
