@@ -143,6 +143,12 @@ export default function AdminDashboard({
     tagline: '',
     price: 6499,
     originalPrice: 7999,
+    sizePrices: {
+      '100ml': 9999,
+      '50ml': 6499,
+      '30ml': 4299,
+      '10ml': 1999,
+    },
     gender: 'Unisex',
     type: 'Woody',
     concentration: 'Eau De Parfum',
@@ -349,12 +355,19 @@ export default function AdminDashboard({
   // Open Edit Modal
   const handleOpenEditModal = (product) => {
     setEditingProduct(product);
+    const basePrice = Number(product.price) || 6499;
     setFormData({
       name: product.name || '',
       subtitle: product.subtitle || '',
       tagline: product.tagline || '',
-      price: product.price || 6499,
-      originalPrice: product.originalPrice || 7999,
+      price: basePrice,
+      originalPrice: product.originalPrice || basePrice + 1500,
+      sizePrices: product.sizePrices ? { ...product.sizePrices } : {
+        '100ml': Math.round(basePrice * 1.6),
+        '50ml': basePrice,
+        '30ml': Math.round(basePrice * 0.65),
+        '10ml': Math.round(basePrice * 0.35),
+      },
       gender: product.gender || 'Unisex',
       type: product.type || 'Woody',
       concentration: product.concentration || 'Eau De Parfum',
@@ -389,8 +402,18 @@ export default function AdminDashboard({
       formData.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') ||
       `prod-${Date.now()}`;
 
+    const baseP = Number(formData.price) || 6499;
+    const finalSizePrices = {
+      '100ml': Number(formData.sizePrices?.['100ml']) || Math.round(baseP * 1.6),
+      '50ml': baseP,
+      '30ml': Number(formData.sizePrices?.['30ml']) || Math.round(baseP * 0.65),
+      '10ml': Number(formData.sizePrices?.['10ml']) || Math.round(baseP * 0.35),
+    };
+
     const newProduct = {
       ...formData,
+      price: baseP,
+      sizePrices: finalSizePrices,
       id: newId,
       rating: 5,
       reviewsCount: 1,
@@ -417,9 +440,19 @@ export default function AdminDashboard({
     e.preventDefault();
     if (!editingProduct) return;
 
+    const baseP = Number(formData.price) || editingProduct.price || 6499;
+    const finalSizePrices = {
+      '100ml': Number(formData.sizePrices?.['100ml']) || Math.round(baseP * 1.6),
+      '50ml': baseP,
+      '30ml': Number(formData.sizePrices?.['30ml']) || Math.round(baseP * 0.65),
+      '10ml': Number(formData.sizePrices?.['10ml']) || Math.round(baseP * 0.35),
+    };
+
     const updated = {
       ...editingProduct,
       ...formData,
+      price: baseP,
+      sizePrices: finalSizePrices,
       topNotes:
         typeof formData.topNotes === 'string'
           ? formData.topNotes.split(',').map((s) => s.trim()).filter(Boolean)

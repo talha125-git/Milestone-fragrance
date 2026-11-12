@@ -8,19 +8,44 @@ export default function QuickViewModal({
   onToggleWishlist,
   isWishlisted,
 }) {
-  const [selectedSize, setSelectedSize] = useState('50ml');
+  const [selectedSize, setSelectedSize] = useState('100ml');
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
 
   if (!product) return null;
 
-  const currentPrice = selectedSize === '50ml' ? product.price : Math.round(product.price * 1.7);
-  const originalPrice = selectedSize === '50ml' ? product.originalPrice : Math.round(product.originalPrice * 1.7);
+  const getSizePrice = (prod, size) => {
+    if (!prod) return 0;
+    const s = (size || '100ml').toLowerCase().trim();
+    if (prod.sizePrices && prod.sizePrices[s] !== undefined && Number(prod.sizePrices[s]) > 0) {
+      return Number(prod.sizePrices[s]);
+    }
+    const base = Number(prod.price) || 6499;
+    if (s === '10ml') return Math.round(base * 0.35);
+    if (s === '30ml') return Math.round(base * 0.65);
+    if (s === '50ml') return base;
+    if (s === '100ml') return Math.round(base * 1.6);
+    return base;
+  };
+
+  const getSizeOriginalPrice = (prod, size) => {
+    if (!prod) return 0;
+    const s = (size || '100ml').toLowerCase().trim();
+    const cur = getSizePrice(prod, size);
+    if (prod.originalPrice && prod.price) {
+      const diff = Number(prod.originalPrice) - Number(prod.price);
+      return cur + (diff > 0 ? diff : 1500);
+    }
+    return cur + 1500;
+  };
+
+  const currentPrice = getSizePrice(product, selectedSize);
+  const originalPrice = getSizeOriginalPrice(product, selectedSize);
 
   const handleAdd = () => {
     onAddToCart({
       ...product,
-      size: `${selectedSize} / ${selectedSize === '50ml' ? '1.7' : '3.4'} fl.oz`,
+      size: selectedSize.toUpperCase(),
       price: currentPrice,
     }, quantity);
     setAdded(true);
@@ -132,21 +157,42 @@ export default function QuickViewModal({
 
               {/* Size Selector */}
               <div>
-                <label className="text-xs text-stone-400 font-medium block mb-2">Bottle Size</label>
-                <div className="flex gap-3">
-                  {['50ml', '100ml'].map((sz) => (
-                    <button
-                      key={sz}
-                      onClick={() => setSelectedSize(sz)}
-                      className={`text-xs px-4 py-2 rounded border transition-colors ${
-                        selectedSize === sz
-                          ? 'border-[#dfb76c] bg-[#dfb76c]/10 text-[#dfb76c] font-semibold'
-                          : 'border-stone-800 bg-[#171411] text-stone-300 hover:border-stone-600'
-                      }`}
-                    >
-                      {sz} {sz === '50ml' ? '(1.7 fl.oz)' : '(3.4 fl.oz)'}
-                    </button>
-                  ))}
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-sm font-sans font-medium text-stone-200 block">Size</label>
+                  <span className="text-[11px] text-stone-400">
+                    <strong className="text-[#dfb76c] uppercase">{selectedSize}</strong> • Rs. {currentPrice.toLocaleString()}
+                  </span>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  {['100ml', '50ml', '30ml', '10ml'].map((sz) => {
+                    const isSelected = selectedSize.toLowerCase() === sz;
+                    return (
+                      <button
+                        key={sz}
+                        type="button"
+                        onClick={() => setSelectedSize(sz)}
+                        className={`min-w-[76px] sm:min-w-[85px] h-[40px] sm:h-[44px] transition-all cursor-pointer font-sans rounded-none select-none flex items-center justify-center ${
+                          isSelected
+                            ? 'border border-white p-[2px] bg-transparent'
+                            : 'border border-stone-600 bg-transparent hover:border-stone-400'
+                        }`}
+                      >
+                        {isSelected ? (
+                          <div className="w-full h-full bg-[#1b251e] border border-stone-600/70 flex items-center justify-center px-2">
+                            <span className="text-xs font-bold tracking-wider text-white uppercase">
+                              {sz.toUpperCase()}
+                            </span>
+                          </div>
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center px-2">
+                            <span className="text-xs font-medium tracking-wider text-stone-300 uppercase hover:text-white">
+                              {sz.toUpperCase()}
+                            </span>
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 

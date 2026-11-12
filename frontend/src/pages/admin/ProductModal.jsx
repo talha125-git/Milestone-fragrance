@@ -175,7 +175,17 @@ export default function ProductModal({
                   type="number"
                   required
                   value={formData.price}
-                  onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
+                  onChange={(e) => {
+                    const val = Number(e.target.value);
+                    setFormData((f) => ({
+                      ...f,
+                      price: val,
+                      sizePrices: {
+                        ...(f.sizePrices || {}),
+                        '50ml': val,
+                      },
+                    }));
+                  }}
                   className="w-full bg-stone-50 border border-stone-200 text-stone-900 text-xs rounded-lg p-2.5 focus:outline-none focus:border-[#b38531] focus:bg-white"
                 />
               </div>
@@ -224,6 +234,133 @@ export default function ProductModal({
                   <option value="Fruity">Fruity</option>
                 </select>
               </div>
+            </div>
+
+            {/* Dynamic Bottle Size Pricing Section */}
+            <div className="p-4 rounded-xl bg-amber-50/40 border border-amber-200/90 space-y-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                <label className="text-[11px] font-bold uppercase tracking-wider text-stone-900 flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#b38531]"></span>
+                  <span>Bottle Sizes & Dynamic Pricing (Rs.) *</span>
+                </label>
+                <span className="text-[11px] text-stone-500 font-medium">
+                  Dynamic prices for 100ML, 50ML, 30ML & 10ML
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
+                {/* 100ML */}
+                <div className="bg-white p-3 rounded-lg border border-stone-200 shadow-xs">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-xs font-bold text-stone-900">100ML</span>
+                    <span className="text-[10px] text-stone-400 font-medium">Grande (3.4 oz)</span>
+                  </div>
+                  <div className="relative">
+                    <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-stone-400 text-xs font-bold">Rs.</span>
+                    <input
+                      type="number"
+                      min="0"
+                      value={formData.sizePrices?.['100ml'] ?? Math.round((Number(formData.price) || 6499) * 1.6)}
+                      onChange={(e) => {
+                        const val = Number(e.target.value);
+                        setFormData((f) => ({
+                          ...f,
+                          sizePrices: {
+                            ...(f.sizePrices || {}),
+                            '100ml': val,
+                          },
+                        }));
+                      }}
+                      className="w-full bg-stone-50 border border-stone-200 text-stone-900 text-xs font-bold rounded p-2 pl-9 focus:outline-none focus:border-[#b38531] focus:bg-white"
+                    />
+                  </div>
+                </div>
+
+                {/* 50ML */}
+                <div className="bg-white p-3 rounded-lg border border-[#b38531]/40 shadow-xs ring-1 ring-[#b38531]/20">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-xs font-bold text-[#b38531]">50ML (Standard)</span>
+                    <span className="text-[10px] text-stone-400 font-medium">Base (1.7 oz)</span>
+                  </div>
+                  <div className="relative">
+                    <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-stone-400 text-xs font-bold">Rs.</span>
+                    <input
+                      type="number"
+                      min="0"
+                      value={formData.sizePrices?.['50ml'] ?? formData.price ?? 6499}
+                      onChange={(e) => {
+                        const val = Number(e.target.value);
+                        setFormData((f) => ({
+                          ...f,
+                          price: val,
+                          sizePrices: {
+                            ...(f.sizePrices || {}),
+                            '50ml': val,
+                          },
+                        }));
+                      }}
+                      className="w-full bg-stone-50 border border-stone-200 text-stone-900 text-xs font-bold rounded p-2 pl-9 focus:outline-none focus:border-[#b38531] focus:bg-white"
+                    />
+                  </div>
+                </div>
+
+                {/* 30ML */}
+                <div className="bg-white p-3 rounded-lg border border-stone-200 shadow-xs">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-xs font-bold text-stone-900">30ML</span>
+                    <span className="text-[10px] text-stone-400 font-medium">Midi (1.0 oz)</span>
+                  </div>
+                  <div className="relative">
+                    <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-stone-400 text-xs font-bold">Rs.</span>
+                    <input
+                      type="number"
+                      min="0"
+                      value={formData.sizePrices?.['30ml'] ?? Math.round((Number(formData.price) || 6499) * 0.65)}
+                      onChange={(e) => {
+                        const val = Number(e.target.value);
+                        setFormData((f) => ({
+                          ...f,
+                          sizePrices: {
+                            ...(f.sizePrices || {}),
+                            '30ml': val,
+                          },
+                        }));
+                      }}
+                      className="w-full bg-stone-50 border border-stone-200 text-stone-900 text-xs font-bold rounded p-2 pl-9 focus:outline-none focus:border-[#b38531] focus:bg-white"
+                    />
+                  </div>
+                </div>
+
+                {/* 10ML */}
+                <div className="bg-white p-3 rounded-lg border border-stone-200 shadow-xs">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-xs font-bold text-stone-900">10ML</span>
+                    <span className="text-[10px] text-stone-400 font-medium">Travel / Pocket</span>
+                  </div>
+                  <div className="relative">
+                    <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-stone-400 text-xs font-bold">Rs.</span>
+                    <input
+                      type="number"
+                      min="0"
+                      value={formData.sizePrices?.['10ml'] ?? Math.round((Number(formData.price) || 6499) * 0.35)}
+                      onChange={(e) => {
+                        const val = Number(e.target.value);
+                        setFormData((f) => ({
+                          ...f,
+                          sizePrices: {
+                            ...(f.sizePrices || {}),
+                            '10ml': val,
+                          },
+                        }));
+                      }}
+                      className="w-full bg-stone-50 border border-stone-200 text-stone-900 text-xs font-bold rounded p-2 pl-9 focus:outline-none focus:border-[#b38531] focus:bg-white"
+                    />
+                  </div>
+                </div>
+              </div>
+              <p className="text-[11px] text-stone-500 italic">
+                * When customers select 100ML, 50ML, 30ML, or 10ML on product page, the price updates dynamically in real-time.
+              </p>
             </div>
 
             <div>

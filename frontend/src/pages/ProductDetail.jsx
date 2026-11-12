@@ -44,7 +44,7 @@ export default function ProductDetail({
       ? isWishlisted
       : Array.isArray(wishlist) && wishlist.some((w) => w.id === currentProduct?.id);
 
-  const [selectedSize, setSelectedSize] = useState('50ml');
+  const [selectedSize, setSelectedSize] = useState('100ml');
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -52,30 +52,49 @@ export default function ProductDetail({
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    setSelectedSize('50ml');
+    setSelectedSize('100ml');
     setQuantity(1);
     setAdded(false);
   }, [currentProduct?.id]);
 
-  const currentPrice =
-    selectedSize === '50ml'
-      ? currentProduct.price
-      : Math.round(currentProduct.price * 1.7);
+  // Dynamic price resolution for bottle sizes (100ml, 50ml, 30ml, 10ml)
+  const getSizePrice = (product, size) => {
+    if (!product) return 0;
+    const s = (size || '100ml').toLowerCase().trim();
+    if (product.sizePrices && product.sizePrices[s] !== undefined && Number(product.sizePrices[s]) > 0) {
+      return Number(product.sizePrices[s]);
+    }
+    const base = Number(product.price) || 6499;
+    if (s === '10ml') return Math.round(base * 0.35);
+    if (s === '30ml') return Math.round(base * 0.65);
+    if (s === '50ml') return base;
+    if (s === '100ml') return Math.round(base * 1.6);
+    return base;
+  };
 
-  const originalPrice =
-    selectedSize === '50ml'
-      ? currentProduct.originalPrice
-      : Math.round(currentProduct.originalPrice * 1.7);
+  const getSizeOriginalPrice = (product, size) => {
+    if (!product) return 0;
+    const s = (size || '100ml').toLowerCase().trim();
+    const cur = getSizePrice(product, size);
+    if (product.originalPrice && product.price) {
+      const diff = Number(product.originalPrice) - Number(product.price);
+      return cur + (diff > 0 ? diff : 1500);
+    }
+    return cur + 1500;
+  };
 
-  const savingsPercent = Math.round(
-    ((originalPrice - currentPrice) / originalPrice) * 100
-  );
+  const currentPrice = getSizePrice(currentProduct, selectedSize);
+  const originalPrice = getSizeOriginalPrice(currentProduct, selectedSize);
+
+  const savingsPercent = originalPrice > currentPrice
+    ? Math.round(((originalPrice - currentPrice) / originalPrice) * 100)
+    : 0;
 
   const handleAdd = () => {
     onAddToCart(
       {
         ...currentProduct,
-        size: `${selectedSize} / ${selectedSize === '50ml' ? '1.7' : '3.4'} fl.oz`,
+        size: selectedSize.toUpperCase(),
         price: currentPrice,
       },
       quantity
@@ -339,27 +358,46 @@ export default function ProductDetail({
             </div>
 
             {/* Size Selector */}
-            <div>
-              <label className="text-xs text-stone-400 font-semibold uppercase tracking-wider block mb-2.5">
-                Select Bottle Volume
-              </label>
-              <div className="flex gap-3">
-                {['50ml', '100ml'].map((sz) => (
-                  <button
-                    key={sz}
-                    onClick={() => setSelectedSize(sz)}
-                    className={`text-xs px-5 py-2.5 rounded-lg border transition-all cursor-pointer focus:outline-none ${
-                      selectedSize === sz
-                        ? 'border-[#dfb76c] bg-[#dfb76c]/15 text-[#dfb76c] font-semibold shadow-sm'
-                        : 'border-[#262018] bg-[#14120f] text-stone-300 hover:border-stone-600'
-                    }`}
-                  >
-                    <span className="block font-medium">{sz}</span>
-                    <span className="text-[10px] text-stone-400">
-                      {sz === '50ml' ? '1.7 fl.oz (Standard)' : '3.4 fl.oz (Grande)'}
-                    </span>
-                  </button>
-                ))}
+            <div className="pt-1">
+              <div className="flex items-center justify-between mb-2.5">
+                <label className="text-base font-sans font-medium text-stone-100 block tracking-wide">
+                  Size
+                </label>
+                <span className="text-xs text-stone-400 font-sans">
+                  Selected: <strong className="text-[#dfb76c] uppercase">{selectedSize}</strong> (Rs. {currentPrice.toLocaleString()})
+                </span>
+              </div>
+              <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
+                {['100ml', '50ml', '30ml', '10ml'].map((sz) => {
+                  const isSelected = selectedSize.toLowerCase() === sz;
+                  return (
+                    <button
+                      key={sz}
+                      type="button"
+                      onClick={() => setSelectedSize(sz)}
+                      aria-label={`Select size ${sz.toUpperCase()}`}
+                      className={`min-w-[85px] sm:min-w-[105px] h-[46px] sm:h-[50px] transition-all cursor-pointer font-sans rounded-none select-none flex items-center justify-center ${
+                        isSelected
+                          ? 'border border-white p-[3px] bg-transparent'
+                          : 'border border-stone-600 bg-transparent hover:border-stone-400'
+                      }`}
+                    >
+                      {isSelected ? (
+                        <div className="w-full h-full bg-[#1b251e] border border-stone-600/70 flex items-center justify-center">
+                          <span className="text-xs sm:text-sm font-bold tracking-wider text-white uppercase">
+                            {sz.toUpperCase()}
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <span className="text-xs sm:text-sm font-medium tracking-wider text-stone-300 uppercase hover:text-white">
+                            {sz.toUpperCase()}
+                          </span>
+                        </div>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 

@@ -187,11 +187,25 @@ export default function App() {
   };
 
   const handleAddToCart = (product, quantity = 1) => {
+    const itemSize = (product.size || '100ML').toUpperCase();
+    const itemKey = `${product.id}__${itemSize}`;
+
+    let itemPrice = Number(product.price);
+    if (!itemPrice || isNaN(itemPrice)) {
+      if (product.sizePrices && product.sizePrices[itemSize.toLowerCase()]) {
+        itemPrice = Number(product.sizePrices[itemSize.toLowerCase()]);
+      } else {
+        itemPrice = 6499;
+      }
+    }
+
     setCart((prev) => {
-      const existing = prev.find((item) => item.id === product.id);
+      const existing = prev.find(
+        (item) => (item.cartKey || `${item.id}__${(item.size || '100ML').toUpperCase()}`) === itemKey
+      );
       if (existing) {
         return prev.map((item) =>
-          item.id === product.id
+          (item.cartKey || `${item.id}__${(item.size || '100ML').toUpperCase()}`) === itemKey
             ? { ...item, quantity: item.quantity + quantity }
             : item
         );
@@ -200,30 +214,37 @@ export default function App() {
         ...prev,
         {
           id: product.id,
+          cartKey: itemKey,
           name: product.name,
-          price: product.price,
+          price: itemPrice,
           image: product.image,
           quantity: quantity,
-          size: product.size || '50ml / 1.7 fl.oz',
+          size: itemSize,
           concentration: product.concentration || 'Eau De Parfum',
         },
       ];
     });
-    showToast(`Added "${product.name}" to cart`);
+    showToast(`Added "${product.name}" (${itemSize}) to cart`);
   };
 
-  const handleUpdateQuantity = (id, newQty) => {
+  const handleUpdateQuantity = (targetKeyOrId, newQty) => {
     if (newQty <= 0) {
-      handleRemoveItem(id);
+      handleRemoveItem(targetKeyOrId);
       return;
     }
     setCart((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, quantity: newQty } : item))
+      prev.map((item) =>
+        item.cartKey === targetKeyOrId || item.id === targetKeyOrId
+          ? { ...item, quantity: newQty }
+          : item
+      )
     );
   };
 
-  const handleRemoveItem = (id) => {
-    setCart((prev) => prev.filter((item) => item.id !== id));
+  const handleRemoveItem = (targetKeyOrId) => {
+    setCart((prev) =>
+      prev.filter((item) => item.cartKey !== targetKeyOrId && item.id !== targetKeyOrId)
+    );
   };
 
   const handleClearCart = () => {

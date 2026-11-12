@@ -102,16 +102,23 @@ export default function ProductsTab({
                     </div>
                   </td>
 
-                  {/* Retail Price */}
+                  {/* Retail Price & Sizes */}
                   <td className="py-3.5 px-4">
                     <div className="font-bold text-stone-900 text-sm">
                       Rs. {Number(p.price).toLocaleString()}
+                      <span className="text-[10px] font-normal text-stone-400 ml-1">(50ml)</span>
                     </div>
-                    {p.originalPrice > p.price && (
+                    {p.sizePrices ? (
+                      <div className="text-[10px] text-stone-500 font-medium space-x-1">
+                        <span>100ML: Rs. {Number(p.sizePrices['100ml'] || Math.round(p.price * 1.6)).toLocaleString()}</span>
+                        <span>•</span>
+                        <span>10ML: Rs. {Number(p.sizePrices['10ml'] || Math.round(p.price * 0.35)).toLocaleString()}</span>
+                      </div>
+                    ) : p.originalPrice > p.price ? (
                       <div className="text-[10px] text-stone-400 line-through">
                         Rs. {Number(p.originalPrice).toLocaleString()}
                       </div>
-                    )}
+                    ) : null}
                   </td>
 
                   {/* Stock Toggle */}

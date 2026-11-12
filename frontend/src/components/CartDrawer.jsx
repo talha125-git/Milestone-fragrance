@@ -150,7 +150,7 @@ export default function CartDrawer({
             ) : (
               cart.map((item) => (
                 <div
-                  key={item.id}
+                  key={item.cartKey || `${item.id}-${item.size || '100ml'}`}
                   className="flex gap-3.5 p-3 rounded-lg bg-[#181410] border border-[#2b2319]"
                 >
                   {/* Thumbnail */}
@@ -186,14 +186,18 @@ export default function CartDrawer({
                           {item.name}
                         </h4>
                         <button
-                          onClick={() => onRemoveItem(item.id)}
+                          onClick={() => onRemoveItem(item.cartKey || item.id)}
                           aria-label="Remove item"
-                          className="text-stone-500 hover:text-red-400 transition-colors p-0.5"
+                          className="text-stone-500 hover:text-red-400 transition-colors p-0.5 cursor-pointer"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
-                      <p className="text-[11px] text-stone-400">{item.concentration || '50ml EDP'}</p>
+                      <p className="text-[11px] text-stone-400 flex items-center gap-1.5 mt-0.5">
+                        <span className="font-semibold text-stone-200 uppercase">{item.size || '100ML'}</span>
+                        <span>•</span>
+                        <span>{item.concentration || 'Eau De Parfum'}</span>
+                      </p>
                       <p className="text-xs font-semibold text-[#dfb76c] mt-0.5">
                         Rs. {item.price.toLocaleString()}
                       </p>
@@ -203,8 +207,8 @@ export default function CartDrawer({
                     <div className="flex items-center gap-3 pt-2">
                       <div className="flex items-center border border-stone-700 rounded bg-[#100e0c]">
                         <button
-                          onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
-                          className="p-1 hover:text-[#dfb76c] text-stone-400 focus:outline-none"
+                          onClick={() => onUpdateQuantity(item.cartKey || item.id, item.quantity - 1)}
+                          className="p-1 hover:text-[#dfb76c] text-stone-400 focus:outline-none cursor-pointer"
                         >
                           <Minus className="w-3 h-3" />
                         </button>
@@ -212,8 +216,8 @@ export default function CartDrawer({
                           {item.quantity}
                         </span>
                         <button
-                          onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
-                          className="p-1 hover:text-[#dfb76c] text-stone-400 focus:outline-none"
+                          onClick={() => onUpdateQuantity(item.cartKey || item.id, item.quantity + 1)}
+                          className="p-1 hover:text-[#dfb76c] text-stone-400 focus:outline-none cursor-pointer"
                         >
                           <Plus className="w-3 h-3" />
                         </button>
