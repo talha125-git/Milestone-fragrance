@@ -30,7 +30,7 @@ export default function GenderBar({ onSelectGender }) {
   ];
 
   return (
-    <section className="w-full bg-[#0b0a09] border-y border-[#201a14] relative select-none">
+    <section className="w-full bg-[#0d0b09] border-y border-[#221d17] relative select-none">
       <div className="w-full max-w-[1920px] mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-3">
           {categories.map((cat, idx) => (
@@ -46,7 +46,7 @@ export default function GenderBar({ onSelectGender }) {
                 }
               }}
               aria-label={`Shop ${cat.title} - ${cat.subtitle}`}
-              className="group relative flex items-center justify-between overflow-hidden bg-[#0b0a09] hover:bg-[#110f0d] transition-colors duration-300 cursor-pointer min-h-[260px] sm:min-h-[290px] md:min-h-[320px] lg:min-h-[360px] xl:min-h-[390px]"
+              className="group relative flex items-center justify-between overflow-hidden bg-[#0d0b09] cursor-pointer min-h-[260px] sm:min-h-[290px] md:min-h-[320px] lg:min-h-[360px] xl:min-h-[390px]"
             >
               {/* Subtle vertical golden divider between columns on desktop */}
               {idx > 0 && (
@@ -55,32 +55,27 @@ export default function GenderBar({ onSelectGender }) {
 
               {/* Horizontal divider for mobile only */}
               {idx > 0 && (
-                <div className="md:hidden absolute top-0 left-6 right-6 h-[1px] bg-[#221c16] pointer-events-none" />
+                <div className="md:hidden absolute top-0 left-6 right-6 h-[1px] bg-[#221d17] pointer-events-none" />
               )}
 
-              {/* Warm luxury spotlight glow behind character */}
-              <div className="absolute right-6 sm:right-10 top-1/2 -translate-y-1/2 w-56 h-56 bg-[#dfb76c]/12 rounded-full blur-3xl pointer-events-none group-hover:bg-[#dfb76c]/20 transition-all duration-500" />
-
-              {/* Right: Full-height Model Photo (never cropped, head and hair 100% visible) */}
+              {/* Right: Full-height Model Photo with smooth zoom transition on card hover */}
               <div className="absolute right-0 bottom-0 top-3 sm:top-4 md:top-5 w-[60%] sm:w-[56%] md:w-[62%] lg:w-[58%] xl:w-[55%] overflow-hidden pointer-events-none flex items-end justify-end">
                 <img
                   src={cat.image}
                   alt={cat.alt}
-                  className="h-full w-auto max-w-full object-contain object-bottom transition-transform duration-700 ease-out group-hover:scale-105"
+                  className="h-full w-auto max-w-full object-contain object-bottom transition-transform duration-500 ease-out group-hover:scale-105 will-change-transform"
                   loading="lazy"
                 />
-                {/* Soft gradient fade on the left edge for seamless text blend */}
-                <div className="absolute inset-y-0 left-0 w-20 sm:w-28 bg-gradient-to-r from-[#0b0a09] via-[#0b0a09]/80 to-transparent pointer-events-none z-10" />
               </div>
 
               {/* Left: Luxury Typography, Gold Accent Underline, and Button */}
               <div className="relative z-10 pl-6 sm:pl-8 lg:pl-10 xl:pl-14 py-6 max-w-[52%] sm:max-w-[48%] flex flex-col items-start justify-center">
                 {/* Title */}
-                <h3 className="text-2xl sm:text-3xl lg:text-[32px] xl:text-[34px] font-sans font-bold text-white tracking-tight leading-none group-hover:text-white transition-colors">
+                <h3 className="text-2xl sm:text-3xl lg:text-[32px] xl:text-[34px] font-sans font-bold text-white tracking-tight leading-none">
                   {cat.title}
                 </h3>
 
-                {/* Gold Underline Accent matching user's design */}
+                {/* Gold Underline Accent */}
                 <div className="w-8 sm:w-10 h-[2px] bg-[#dfb76c] my-2.5 sm:my-3 transition-all duration-300 group-hover:w-14 group-hover:bg-[#f0c87d]" />
 
                 {/* Subtitle */}
@@ -92,15 +87,12 @@ export default function GenderBar({ onSelectGender }) {
                 <button
                   type="button"
                   tabIndex={-1}
-                  className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full border border-[#dfb76c]/70 text-[#dfb76c] text-[11px] sm:text-xs font-semibold tracking-wider uppercase transition-all duration-300 group-hover:bg-[#dfb76c] group-hover:text-[#0b0a09] group-hover:border-[#dfb76c] shadow-xs active:scale-95 cursor-pointer"
+                  className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full border border-[#dfb76c]/70 text-[#dfb76c] text-[11px] sm:text-xs font-semibold tracking-wider uppercase transition-all duration-300 group-hover:bg-[#dfb76c] group-hover:text-[#0d0b09] group-hover:border-[#dfb76c] shadow-xs active:scale-95 cursor-pointer"
                 >
                   <span>SHOP NOW</span>
                   <ArrowRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-1" />
                 </button>
               </div>
-
-              {/* Subtle luxury gold rim light on card hover */}
-              <div className="absolute inset-0 border border-transparent group-hover:border-[#dfb76c]/25 transition-colors duration-300 pointer-events-none" />
             </div>
           ))}
         </div>
