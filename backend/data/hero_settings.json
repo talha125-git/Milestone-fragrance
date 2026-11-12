@@ -1,8 +1,13 @@
 [
   {
     "id": "ghanam",
+<<<<<<< HEAD
     "bgKey": "ghanamHeroBg",
     "bgImage": "/src/assets/ghanam_rang_hero_bg.png",
+=======
+    "bgKey": "professorHeroBg",
+    "bgImage": "/src/assets/professor_hero_bg.png",
+>>>>>>> origin/main
     "tag": "GHANAM RANGE • ORIENTAL HERITAGE",
     "titleLine1": "Ghanam Range",
     "titleLine2": "Crafted For Royalty",
@@ -28,7 +33,11 @@
     "bgKey": "heroBg",
     "bgImage": "/src/assets/hero_bg_image.png",
     "tag": "SIGNATURE SERIES • PREMIUM FRAGRANCES",
+<<<<<<< HEAD
     "titleLine1": "Signature Scents",
+=======
+    "titleLine1": "Timeless Scents",
+>>>>>>> origin/main
     "titleLine2": "For Every Moment",
     "description": "Discover the art of fragrance. Crafted for those who leave a lasting impression. A refined balance of warm woods, golden amber, and Italian bergamot.",
     "notes": "Warm Woods & Amber • Cedarwood & Oud",
