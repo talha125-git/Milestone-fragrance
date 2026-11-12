@@ -48,7 +48,7 @@ export default function ProductDetail({
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [activeTab, setActiveTab] = useState('notes');
+  const [activeTab, setActiveTab] = useState('usage');
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -448,24 +448,14 @@ export default function ProductDetail({
           </div>
         </div>
 
-        {/* Detailed Tabs: Performance, Scent Journey, How to Apply */}
+        {/* Detailed Tabs: How to Apply & The Atelier Craft */}
         <div className="border-t border-[#221e1a] pt-12 mb-16 sm:mb-24">
           <div className="flex items-center justify-center gap-2 sm:gap-4 mb-8 border-b border-[#221e1a] pb-4">
             <button
-              onClick={() => setActiveTab('notes')}
-              className={`text-xs sm:text-sm font-semibold px-4 py-2 rounded-full transition-colors cursor-pointer ${
-                activeTab === 'notes'
-                  ? 'bg-[#dfb76c] text-black'
-                  : 'text-stone-400 hover:text-white bg-[#14120f]'
-              }`}
-            >
-              Fragrance Architecture
-            </button>
-            <button
               onClick={() => setActiveTab('usage')}
-              className={`text-xs sm:text-sm font-semibold px-4 py-2 rounded-full transition-colors cursor-pointer ${
+              className={`text-xs sm:text-sm font-semibold px-5 py-2.5 rounded-full transition-colors cursor-pointer ${
                 activeTab === 'usage'
-                  ? 'bg-[#dfb76c] text-black'
+                  ? 'bg-[#dfb76c] text-black shadow-sm'
                   : 'text-stone-400 hover:text-white bg-[#14120f]'
               }`}
             >
@@ -473,9 +463,9 @@ export default function ProductDetail({
             </button>
             <button
               onClick={() => setActiveTab('craft')}
-              className={`text-xs sm:text-sm font-semibold px-4 py-2 rounded-full transition-colors cursor-pointer ${
+              className={`text-xs sm:text-sm font-semibold px-5 py-2.5 rounded-full transition-colors cursor-pointer ${
                 activeTab === 'craft'
-                  ? 'bg-[#dfb76c] text-black'
+                  ? 'bg-[#dfb76c] text-black shadow-sm'
                   : 'text-stone-400 hover:text-white bg-[#14120f]'
               }`}
             >
@@ -484,81 +474,6 @@ export default function ProductDetail({
           </div>
 
           <div className="max-w-3xl mx-auto text-left text-xs sm:text-sm text-stone-300 leading-relaxed bg-[#14120f] border border-[#262018] rounded-2xl p-6 sm:p-8">
-            {activeTab === 'notes' && (
-              <div className="space-y-5">
-                <div>
-                  <h3 className="font-serif text-lg text-white font-normal mb-2">
-                    The Scent Story of {currentProduct.name}
-                  </h3>
-                  <p className="text-stone-300 leading-relaxed">
-                    {currentProduct.description ||
-                      `${currentProduct.name} is handcrafted with over 25% fragrance oil concentration. It opens with an immediate radiant projection and evolves gracefully through multidimensional notes into a deep, velvety dry-down that lingers effortlessly on skin and garments for 12+ hours.`}
-                  </p>
-                </div>
-
-                {/* Dynamic Olfactory Architecture Pyramid */}
-                <div className="space-y-3 pt-4 border-t border-[#262018]">
-                  <h4 className="text-xs uppercase font-bold text-[#dfb76c] tracking-wider">
-                    Olfactory Note Architecture
-                  </h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <div className="bg-[#1c1813] border border-[#2e261c] rounded-xl p-3">
-                      <span className="text-[10px] uppercase font-bold text-stone-400 block mb-1">
-                        Top Notes (Opening)
-                      </span>
-                      <p className="text-white text-xs font-medium">
-                        {Array.isArray(currentProduct.topNotes)
-                          ? currentProduct.topNotes.join(', ')
-                          : currentProduct.topNotes || 'Bergamot, Cardamom'}
-                      </p>
-                    </div>
-
-                    <div className="bg-[#1c1813] border border-[#2e261c] rounded-xl p-3">
-                      <span className="text-[10px] uppercase font-bold text-stone-400 block mb-1">
-                        Heart Notes (Core)
-                      </span>
-                      <p className="text-white text-xs font-medium">
-                        {Array.isArray(currentProduct.heartNotes)
-                          ? currentProduct.heartNotes.join(', ')
-                          : currentProduct.heartNotes || 'Cedarwood, Amber'}
-                      </p>
-                    </div>
-
-                    <div className="bg-[#1c1813] border border-[#2e261c] rounded-xl p-3">
-                      <span className="text-[10px] uppercase font-bold text-stone-400 block mb-1">
-                        Base Notes (Dry-down)
-                      </span>
-                      <p className="text-white text-xs font-medium">
-                        {Array.isArray(currentProduct.baseNotes)
-                          ? currentProduct.baseNotes.join(', ')
-                          : currentProduct.baseNotes || 'Agarwood, Vanilla'}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Specification Grid */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-3 border-t border-[#262018] text-xs">
-                  <div>
-                    <span className="text-stone-400 block text-[10px] uppercase">Concentration</span>
-                    <span className="text-[#dfb76c] font-semibold">{currentProduct.concentration || 'Eau De Parfum'}</span>
-                  </div>
-                  <div>
-                    <span className="text-stone-400 block text-[10px] uppercase">Olfactory Family</span>
-                    <span className="text-[#dfb76c] font-semibold">{currentProduct.type}</span>
-                  </div>
-                  <div>
-                    <span className="text-stone-400 block text-[10px] uppercase">Longevity</span>
-                    <span className="text-[#dfb76c] font-semibold">{currentProduct.longevity || '12+ Hours'}</span>
-                  </div>
-                  <div>
-                    <span className="text-stone-400 block text-[10px] uppercase">Gender Profile</span>
-                    <span className="text-[#dfb76c] font-semibold">{currentProduct.gender}</span>
-                  </div>
-                </div>
-              </div>
-            )}
-
             {activeTab === 'usage' && (
               <div className="space-y-4">
                 <h3 className="font-serif text-lg text-white font-normal">
