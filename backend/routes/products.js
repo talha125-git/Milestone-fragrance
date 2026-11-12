@@ -53,7 +53,7 @@ try {
 router.get('/', (req, res) => {
   try {
     let result = [...products];
-    const { gender, type, bestseller, search, sort } = req.query;
+    const { gender, type, bestseller, newarrival, search, sort } = req.query;
 
     // Filter by gender
     if (gender && gender !== 'all') {
@@ -74,6 +74,11 @@ router.get('/', (req, res) => {
     // Filter by best seller flag
     if (bestseller === 'true') {
       result = result.filter((p) => p.bestSeller);
+    }
+
+    // Filter by new arrival flag
+    if (newarrival === 'true') {
+      result = result.filter((p) => p.isNewArrival);
     }
 
     // Search keyword
@@ -192,6 +197,7 @@ router.post('/', (req, res) => {
       baseNotes,
       inStock,
       bestSeller,
+      isNewArrival,
       image,
     } = req.body;
 
@@ -223,6 +229,7 @@ router.post('/', (req, res) => {
       heartNotes: Array.isArray(heartNotes) ? heartNotes : (heartNotes ? heartNotes.split(',').map(s => s.trim()) : ['Cedarwood', 'Amber']),
       baseNotes: Array.isArray(baseNotes) ? baseNotes : (baseNotes ? baseNotes.split(',').map(s => s.trim()) : ['Oud', 'Musk']),
       bestSeller: Boolean(bestSeller),
+      isNewArrival: Boolean(isNewArrival),
       inStock: inStock !== undefined ? Boolean(inStock) : true,
     };
 

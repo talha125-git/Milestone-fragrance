@@ -153,6 +153,7 @@ export default function AdminDashboard({
     baseNotes: 'Rich Agarwood (Oud), Bourbon Vanilla',
     inStock: true,
     bestSeller: false,
+    isNewArrival: true,
     image: prodSignature,
     assetPath: '',
   };
@@ -359,6 +360,7 @@ export default function AdminDashboard({
       baseNotes: Array.isArray(product.baseNotes) ? product.baseNotes.join(', ') : '',
       inStock: product.inStock !== undefined ? product.inStock : true,
       bestSeller: Boolean(product.bestSeller),
+      isNewArrival: Boolean(product.isNewArrival),
       image: product.image || prodSignature,
       assetPath: product.assetPath || '',
     });

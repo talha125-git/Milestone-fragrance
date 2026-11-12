@@ -56,6 +56,11 @@ export default function QuickViewModal({
               <span className="absolute top-4 left-4 bg-black/80 text-[#dfb76c] text-[10px] font-semibold tracking-wider uppercase px-2.5 py-1 rounded">
                 {product.concentration}
               </span>
+              {product.isNewArrival && (
+                <span className="absolute top-4 right-4 bg-[#dfb76c] text-[#0d0c0a] font-bold text-[10px] uppercase px-2.5 py-1 rounded shadow-md tracking-wider">
+                  ★ New Arrival
+                </span>
+              )}
             </div>
 
             {/* Product Details */}

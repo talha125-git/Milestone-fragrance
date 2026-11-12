@@ -73,11 +73,16 @@ export default function ProductsTab({
                         <img src={p.image} alt={p.name} className="w-full h-full object-contain" />
                       </div>
                       <div>
-                        <div className="font-serif text-sm font-bold text-stone-900 flex items-center gap-1.5">
+                        <div className="font-serif text-sm font-bold text-stone-900 flex flex-wrap items-center gap-1.5">
                           <span>{p.name}</span>
                           {p.bestSeller && (
                             <span className="bg-[#b38531] text-white text-[9px] font-bold px-1.5 py-0.2 rounded uppercase">
                               Bestseller
+                            </span>
+                          )}
+                          {p.isNewArrival && (
+                            <span className="bg-emerald-600 text-white text-[9px] font-bold px-1.5 py-0.2 rounded uppercase">
+                              New Arrival
                             </span>
                           )}
                         </div>

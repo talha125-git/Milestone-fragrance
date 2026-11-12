@@ -35,6 +35,7 @@ export const products = [
     baseNotes: ['Rich Agarwood (Oud)', 'Bourbon Vanilla', 'Patchouli'],
     bestSeller: true,
     inStock: true,
+    isNewArrival: false,
   },
   {
     id: 'believe',
@@ -56,6 +57,7 @@ export const products = [
     baseNotes: ['Ambergris', 'Guaiac Wood', 'Oakmoss'],
     bestSeller: true,
     inStock: true,
+    isNewArrival: true,
   },
   {
     id: 'ghanam',
@@ -77,6 +79,7 @@ export const products = [
     baseNotes: ['Cambodian Agarwood', 'Royal Sandalwood', 'White Musk'],
     bestSeller: true,
     inStock: true,
+    isNewArrival: false,
   },
   {
     id: 'professor',
@@ -98,6 +101,7 @@ export const products = [
     baseNotes: ['Madagascar Amber', 'Tonka Bean', 'Tobacco Blossom'],
     bestSeller: true,
     inStock: true,
+    isNewArrival: true,
   },
   {
     id: 'talha',
@@ -119,6 +123,7 @@ export const products = [
     baseNotes: ['Rich Agarwood', 'Bourbon Vanilla'],
     bestSeller: false,
     inStock: true,
+    isNewArrival: false,
   },
 ];
 

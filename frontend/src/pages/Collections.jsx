@@ -102,9 +102,15 @@ export default function Collections({
                     alt={product.name}
                     className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
                   />
-                  <span className="absolute top-2 left-2 bg-[#dfb76c] text-black font-bold text-[9px] uppercase px-1.5 py-0.5 rounded">
-                    Bestseller
-                  </span>
+                  {product.isNewArrival ? (
+                    <span className="absolute top-2 left-2 bg-[#dfb76c] text-[#0d0c0a] font-bold text-[9px] uppercase px-2 py-0.5 rounded shadow-sm tracking-wider">
+                      ★ New Arrival
+                    </span>
+                  ) : product.bestSeller ? (
+                    <span className="absolute top-2 left-2 bg-[#dfb76c] text-black font-bold text-[9px] uppercase px-1.5 py-0.5 rounded">
+                      Bestseller
+                    </span>
+                  ) : null}
                 </div>
 
                 <div className="flex-1 flex flex-col justify-between">

@@ -181,6 +181,12 @@ export default function ProductDetail({
                 )}
 
                 {/* Perfume Bottle Image */}
+                {currentProduct.isNewArrival && (
+                  <span className="absolute top-4 left-4 z-10 bg-[#dfb76c] text-[#0d0c0a] font-bold text-[10px] uppercase px-2.5 py-1 rounded shadow-md tracking-wider flex items-center gap-1">
+                    <Sparkles className="w-3 h-3" />
+                    <span>New Arrival</span>
+                  </span>
+                )}
                 <img
                   src={currentProduct.image}
                   alt={currentProduct.name}

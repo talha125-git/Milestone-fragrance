@@ -31,6 +31,7 @@ export default function Header({
 
   const navLinks = [
     { name: 'Home', path: '/', id: 'home' },
+    { name: 'New Arrivals', path: '/new-arrivals', id: 'new-arrivals' },
     { name: 'Men', path: '/men', id: 'men' },
     { name: 'Women', path: '/women', id: 'women' },
     { name: 'Unisex', path: '/unisex', id: 'unisex' },

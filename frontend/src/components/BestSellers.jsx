@@ -70,6 +70,11 @@ export default function BestSellers({
                     alt={product.name}
                     className="w-full h-full object-contain p-1 transition-transform duration-500 group-hover:scale-105"
                   />
+                  {product.isNewArrival && (
+                    <span className="absolute top-2 left-2 bg-[#dfb76c] text-[#0d0c0a] font-bold text-[9px] uppercase px-2 py-0.5 rounded shadow-sm tracking-wider">
+                      ★ New Arrival
+                    </span>
+                  )}
                 </div>
 
                 {/* Content */}

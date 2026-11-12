@@ -7,6 +7,7 @@ import WishlistDrawer from './components/WishlistDrawer';
 import SearchModal from './components/SearchModal';
 
 import Home from './pages/Home';
+import NewArrivals from './pages/NewArrivals';
 import Men from './pages/Men';
 import Women from './pages/Women';
 import Unisex from './pages/Unisex';
@@ -312,6 +313,19 @@ export default function App() {
                 }}
                 products={allProducts}
                 heroSlides={heroSlides}
+              />
+            }
+          />
+
+          <Route
+            path="/new-arrivals"
+            element={
+              <NewArrivals
+                onAddToCart={handleAddToCart}
+                onToggleWishlist={handleToggleWishlist}
+                wishlistIds={wishlist.map((w) => w.id)}
+                onOpenQuickView={handleViewProduct}
+                products={allProducts}
               />
             }
           />

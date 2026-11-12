@@ -105,6 +105,11 @@ export default function Women({
                     alt={product.name}
                     className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
                   />
+                  {product.isNewArrival && (
+                    <span className="absolute top-2 left-2 bg-[#dfb76c] text-[#0d0c0a] font-bold text-[9px] uppercase px-2 py-0.5 rounded shadow-sm tracking-wider">
+                      ★ New Arrival
+                    </span>
+                  )}
                   <span className="absolute bottom-2 left-2 bg-black/80 text-[#dfb76c] text-[10px] uppercase font-semibold px-2 py-0.5 rounded">
                     {product.type}
                   </span>

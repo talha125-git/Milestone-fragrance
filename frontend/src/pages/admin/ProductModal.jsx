@@ -275,7 +275,7 @@ export default function ProductModal({
               />
             </div>
 
-            <div className="flex items-center gap-6 pt-2">
+            <div className="flex flex-wrap items-center gap-6 pt-2">
               <label className="flex items-center gap-2 text-xs font-semibold text-stone-700 cursor-pointer">
                 <input
                   type="checkbox"
@@ -294,6 +294,16 @@ export default function ProductModal({
                   className="rounded border-stone-300 text-[#b38531] focus:ring-0 cursor-pointer"
                 />
                 <span>Mark as Bestseller</span>
+              </label>
+
+              <label className="flex items-center gap-2 text-xs font-semibold text-stone-700 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={Boolean(formData.isNewArrival)}
+                  onChange={(e) => setFormData({ ...formData, isNewArrival: e.target.checked })}
+                  className="rounded border-stone-300 text-[#b38531] focus:ring-0 cursor-pointer"
+                />
+                <span className="text-emerald-700 font-bold">★ Mark as New Arrival</span>
               </label>
             </div>
 
