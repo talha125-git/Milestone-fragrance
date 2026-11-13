@@ -54,7 +54,6 @@ export default function ProductReviews({
     rating: 5,
     title: '',
     comment: '',
-    performance: '12+ Hours Longevity',
     name: '',
     email: '',
     city: 'Lahore',
@@ -90,15 +89,6 @@ export default function ProductReviews({
     1: 'Needs Improvement (1/5)',
   };
 
-  const performanceOptions = [
-    '12+ Hours Longevity',
-    'Huge Compliment Magnet',
-    'Massive Sillage & Projection',
-    'Smooth & Rich French Blend',
-    'Office & Everyday Safe',
-    'Regal Royal Aura',
-  ];
-
   const handleOpenModal = () => {
     const reviewedList = getReviewedProducts();
     const alreadyReviewed = reviewedList.includes(productId.toLowerCase());
@@ -109,7 +99,6 @@ export default function ProductReviews({
       rating: 5,
       title: '',
       comment: '',
-      performance: '12+ Hours Longevity',
       name: userInfo.name || '',
       email: userInfo.email || '',
       city: userInfo.city || 'Lahore',
@@ -158,7 +147,7 @@ export default function ProductReviews({
       rating: formData.rating,
       title: formData.title.trim() || 'Verified Customer Review',
       comment: formData.comment.trim(),
-      performance: formData.performance,
+      performance: '',
       verified: true,
       helpful: 1,
       date: formattedDate,
@@ -429,31 +418,6 @@ export default function ProductReviews({
                     }
                     className="w-full bg-[#1b1713] border border-[#2d251c] text-white text-xs rounded-xl p-3 focus:outline-none focus:border-[#dfb76c] transition-colors"
                   />
-                </div>
-
-                {/* Scent Highlight Chips */}
-                <div>
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-stone-300 mb-1.5">
-                    Key Highlight
-                  </label>
-                  <div className="flex flex-wrap gap-1.5">
-                    {performanceOptions.slice(0, 4).map((opt) => (
-                      <button
-                        key={opt}
-                        type="button"
-                        onClick={() =>
-                          setFormData((prev) => ({ ...prev, performance: opt }))
-                        }
-                        className={`px-2.5 py-1 rounded-full text-[10px] font-medium transition-all cursor-pointer border ${
-                          formData.performance === opt
-                            ? 'bg-[#dfb76c] text-[#0d0c0a] font-bold border-[#dfb76c]'
-                            : 'bg-[#181511] text-stone-400 border-[#2a231b] hover:text-white'
-                        }`}
-                      >
-                        {opt}
-                      </button>
-                    ))}
-                  </div>
                 </div>
 
                 {/* Footer Actions */}
