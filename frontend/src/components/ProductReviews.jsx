@@ -10,13 +10,41 @@ import {
 } from 'lucide-react';
 import { loadStoredReviews, persistReviews } from '../data/reviews';
 
+const getReviewedProducts = () => {
+  try {
+    const raw = localStorage.getItem('milestone_reviewed_products');
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    return [];
+  }
+};
+
+const markProductAsReviewed = (prodId) => {
+  try {
+    const list = getReviewedProducts();
+    if (!list.includes(prodId.toLowerCase())) {
+      list.push(prodId.toLowerCase());
+      localStorage.setItem('milestone_reviewed_products', JSON.stringify(list));
+    }
+  } catch (e) {}
+};
+
+const getStoredUserInfo = () => {
+  try {
+    const raw = localStorage.getItem('milestone_reviewer_info');
+    return raw ? JSON.parse(raw) : { name: '', email: '', city: 'Lahore' };
+  } catch (e) {
+    return { name: '', email: '', city: 'Lahore' };
+  }
+};
+
 export default function ProductReviews({
   product,
   onReviewSubmitted,
 }) {
   const [reviews, setReviews] = useState(() => loadStoredReviews());
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalStep, setModalStep] = useState(1); // 1: Rating & Product, 2: Content, 3: User Info, 4: Done
+  const [modalStep, setModalStep] = useState(1); // 'already_reviewed' | 1 | 2 | 3 | 4
 
   // Hover state for Step 1 stars
   const [hoverRating, setHoverRating] = useState(0);
@@ -76,17 +104,26 @@ export default function ProductReviews({
   ];
 
   const handleOpenModal = () => {
-    setModalStep(1);
+    const reviewedList = getReviewedProducts();
+    const alreadyReviewed = reviewedList.includes(productId.toLowerCase());
+    const userInfo = getStoredUserInfo();
+
     setHoverRating(0);
     setFormData({
       rating: 5,
       title: '',
       comment: '',
       performance: '12+ Hours Longevity',
-      name: '',
-      email: '',
-      city: 'Lahore',
+      name: userInfo.name || '',
+      email: userInfo.email || '',
+      city: userInfo.city || 'Lahore',
     });
+
+    if (alreadyReviewed) {
+      setModalStep('already_reviewed');
+    } else {
+      setModalStep(1);
+    }
     setIsModalOpen(true);
   };
 
@@ -135,6 +172,19 @@ export default function ProductReviews({
     const updatedList = [newReview, ...reviews];
     setReviews(updatedList);
     persistReviews(updatedList);
+
+    // Mark product as reviewed from this device & remember info
+    markProductAsReviewed(productId);
+    try {
+      localStorage.setItem(
+        'milestone_reviewer_info',
+        JSON.stringify({
+          name: formData.name.trim(),
+          email: formData.email.trim(),
+          city: formData.city.trim(),
+        })
+      );
+    } catch (err) {}
 
     // Also send to backend API
     fetch('/api/reviews', {
@@ -211,6 +261,33 @@ export default function ProductReviews({
             >
               <X className="w-5 h-5" />
             </button>
+
+            {/* ALREADY REVIEWED PROMPT (Appears if user previously reviewed this product on this device) */}
+            {modalStep === 'already_reviewed' && (
+              <div className="text-center py-8 sm:py-12 px-2 sm:px-6 space-y-7 animate-in fade-in zoom-in-95 duration-200">
+                <p className="text-white text-base sm:text-lg font-medium max-w-sm mx-auto leading-relaxed">
+                  You've already reviewed this product from this device. Do you want to write another review?
+                </p>
+
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => setModalStep(1)}
+                    className="w-full sm:w-auto px-6 py-3 rounded-xl bg-[#1d2922] border-2 border-emerald-500/80 hover:border-emerald-400 text-white font-semibold text-xs sm:text-sm transition-all shadow-md cursor-pointer hover:bg-[#25362c]"
+                  >
+                    Write another review
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleCloseModal}
+                    className="w-full sm:w-auto px-6 py-3 rounded-xl bg-transparent border border-stone-600 hover:border-stone-400 text-stone-300 hover:text-white font-medium text-xs sm:text-sm transition-all cursor-pointer"
+                  >
+                    Not now
+                  </button>
+                </div>
+              </div>
+            )}
 
             {/* STEP 1: Product Image + 5 Stars */}
             {modalStep === 1 && (
