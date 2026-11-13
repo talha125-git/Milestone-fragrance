@@ -5,6 +5,8 @@ import {
   Sparkles,
   X,
   Check,
+  ArrowLeft,
+  ArrowRight,
 } from 'lucide-react';
 import { loadStoredReviews, persistReviews } from '../data/reviews';
 
@@ -14,22 +16,21 @@ export default function ProductReviews({
 }) {
   const [reviews, setReviews] = useState(() => loadStoredReviews());
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [submittedSuccess, setSubmittedSuccess] = useState(false);
+  const [modalStep, setModalStep] = useState(1); // 1: Rating & Product, 2: Content, 3: User Info, 4: Done
 
-  // Hover rating on the main page trigger
-  const [triggerHoverRating, setTriggerHoverRating] = useState(0);
+  // Hover state for Step 1 stars
+  const [hoverRating, setHoverRating] = useState(0);
 
   // Form State
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    city: 'Lahore',
     rating: 5,
     title: '',
     comment: '',
     performance: '12+ Hours Longevity',
+    name: '',
+    email: '',
+    city: 'Lahore',
   });
-  const [modalHoverRating, setModalHoverRating] = useState(0);
 
   // Listen to reviews updates
   useEffect(() => {
@@ -74,16 +75,38 @@ export default function ProductReviews({
     'Regal Royal Aura',
   ];
 
-  // Open modal pre-selected with star rating
-  const handleStarClickToOpen = (star) => {
-    setFormData((prev) => ({ ...prev, rating: star }));
-    setSubmittedSuccess(false);
+  const handleOpenModal = () => {
+    setModalStep(1);
+    setHoverRating(0);
+    setFormData({
+      rating: 5,
+      title: '',
+      comment: '',
+      performance: '12+ Hours Longevity',
+      name: '',
+      email: '',
+      city: 'Lahore',
+    });
     setIsModalOpen(true);
   };
 
-  const handleSubmitReview = async (e) => {
-    e.preventDefault();
-    if (!formData.name.trim() || !formData.comment.trim()) return;
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setModalStep(1);
+  };
+
+  // Step 1: Select rating and move smoothly to Step 2
+  const handleSelectRating = (star) => {
+    setFormData((prev) => ({ ...prev, rating: star }));
+    setTimeout(() => {
+      setModalStep(2);
+    }, 180);
+  };
+
+  // Step 3 -> Step 4: Submit
+  const handleSubmitReview = (e) => {
+    if (e) e.preventDefault();
+    if (!formData.comment.trim() || !formData.name.trim() || !formData.email.trim()) return;
 
     const now = new Date();
     const formattedDate = now.toLocaleDateString('en-US', {
@@ -120,280 +143,396 @@ export default function ProductReviews({
       body: JSON.stringify(newReview),
     }).catch(() => {});
 
-    setSubmittedSuccess(true);
-    setFormData({
-      name: '',
-      email: '',
-      city: 'Lahore',
-      rating: 5,
-      title: '',
-      comment: '',
-      performance: '12+ Hours Longevity',
-    });
-
     if (onReviewSubmitted) {
       onReviewSubmitted(newReview);
     }
 
-    setTimeout(() => {
-      setSubmittedSuccess(false);
-      setIsModalOpen(false);
-    }, 1800);
+    setModalStep(4);
   };
 
   return (
-    <section id="reviews-section" className="w-full pt-10 pb-8 border-t border-[#221e1a] text-stone-200">
-      <div className="space-y-6">
-        {/* Simple & Clean Reviews Header with 5-Star Hover Trigger */}
-        <div className="bg-[#14120f] border border-[#262018] rounded-2xl p-6 sm:p-8 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-6">
-          {/* Left: Overall Rating Score */}
-          <div className="space-y-1">
-            <div className="flex items-center gap-1.5 text-[#dfb76c] text-[11px] font-semibold tracking-[0.2em] uppercase">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>CUSTOMER REVIEWS</span>
-            </div>
-            <div className="flex items-baseline gap-3">
-              <span className="text-3xl sm:text-4xl font-serif font-bold text-white tracking-tight">
-                {avgRating}
-              </span>
-              <div className="flex text-[#dfb76c]">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-4 h-4 fill-[#dfb76c]" />
-                ))}
-              </div>
-              <span className="text-xs text-stone-400">
-                ({totalReviewsCount} {totalReviewsCount === 1 ? 'review' : 'reviews'})
-              </span>
-            </div>
-            <p className="text-xs text-stone-400">
-              Verified buyers sharing longevity, sillage & scent performance for <strong className="text-stone-200">{product?.name}</strong>.
-            </p>
+    <section id="reviews-section" className="w-full pt-8 pb-4 border-t border-[#221e1a] text-stone-200">
+      {/* Product Page Trigger: Rating Summary & "Write a Review" Button */}
+      <div className="bg-[#14120f] border border-[#262018] rounded-2xl p-6 sm:p-8 shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+        {/* Left: Overall Rating & Scent Note Badge */}
+        <div className="space-y-1.5 text-left">
+          <div className="flex items-center gap-1.5 text-[#dfb76c] text-[11px] font-semibold tracking-[0.2em] uppercase">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>CUSTOMER EXPERIENCES</span>
           </div>
-
-          {/* Right: Interactive 5 Stars Hover & Click Trigger */}
-          <div className="bg-[#181511] border border-[#2e261d] rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-4 text-left shadow-sm">
-            <div>
-              <span className="text-[11px] font-bold uppercase tracking-wider text-stone-300 block mb-1">
-                Rate & Review This Perfume:
-              </span>
-              {/* 5 Stars with Hover Transition */}
-              <div className="flex items-center gap-1">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <button
-                    key={star}
-                    type="button"
-                    onMouseEnter={() => setTriggerHoverRating(star)}
-                    onMouseLeave={() => setTriggerHoverRating(0)}
-                    onClick={() => handleStarClickToOpen(star)}
-                    title={`Click to rate ${star} star${star > 1 ? 's' : ''} and write review`}
-                    className="p-1 focus:outline-none transition-transform hover:scale-125 cursor-pointer group"
-                  >
-                    <Star
-                      className={`w-6 h-6 transition-colors duration-150 ${
-                        (triggerHoverRating || 0) >= star
-                          ? 'fill-[#dfb76c] text-[#dfb76c] drop-shadow-[0_0_8px_rgba(223,183,108,0.5)]'
-                          : 'text-stone-600 hover:text-[#dfb76c]'
-                      }`}
-                    />
-                  </button>
-                ))}
-                <span className="text-xs font-semibold text-[#dfb76c] ml-2 min-w-[90px]">
-                  {triggerHoverRating > 0 ? ratingDescriptions[triggerHoverRating] : 'Click to Rate'}
-                </span>
-              </div>
+          <div className="flex items-center gap-3">
+            <span className="text-3xl sm:text-4xl font-serif font-bold text-white tracking-tight">
+              {avgRating}
+            </span>
+            <div className="flex text-[#dfb76c]">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} className="w-4 h-4 fill-[#dfb76c]" />
+              ))}
             </div>
-
-            {/* Direct Button Alternative */}
-            <button
-              type="button"
-              onClick={() => handleStarClickToOpen(5)}
-              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-[#dfb76c] hover:bg-[#caa053] active:scale-[0.99] text-[#0d0c0a] text-xs font-bold uppercase tracking-wider transition-all shadow-md cursor-pointer whitespace-nowrap"
-            >
-              <PenSquare className="w-3.5 h-3.5" />
-              <span>Write a Review</span>
-            </button>
+            <span className="text-xs text-stone-400">
+              ({totalReviewsCount} {totalReviewsCount === 1 ? 'review' : 'reviews'})
+            </span>
           </div>
+          <p className="text-xs text-stone-400">
+            Read verified customer reviews or share your feedback for{' '}
+            <strong className="text-stone-200">{product?.name}</strong>.
+          </p>
+        </div>
+
+        {/* Right: Write a Review Button */}
+        <div>
+          <button
+            type="button"
+            onClick={handleOpenModal}
+            className="inline-flex items-center justify-center gap-2.5 px-6 py-3 rounded-xl bg-[#dfb76c] hover:bg-[#caa053] active:scale-[0.98] text-[#0d0c0a] text-xs font-bold uppercase tracking-wider transition-all shadow-lg hover:shadow-[#dfb76c]/20 cursor-pointer whitespace-nowrap"
+          >
+            <PenSquare className="w-4 h-4 text-[#0d0c0a]" />
+            <span>Write a Review</span>
+          </button>
         </div>
       </div>
 
-      {/* POPUP MODAL (Opens when hovering and clicking on stars) */}
+      {/* POPUP MODAL (PerfumePlus / Judge.me Multi-Step Flow) */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 overflow-y-auto">
+        <div className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4">
           {/* Backdrop */}
           <div
-            onClick={() => setIsModalOpen(false)}
-            className="fixed inset-0 bg-black/80 backdrop-blur-xs transition-opacity"
+            onClick={handleCloseModal}
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
           />
 
-          <div className="relative min-h-screen flex items-center justify-center p-4">
-            <div className="relative w-full max-w-xl bg-[#14120f] border border-[#b38531]/40 rounded-2xl shadow-2xl p-6 sm:p-8 space-y-6 text-stone-200 animate-in fade-in zoom-in-95 duration-200">
-              {/* Modal Header */}
-              <div className="flex items-center justify-between pb-3 border-b border-[#241e17]">
-                <div>
-                  <h3 className="font-serif text-lg font-bold text-white flex items-center gap-2">
-                    <PenSquare className="w-4 h-4 text-[#dfb76c]" />
-                    <span>Write a Review</span>
-                  </h3>
-                  <p className="text-xs text-stone-400 mt-0.5">
-                    Reviewing: <strong className="text-white">{product?.name}</strong>
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="p-1.5 text-stone-400 hover:text-white rounded-lg hover:bg-stone-800 transition-colors cursor-pointer"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
+          {/* Modal Container */}
+          <div className="relative w-full max-w-lg bg-[#14120f] border border-[#dfb76c]/40 rounded-2xl shadow-2xl p-6 sm:p-8 text-stone-200 animate-in fade-in zoom-in-95 duration-200">
+            {/* Top Close Button */}
+            <button
+              type="button"
+              onClick={handleCloseModal}
+              className="absolute top-4 right-4 p-2 text-stone-400 hover:text-white rounded-lg hover:bg-stone-800 transition-colors cursor-pointer z-10"
+            >
+              <X className="w-5 h-5" />
+            </button>
 
-              {submittedSuccess ? (
-                <div className="py-8 text-center space-y-3 bg-[#181511] rounded-xl border border-emerald-600/40 animate-in fade-in">
-                  <div className="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto border border-emerald-500/40">
-                    <Check className="w-6 h-6 stroke-[3]" />
-                  </div>
-                  <h4 className="text-lg font-serif font-bold text-white">Review Submitted!</h4>
-                  <p className="text-xs text-stone-300 max-w-sm mx-auto">
-                    Thank you for your feedback! Your review has been published on this product page and the homepage customer reviews.
+            {/* STEP 1: Product Image + 5 Stars */}
+            {modalStep === 1 && (
+              <div className="text-center pt-2 pb-4 space-y-4 animate-in fade-in duration-200">
+                {/* Product Image */}
+                <div className="w-24 h-24 sm:w-28 sm:h-28 mx-auto rounded-2xl bg-[#1b1712] border border-[#2e261e] p-3 flex items-center justify-center shadow-inner">
+                  {product?.image ? (
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="w-full h-full object-contain drop-shadow-md"
+                    />
+                  ) : (
+                    <Sparkles className="w-10 h-10 text-[#dfb76c]" />
+                  )}
+                </div>
+
+                {/* Product Name */}
+                <div>
+                  <h3 className="font-serif text-lg sm:text-xl font-bold text-white tracking-wide">
+                    {product?.name}
+                  </h3>
+                  <p className="text-xs uppercase tracking-wider text-stone-400 mt-0.5">
+                    How would you rate this fragrance?
                   </p>
                 </div>
-              ) : (
-                <form onSubmit={handleSubmitReview} className="space-y-4 text-xs">
-                  {/* Rating Selector inside modal */}
-                  <div className="bg-[#181511] p-3.5 rounded-xl border border-[#2a231b] flex items-center justify-between">
-                    <div>
-                      <label className="block text-[11px] font-bold uppercase tracking-wider text-stone-300 mb-1">
-                        Your Rating *
-                      </label>
-                      <div className="flex items-center gap-1.5">
-                        {[1, 2, 3, 4, 5].map((star) => (
-                          <button
-                            key={star}
-                            type="button"
-                            onMouseEnter={() => setModalHoverRating(star)}
-                            onMouseLeave={() => setModalHoverRating(0)}
-                            onClick={() => setFormData({ ...formData, rating: star })}
-                            className="p-0.5 focus:outline-none transition-transform hover:scale-125 cursor-pointer"
-                          >
-                            <Star
-                              className={`w-5 h-5 ${
-                                (modalHoverRating || formData.rating) >= star
-                                  ? 'fill-[#dfb76c] text-[#dfb76c]'
-                                  : 'text-stone-600'
-                              }`}
-                            />
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                    <span className="text-xs font-bold text-[#dfb76c]">
-                      {ratingDescriptions[modalHoverRating || formData.rating]}
+
+                {/* 5 Stars with Smooth Hover */}
+                <div
+                  className="flex items-center justify-center gap-1.5 py-3"
+                  onMouseLeave={() => setHoverRating(0)}
+                >
+                  {[1, 2, 3, 4, 5].map((star) => {
+                    const isLit = (hoverRating || 0) >= star;
+                    return (
+                      <button
+                        key={star}
+                        type="button"
+                        onMouseEnter={() => setHoverRating(star)}
+                        onClick={() => handleSelectRating(star)}
+                        title={`Rate ${star} star${star > 1 ? 's' : ''}`}
+                        className="p-1 focus:outline-none cursor-pointer transition-transform"
+                      >
+                        <Star
+                          className={`w-9 h-9 sm:w-10 sm:h-10 transition-all duration-150 transform ${
+                            isLit
+                              ? 'fill-[#dfb76c] text-[#dfb76c] scale-115 drop-shadow-[0_0_12px_rgba(223,183,108,0.65)]'
+                              : 'text-stone-600 scale-100 hover:text-stone-400'
+                          }`}
+                        />
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Star Description Tooltip */}
+                <div className="h-6">
+                  <span className="text-xs sm:text-sm font-semibold text-[#dfb76c] transition-opacity duration-150">
+                    {hoverRating > 0 ? ratingDescriptions[hoverRating] : 'Select your rating'}
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* STEP 2: Review Content (Required) */}
+            {modalStep === 2 && (
+              <div className="space-y-4 animate-in fade-in duration-200 text-left">
+                {/* Header with Back and Selected Stars */}
+                <div className="flex items-center justify-between pb-3 border-b border-[#241e17]">
+                  <button
+                    type="button"
+                    onClick={() => setModalStep(1)}
+                    className="inline-flex items-center gap-1.5 text-xs text-stone-400 hover:text-white transition-colors cursor-pointer"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                    <span>Back</span>
+                  </button>
+                  <div className="flex items-center gap-1 text-[#dfb76c]">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star
+                        key={star}
+                        onClick={() => setFormData((prev) => ({ ...prev, rating: star }))}
+                        className={`w-4 h-4 cursor-pointer transition-colors ${
+                          formData.rating >= star
+                            ? 'fill-[#dfb76c] text-[#dfb76c]'
+                            : 'text-stone-600'
+                        }`}
+                      />
+                    ))}
+                    <span className="text-[11px] text-stone-300 ml-1 font-semibold">
+                      ({formData.rating}/5)
                     </span>
                   </div>
+                </div>
 
-                  {/* Review Headline */}
-                  <div>
-                    <label className="block text-[11px] font-bold uppercase tracking-wider text-stone-300 mb-1.5">
-                      Review Headline / Summary *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. Unbelievable longevity, lasted all day!"
-                      value={formData.title}
-                      onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                      className="w-full bg-[#1b1713] border border-[#2d251c] text-white text-xs rounded-lg p-3 focus:outline-none focus:border-[#dfb76c]"
-                    />
+                {/* Step Subtitle */}
+                <div>
+                  <h3 className="font-serif text-base sm:text-lg font-bold text-white">
+                    Review Content
+                  </h3>
+                  <p className="text-xs text-stone-400">
+                    Share your detailed impression of {product?.name}.
+                  </p>
+                </div>
+
+                {/* Review Content (Required) */}
+                <div>
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-stone-300 mb-1.5">
+                    Review Content * <span className="text-stone-400 font-normal">(Required)</span>
+                  </label>
+                  <textarea
+                    rows={4}
+                    required
+                    placeholder="What did you love about the scent? How was the longevity, projection, and occasion wear?..."
+                    value={formData.comment}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, comment: e.target.value }))
+                    }
+                    className="w-full bg-[#1b1713] border border-[#2d251c] text-white text-xs rounded-xl p-3.5 focus:outline-none focus:border-[#dfb76c] transition-colors resize-none leading-relaxed"
+                  />
+                </div>
+
+                {/* Review Headline / Title (Optional) */}
+                <div>
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-stone-300 mb-1.5">
+                    Review Title / Headline <span className="text-stone-400 font-normal">(Optional)</span>
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. A true French masterpiece, lasts 12+ hours!"
+                    value={formData.title}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, title: e.target.value }))
+                    }
+                    className="w-full bg-[#1b1713] border border-[#2d251c] text-white text-xs rounded-xl p-3 focus:outline-none focus:border-[#dfb76c] transition-colors"
+                  />
+                </div>
+
+                {/* Scent Highlight Chips */}
+                <div>
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-stone-300 mb-1.5">
+                    Key Highlight
+                  </label>
+                  <div className="flex flex-wrap gap-1.5">
+                    {performanceOptions.slice(0, 4).map((opt) => (
+                      <button
+                        key={opt}
+                        type="button"
+                        onClick={() =>
+                          setFormData((prev) => ({ ...prev, performance: opt }))
+                        }
+                        className={`px-2.5 py-1 rounded-full text-[10px] font-medium transition-all cursor-pointer border ${
+                          formData.performance === opt
+                            ? 'bg-[#dfb76c] text-[#0d0c0a] font-bold border-[#dfb76c]'
+                            : 'bg-[#181511] text-stone-400 border-[#2a231b] hover:text-white'
+                        }`}
+                      >
+                        {opt}
+                      </button>
+                    ))}
                   </div>
+                </div>
 
-                  {/* Review Body */}
-                  <div>
-                    <label className="block text-[11px] font-bold uppercase tracking-wider text-stone-300 mb-1.5">
-                      Your Detailed Review *
-                    </label>
-                    <textarea
-                      rows={3}
-                      required
-                      placeholder="Describe the scent, longevity, projection, and occasion..."
-                      value={formData.comment}
-                      onChange={(e) => setFormData({ ...formData, comment: e.target.value })}
-                      className="w-full bg-[#1b1713] border border-[#2d251c] text-white text-xs rounded-lg p-3 focus:outline-none focus:border-[#dfb76c] resize-none"
-                    />
-                  </div>
+                {/* Footer Actions */}
+                <div className="pt-3 flex items-center justify-between border-t border-[#241e17]">
+                  <button
+                    type="button"
+                    onClick={() => setModalStep(1)}
+                    className="text-xs text-stone-400 hover:text-white cursor-pointer"
+                  >
+                    Back
+                  </button>
+                  <button
+                    type="button"
+                    disabled={!formData.comment.trim()}
+                    onClick={() => setModalStep(3)}
+                    className={`inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all shadow-md cursor-pointer ${
+                      formData.comment.trim()
+                        ? 'bg-[#dfb76c] hover:bg-[#caa053] text-[#0d0c0a]'
+                        : 'bg-stone-800 text-stone-500 cursor-not-allowed'
+                    }`}
+                  >
+                    <span>Next</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            )}
 
-                  {/* Scent Performance Tag */}
-                  <div>
-                    <label className="block text-[11px] font-bold uppercase tracking-wider text-stone-300 mb-1.5">
-                      Highlight Performance
-                    </label>
-                    <div className="flex flex-wrap gap-1.5">
-                      {performanceOptions.slice(0, 4).map((opt) => (
-                        <button
-                          key={opt}
-                          type="button"
-                          onClick={() => setFormData({ ...formData, performance: opt })}
-                          className={`px-2.5 py-1 rounded-full text-[10px] font-medium transition-all cursor-pointer border ${
-                            formData.performance === opt
-                              ? 'bg-[#dfb76c] text-[#0d0c0a] font-bold border-[#dfb76c]'
-                              : 'bg-[#181511] text-stone-400 border-[#2a231b] hover:text-white'
-                          }`}
-                        >
-                          {opt}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+            {/* STEP 3: Reviewer Information (Name & Email Required) */}
+            {modalStep === 3 && (
+              <form
+                onSubmit={handleSubmitReview}
+                className="space-y-4 animate-in fade-in duration-200 text-left"
+              >
+                {/* Header with Back */}
+                <div className="flex items-center justify-between pb-3 border-b border-[#241e17]">
+                  <button
+                    type="button"
+                    onClick={() => setModalStep(2)}
+                    className="inline-flex items-center gap-1.5 text-xs text-stone-400 hover:text-white transition-colors cursor-pointer"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                    <span>Back</span>
+                  </button>
+                  <span className="text-[11px] font-semibold text-[#dfb76c] uppercase tracking-wider">
+                    Almost Done
+                  </span>
+                </div>
 
-                  {/* Author Name & City */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                    <div>
-                      <label className="block text-[11px] font-bold uppercase tracking-wider text-stone-300 mb-1.5">
-                        Your Full Name *
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        placeholder="e.g. Daniyal Tariq"
-                        value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        className="w-full bg-[#1b1713] border border-[#2d251c] text-white text-xs rounded-lg p-2.5 focus:outline-none focus:border-[#dfb76c]"
-                      />
-                    </div>
+                {/* Subtitle */}
+                <div>
+                  <h3 className="font-serif text-base sm:text-lg font-bold text-white">
+                    Your Information
+                  </h3>
+                  <p className="text-xs text-stone-400">
+                    Enter your details to publish your verified customer review.
+                  </p>
+                </div>
 
-                    <div>
-                      <label className="block text-[11px] font-bold uppercase tracking-wider text-stone-300 mb-1.5">
-                        City (Pakistan) *
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        placeholder="e.g. Lahore, Karachi, Islamabad..."
-                        value={formData.city}
-                        onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                        className="w-full bg-[#1b1713] border border-[#2d251c] text-white text-xs rounded-lg p-2.5 focus:outline-none focus:border-[#dfb76c]"
-                      />
-                    </div>
-                  </div>
+                {/* Full Name (Required) */}
+                <div>
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-stone-300 mb-1.5">
+                    Your Name * <span className="text-stone-400 font-normal">(Required)</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Daniyal Tariq"
+                    value={formData.name}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, name: e.target.value }))
+                    }
+                    className="w-full bg-[#1b1713] border border-[#2d251c] text-white text-xs rounded-xl p-3 focus:outline-none focus:border-[#dfb76c] transition-colors"
+                  />
+                </div>
 
-                  {/* Submit CTA */}
-                  <div className="pt-3 flex items-center justify-end gap-3 border-t border-[#241e17]">
-                    <button
-                      type="button"
-                      onClick={() => setIsModalOpen(false)}
-                      className="px-4 py-2.5 rounded-lg bg-transparent text-stone-400 hover:text-white transition-colors cursor-pointer"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      className="px-7 py-2.5 rounded-lg bg-[#dfb76c] hover:bg-[#caa053] text-[#0d0c0a] font-bold text-xs uppercase tracking-wider transition-all shadow-md hover:shadow-lg cursor-pointer"
-                    >
-                      Submit Review
-                    </button>
-                  </div>
-                </form>
-              )}
-            </div>
+                {/* Email Address (Required) */}
+                <div>
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-stone-300 mb-1.5">
+                    Email Address * <span className="text-stone-400 font-normal">(Required)</span>
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    placeholder="e.g. daniyal@example.com"
+                    value={formData.email}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, email: e.target.value }))
+                    }
+                    className="w-full bg-[#1b1713] border border-[#2d251c] text-white text-xs rounded-xl p-3 focus:outline-none focus:border-[#dfb76c] transition-colors"
+                  />
+                  <p className="text-[10px] text-stone-500 mt-1">
+                    Your email will not be displayed publicly on the store.
+                  </p>
+                </div>
+
+                {/* City in Pakistan (Optional) */}
+                <div>
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-stone-300 mb-1.5">
+                    City in Pakistan <span className="text-stone-400 font-normal">(Optional)</span>
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Lahore, Karachi, Islamabad, Peshawar..."
+                    value={formData.city}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, city: e.target.value }))
+                    }
+                    className="w-full bg-[#1b1713] border border-[#2d251c] text-white text-xs rounded-xl p-3 focus:outline-none focus:border-[#dfb76c] transition-colors"
+                  />
+                </div>
+
+                {/* Footer Actions */}
+                <div className="pt-3 flex items-center justify-between border-t border-[#241e17]">
+                  <button
+                    type="button"
+                    onClick={() => setModalStep(2)}
+                    className="text-xs text-stone-400 hover:text-white cursor-pointer"
+                  >
+                    Back
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={!formData.name.trim() || !formData.email.trim()}
+                    className={`inline-flex items-center gap-2 px-7 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all shadow-md cursor-pointer ${
+                      formData.name.trim() && formData.email.trim()
+                        ? 'bg-[#dfb76c] hover:bg-[#caa053] text-[#0d0c0a]'
+                        : 'bg-stone-800 text-stone-500 cursor-not-allowed'
+                    }`}
+                  >
+                    <span>Submit Review</span>
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {/* STEP 4: Review Done */}
+            {modalStep === 4 && (
+              <div className="text-center py-6 space-y-4 animate-in fade-in zoom-in-95 duration-200">
+                <div className="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto border border-emerald-500/40 shadow-lg shadow-emerald-950/50">
+                  <Check className="w-8 h-8 stroke-[3]" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-serif font-bold text-white">
+                    Thank You for Your Review!
+                  </h3>
+                  <p className="text-xs text-stone-300 max-w-sm mx-auto mt-2 leading-relaxed">
+                    Your feedback for <strong className="text-white">{product?.name}</strong> has been successfully submitted and will appear in our customer reviews.
+                  </p>
+                </div>
+                <div className="pt-2">
+                  <button
+                    type="button"
+                    onClick={handleCloseModal}
+                    className="px-8 py-2.5 rounded-xl bg-[#dfb76c] hover:bg-[#caa053] text-[#0d0c0a] font-bold text-xs uppercase tracking-wider transition-all shadow-md cursor-pointer"
+                  >
+                    Done
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
