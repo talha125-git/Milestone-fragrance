@@ -16,6 +16,11 @@ export default function Testimonials() {
     return () => window.removeEventListener('milestone_reviews_updated', handleUpdate);
   }, []);
 
+  // If there are no reviews yet, hide the section completely
+  if (!reviewsList || reviewsList.length === 0) {
+    return null;
+  }
+
   // Items per view: 3 on desktop, 1 on mobile
   const itemsPerPage = 3;
   const totalPages = Math.ceil(reviewsList.length / itemsPerPage);

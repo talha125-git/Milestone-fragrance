@@ -196,33 +196,5 @@ export const fragranceTypes = [
   },
 ];
 
-export const testimonials = [
-  {
-    id: 1,
-    name: 'Ahmed Raza',
-    city: 'Karachi',
-    avatar: avatarAhmed,
-    rating: 5,
-    quote: '"Signature is absolutely amazing! The fragrance lasts all day and gets so many compliments."',
-    verified: true,
-  },
-  {
-    id: 2,
-    name: 'Ayesha Khan',
-    city: 'Lahore',
-    avatar: avatarAyesha,
-    rating: 5,
-    quote: '"Believe is my new favorite. It\'s fresh, elegant and perfect for everyday wear. Milestone Fragrances never disappoints!"',
-    verified: true,
-  },
-  {
-    id: 3,
-    name: 'Usman Sheikh',
-    city: 'Islamabad',
-    avatar: avatarUsman,
-    rating: 5,
-    quote: '"Professor has a premium and bold fragrance. The quality and packaging are top-notch. Will definitely order again!"',
-    verified: true,
-  },
-];
+export const testimonials = [];
 

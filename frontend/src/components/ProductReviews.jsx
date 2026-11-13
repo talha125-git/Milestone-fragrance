@@ -71,19 +71,15 @@ export default function ProductReviews({
 
   const productId = product?.id || 'signature';
 
-  // Filter reviews for this specific product (or fallback)
+  // Filter reviews for this specific product
   const productReviews = reviews.filter(
     (r) => r.productId?.toLowerCase() === productId.toLowerCase()
   );
 
-  const displayedReviewsPool = productReviews.length > 0
-    ? productReviews
-    : reviews.slice(0, 3);
-
   // Calculate Average Rating & Counts
-  const totalReviewsCount = displayedReviewsPool.length;
+  const totalReviewsCount = productReviews.length;
   const avgRating = totalReviewsCount > 0
-    ? (displayedReviewsPool.reduce((sum, r) => sum + (r.rating || 5), 0) / totalReviewsCount).toFixed(1)
+    ? (productReviews.reduce((sum, r) => sum + (r.rating || 5), 0) / totalReviewsCount).toFixed(1)
     : '5.0';
 
   const ratingDescriptions = {
@@ -223,10 +219,19 @@ export default function ProductReviews({
               ({totalReviewsCount} {totalReviewsCount === 1 ? 'review' : 'reviews'})
             </span>
           </div>
-          <p className="text-xs text-stone-400">
-            Read verified customer reviews or share your feedback for{' '}
-            <strong className="text-stone-200">{product?.name}</strong>.
-          </p>
+            <p className="text-xs text-stone-400">
+              {totalReviewsCount > 0 ? (
+                <>
+                  Read verified customer reviews or share your feedback for{' '}
+                  <strong className="text-stone-200">{product?.name}</strong>.
+                </>
+              ) : (
+                <>
+                  Be the first to review{' '}
+                  <strong className="text-stone-200">{product?.name}</strong>.
+                </>
+              )}
+            </p>
         </div>
 
         {/* Right: Write a Review Button */}
