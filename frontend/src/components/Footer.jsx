@@ -12,6 +12,7 @@ export default function Footer({ onNavigate }) {
     { name: 'Women', path: '/women' },
     { name: 'Unisex', path: '/unisex' },
     { name: 'Collections', path: '/collections' },
+    { name: 'Reviews', path: '/reviews' },
     { name: 'About Us', path: '/about' },
     { name: 'Contact', path: '/contact' },
   ];

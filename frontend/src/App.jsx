@@ -14,6 +14,7 @@ import Unisex from './pages/Unisex';
 import Collections from './pages/Collections';
 import About from './pages/About';
 import Contact from './pages/Contact';
+import Reviews from './pages/Reviews';
 import ProductDetail from './pages/ProductDetail';
 import Checkout from './pages/Checkout';
 import Login from './pages/Login';
@@ -460,6 +461,11 @@ export default function App() {
           <Route
             path="/contact"
             element={<Contact />}
+          />
+
+          <Route
+            path="/reviews"
+            element={<Reviews onSelectProduct={handleViewProduct} />}
           />
 
           <Route

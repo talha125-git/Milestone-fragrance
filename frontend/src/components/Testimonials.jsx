@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Star, ChevronLeft, ChevronRight, CheckCircle2, Sparkles, MessageSquare } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Star, ChevronLeft, ChevronRight, CheckCircle2, Sparkles, MessageSquare, ArrowRight } from 'lucide-react';
 import { loadStoredReviews } from '../data/reviews';
 import { avatarAhmed, avatarAyesha, avatarUsman } from '../assets';
 
@@ -197,6 +198,18 @@ export default function Testimonials() {
             </button>
           </div>
         )}
+
+        {/* View All Reviews Button */}
+        <div className="mt-8 sm:mt-10 text-center">
+          <Link
+            to="/reviews"
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="inline-flex items-center gap-2 px-7 py-3 rounded-xl border border-[#dfb76c] bg-[#14120f] hover:bg-[#dfb76c] text-[#dfb76c] hover:text-[#0d0c0a] text-xs font-bold uppercase tracking-wider transition-all duration-300 shadow-md hover:shadow-lg hover:shadow-[#dfb76c]/20 cursor-pointer group"
+          >
+            <span>View All Reviews</span>
+            <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+          </Link>
+        </div>
       </div>
     </section>
   );

@@ -1,3 +1,3 @@
 git add .
-git commit -m "feat: add sharp size selector (100ML, 50ML, 30ML, 10ML) with dynamic pricing in catalog and admin"
+git commit -m "feat: move view all reviews button to homepage customer reviews section"
 git push -u origin main
