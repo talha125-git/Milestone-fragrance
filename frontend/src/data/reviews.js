@@ -127,10 +127,14 @@ export const loadStoredReviews = () => {
     if (raw) {
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed) && parsed.length > 0) {
+        // Filter out any test reviews
+        const cleaned = parsed.filter(
+          (r) => r.comment !== 'abc' && r.title !== 'bad' && r.name !== 'test'
+        );
         // Merge with defaults so new defaults aren't missed
-        const existingIds = new Set(parsed.map((r) => r.id));
+        const existingIds = new Set(cleaned.map((r) => r.id));
         const missingDefaults = defaultReviews.filter((dr) => !existingIds.has(dr.id));
-        return [...parsed, ...missingDefaults];
+        return [...cleaned, ...missingDefaults];
       }
     }
   } catch (err) {
