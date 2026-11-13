@@ -524,7 +524,7 @@ export default function ProductDetail({
         </div>
 
         {/* Detailed Tabs: How to Apply & The Atelier Craft */}
-        <div className="border-t border-[#221e1a] pt-12 mb-16 sm:mb-24">
+        {/* <div className="border-t border-[#221e1a] pt-12 mb-16 sm:mb-24">
           <div className="flex items-center justify-center gap-2 sm:gap-4 mb-8 border-b border-[#221e1a] pb-4">
             <button
               onClick={() => setActiveTab('usage')}
@@ -605,7 +605,7 @@ export default function ProductDetail({
               </div>
             )}
           </div>
-        </div>
+        </div> */}
 
         {/* Customer Reviews Section (PerfumePlus & Judge.me Style) */}
         <ProductReviews product={currentProduct} />
