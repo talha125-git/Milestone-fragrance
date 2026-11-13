@@ -18,6 +18,7 @@ import {
   Zap,
 } from 'lucide-react';
 import { products as defaultProducts } from '../data/products';
+import ProductReviews from '../components/ProductReviews';
 
 export default function ProductDetail({
   product,
@@ -114,6 +115,13 @@ export default function ProductDetail({
       quantity
     );
     navigate('/checkout');
+  };
+
+  const scrollToReviews = () => {
+    const el = document.getElementById('reviews-section');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   };
 
   const handleShare = () => {
@@ -299,15 +307,20 @@ export default function ProductDetail({
               )}
             </div>
 
-            {/* Rating & Reviews */}
-            <div className="flex items-center gap-3">
+            {/* Rating & Reviews (Clickable scroll to customer reviews) */}
+            <div
+              onClick={scrollToReviews}
+              className="flex items-center gap-3 cursor-pointer group/rev transition-opacity hover:opacity-90 w-fit"
+              title="Click to jump to customer reviews"
+            >
               <div className="flex text-[#dfb76c]">
                 {[...Array(currentProduct.rating || 5)].map((_, i) => (
                   <Star key={i} className="w-4 h-4 fill-[#dfb76c] text-[#dfb76c]" />
                 ))}
               </div>
-              <span className="text-xs text-stone-300 font-medium">
-                5.0 ({currentProduct.reviewsCount || 100} verified customer reviews)
+              <span className="text-xs text-stone-300 font-medium group-hover/rev:text-[#dfb76c] transition-colors flex items-center gap-1">
+                <span>5.0 ({currentProduct.reviewsCount || 100} verified customer reviews)</span>
+                <span className="text-[#dfb76c] text-[10px] font-bold">&darr;</span>
               </span>
             </div>
 
@@ -594,6 +607,9 @@ export default function ProductDetail({
             )}
           </div>
         </div>
+
+        {/* Customer Reviews Section (PerfumePlus & Judge.me Style) */}
+        <ProductReviews product={currentProduct} />
 
         {/* You May Also Like / Related Fragrances */}
         <div className="pt-8 border-t border-[#221e1a]">
