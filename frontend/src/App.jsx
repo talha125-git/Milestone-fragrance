@@ -1,5 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
+
+// Disable automatic browser scroll restoration to avoid scroll jumps / blinking on route change
+if (typeof window !== 'undefined' && 'scrollRestoration' in window.history) {
+  window.history.scrollRestoration = 'manual';
+}
 import Header from './components/Header';
 import Footer from './components/Footer';
 import CartDrawer from './components/CartDrawer';
@@ -264,9 +269,11 @@ export default function App() {
     }
   };
 
-  // Auto scroll to top on pathname change
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  // Directly reset scroll to top synchronously BEFORE paint on route change
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
   }, [location.pathname]);
 
   const handleNavigate = (pathOrId) => {
@@ -278,14 +285,12 @@ export default function App() {
       target = `/${target}`;
     }
     navigate(target);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleViewProduct = (product) => {
     if (product && product.id) {
       setSelectedProduct(product);
       navigate(`/products/${product.id}`);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
@@ -332,7 +337,6 @@ export default function App() {
                 onSelectType={(t) => {
                   setSelectedCollectionType(t);
                   navigate(`/collections/${encodeURIComponent(t.toLowerCase())}`);
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
                 products={allProducts}
                 heroSlides={heroSlides}

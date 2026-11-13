@@ -53,7 +53,6 @@ export default function ProductDetail({
   const [activeTab, setActiveTab] = useState('usage');
 
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
     setSelectedSize('100ml');
     setQuantity(1);
     setAdded(false);
@@ -632,7 +631,6 @@ export default function ProductDetail({
                   } else {
                     navigate(`/products/${rel.id}`);
                   }
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
                 className="group bg-[#14120f] border border-[#262018] hover:border-[#dfb76c] rounded-xl p-4 transition-all duration-300 cursor-pointer hover:shadow-xl text-left"
               >

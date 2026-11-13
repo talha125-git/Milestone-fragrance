@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+html, body {
+  scroll-behavior: auto !important;
+}
+
 @keyframes marquee {
   0% {
     transform: translateX(0);

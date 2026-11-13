@@ -53,7 +53,6 @@ export default function Header({
     navigate(link.path);
     if (setCurrentPage) setCurrentPage(link.id);
     setMobileMenuOpen(false);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (

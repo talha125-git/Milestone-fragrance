@@ -20,7 +20,6 @@ export default function Footer({ onNavigate }) {
   const handleLinkClick = (path) => {
     navigate(path);
     if (onNavigate) onNavigate(path);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const customerCare = [

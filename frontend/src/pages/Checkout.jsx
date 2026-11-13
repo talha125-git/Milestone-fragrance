@@ -175,7 +175,7 @@ export default function Checkout({
       setOrderComplete(true);
       if (onOrderSuccess) onOrderSuccess(savedOrder);
       if (onClearCart) onClearCart();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo(0, 0);
     } catch (err) {
       console.warn('[Checkout submit error]:', err);
       // Offline fallback
@@ -190,7 +190,7 @@ export default function Checkout({
       setOrderComplete(true);
       if (onOrderSuccess) onOrderSuccess(offlineOrder);
       if (onClearCart) onClearCart();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo(0, 0);
     } finally {
       setIsSubmitting(false);
     }
