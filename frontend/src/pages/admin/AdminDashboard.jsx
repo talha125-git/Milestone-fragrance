@@ -7,9 +7,11 @@ import {
   Mail,
   Users,
   Sparkles,
+  Star,
 } from 'lucide-react';
 import { prodSignature } from '../../assets';
 import { products as initialLocalProducts } from '../../data/products';
+import { loadStoredReviews, persistReviews } from '../../data/reviews';
 
 import AdminSidebar from './AdminSidebar';
 import AdminHeader from './AdminHeader';
@@ -18,6 +20,7 @@ import ProductsTab from './ProductsTab';
 import OrdersTab from './OrdersTab';
 import MessagesTab from './MessagesTab';
 import NewsletterTab from './NewsletterTab';
+import ReviewsTab from './ReviewsTab';
 import HeroTab from './frontend_setup/HeroTab';
 import ProductModal from './ProductModal';
 import DeleteModal from './DeleteModal';
@@ -48,6 +51,7 @@ export default function AdminDashboard({
 
     if (cleanPath === '/admin/products') return 'products';
     if (cleanPath === '/admin/orders') return 'orders';
+    if (cleanPath === '/admin/reviews') return 'reviews';
     if (cleanPath === '/admin/messages' || cleanPath === '/admin/inquiries') return 'messages';
     if (cleanPath === '/admin/newsletter' || cleanPath === '/admin/subscribers') return 'newsletter';
     return 'overview';
@@ -67,6 +71,9 @@ export default function AdminDashboard({
         break;
       case 'orders':
         targetPath = '/admin/orders';
+        break;
+      case 'reviews':
+        targetPath = '/admin/reviews';
         break;
       case 'messages':
       case 'inquiries':
@@ -142,6 +149,16 @@ export default function AdminDashboard({
   });
   const [messages, setMessages] = useState([]);
   const [subscribers, setSubscribers] = useState([]);
+  const [reviews, setReviews] = useState(() => loadStoredReviews());
+
+  // Listen to reviews updates across tabs and storefront submissions
+  useEffect(() => {
+    const handleReviewUpdate = () => {
+      setReviews(loadStoredReviews());
+    };
+    window.addEventListener('milestone_reviews_updated', handleReviewUpdate);
+    return () => window.removeEventListener('milestone_reviews_updated', handleReviewUpdate);
+  }, []);
 
   // Product Filtering & Search
   const [searchProductQuery, setSearchProductQuery] = useState('');
@@ -351,6 +368,20 @@ export default function AdminDashboard({
           const msgJson = await msgRes.json();
           if (msgJson.data && Array.isArray(msgJson.data)) {
             setMessages(msgJson.data);
+          }
+        }
+      } catch {
+        // Fallback
+      }
+
+      // 5. Fetch Real Customer Reviews
+      try {
+        const revRes = await fetch('/api/reviews');
+        if (revRes.ok) {
+          const revJson = await revRes.json();
+          if (revJson.data && Array.isArray(revJson.data)) {
+            setReviews(revJson.data);
+            persistReviews(revJson.data);
           }
         }
       } catch {
@@ -571,6 +602,20 @@ export default function AdminDashboard({
     showToast(`Order ${orderId} removed`, 'info');
   };
 
+  // Delete Review
+  const handleDeleteReview = (reviewId, reviewerName = 'Customer') => {
+    if (!window.confirm(`Are you sure you want to delete the review by "${reviewerName}"?`)) return;
+    const updated = reviews.filter((r) => r.id !== reviewId);
+    setReviews(updated);
+    persistReviews(updated);
+
+    fetch(`/api/reviews/${reviewId}`, {
+      method: 'DELETE',
+    }).catch(() => {});
+
+    showToast(`Review by "${reviewerName}" removed`, 'info');
+  };
+
   // Filtered Products
   const filteredProducts = productsList.filter((p) => {
     const matchesSearch =
@@ -592,6 +637,7 @@ export default function AdminDashboard({
     { id: 'overview', path: '/admin/overview', label: 'Dashboard Overview', icon: LayoutDashboard, badge: null },
     { id: 'products', path: '/admin/products', label: 'Fragrances Catalog', icon: Package, badge: productsList.length },
     { id: 'orders', path: '/admin/orders', label: 'Customer Orders', icon: ShoppingBag, badge: orders.length },
+    { id: 'reviews', path: '/admin/reviews', label: 'Customer Reviews', icon: Star, badge: reviews.length },
     { id: 'messages', path: '/admin/messages', label: 'Contact Inquiries', icon: Mail, badge: unreadMessagesCount > 0 ? `${unreadMessagesCount} new` : null },
     { id: 'newsletter', path: '/admin/newsletter', label: 'VIP Subscribers', icon: Users, badge: subscribers.length },
   ];
@@ -668,6 +714,14 @@ export default function AdminDashboard({
               orders={orders}
               handleOrderStatusChange={handleOrderStatusChange}
               handleDeleteOrder={handleDeleteOrder}
+            />
+          )}
+
+          {activeTab === 'reviews' && (
+            <ReviewsTab
+              reviews={reviews}
+              onDeleteReview={handleDeleteReview}
+              showToast={showToast}
             />
           )}
 

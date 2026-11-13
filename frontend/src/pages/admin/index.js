@@ -6,6 +6,7 @@ export { default as ProductsTab } from './ProductsTab';
 export { default as OrdersTab } from './OrdersTab';
 export { default as MessagesTab } from './MessagesTab';
 export { default as NewsletterTab } from './NewsletterTab';
+export { default as ReviewsTab } from './ReviewsTab';
 export { default as ProductModal } from './ProductModal';
 export { default as DeleteModal } from './DeleteModal';
 export { default as HeroTab } from './frontend_setup/HeroTab';

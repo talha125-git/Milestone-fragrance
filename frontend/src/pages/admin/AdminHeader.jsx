@@ -51,6 +51,8 @@ export default function AdminHeader({
         return 'Inquiries & Customer Care';
       case 'newsletter':
         return 'VIP Newsletter Subscribers';
+      case 'reviews':
+        return 'Customer Reviews & Moderation';
       case 'hero':
         return 'Home Hero Banner & Imagery';
       default:

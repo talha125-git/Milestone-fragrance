@@ -120,5 +120,19 @@ router.post('/:id/helpful', (req, res) => {
   res.json({ success: true, helpful: review.helpful });
 });
 
+/**
+ * DELETE /api/reviews/:id
+ */
+router.delete('/:id', (req, res) => {
+  const { id } = req.params;
+  const initialLength = reviews.length;
+  reviews = reviews.filter((r) => r.id !== id);
+  if (reviews.length === initialLength) {
+    return res.status(404).json({ success: false, message: 'Review not found' });
+  }
+  saveReviewsToDisk();
+  res.json({ success: true, message: 'Review deleted successfully' });
+});
+
 export default router;
 
