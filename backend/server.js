@@ -12,6 +12,7 @@ import uploadRouter from './routes/upload.js';
 import heroRouter from './routes/hero.js';
 import reviewsRouter from './routes/reviews.js';
 import settingsRouter from './routes/settings.js';
+import aboutRouter from './routes/about.js';
 
 dotenv.config();
 
@@ -58,6 +59,7 @@ app.use('/api/upload', uploadRouter);
 app.use('/api/hero', heroRouter);
 app.use('/api/reviews', reviewsRouter);
 app.use('/api/settings', settingsRouter);
+app.use('/api/about', aboutRouter);
 
 // Admin Authentication Route
 app.post('/api/admin/login', (req, res) => {

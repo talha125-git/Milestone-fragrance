@@ -25,6 +25,7 @@ import ReviewsTab from './ReviewsTab';
 import AddProductTab from './AddProductTab';
 import SettingsTab from './SettingsTab';
 import HeroTab from './frontend_setup/HeroTab';
+import AboutTab from './frontend_setup/AboutTab';
 import ProductModal from './ProductModal';
 import DeleteModal from './DeleteModal';
 
@@ -50,6 +51,14 @@ export default function AdminDashboard({
       cleanPath === '/admin/hero-banner'
     ) {
       return 'hero';
+    }
+
+    if (
+      cleanPath === '/admin/frontend-setup/about' ||
+      cleanPath === '/admin/frontend_setup/about' ||
+      cleanPath === '/admin/about'
+    ) {
+      return 'about';
     }
 
     if (cleanPath === '/admin/products/add' || cleanPath === '/admin/add-product') return 'add-product';
@@ -99,6 +108,10 @@ export default function AdminDashboard({
       case 'hero-banner':
       case 'frontend-setup/hero':
         targetPath = '/admin/frontend-setup/hero';
+        break;
+      case 'about':
+      case 'frontend-setup/about':
+        targetPath = '/admin/frontend-setup/about';
         break;
       default:
         targetPath = `/admin/${tabId}`;
@@ -809,6 +822,10 @@ export default function AdminDashboard({
               productsList={productsList}
               showToast={showToast}
             />
+          )}
+
+          {activeTab === 'about' && (
+            <AboutTab showToast={showToast} />
           )}
 
           {activeTab === 'settings' && (

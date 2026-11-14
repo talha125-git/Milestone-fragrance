@@ -22,6 +22,7 @@ import avatarUsman from './avatar_usman.png';
 import leafLeft from './leaf_left.png';
 import leafRight from './leaf_right.png';
 import paymentMethods from './payment_methods.png';
+import founderYaseenAhmad from './founder_yaseen_ahmad.png';
 
 export {
   logo,
@@ -48,5 +49,6 @@ export {
   leafLeft,
   leafRight,
   paymentMethods,
+  founderYaseenAhmad,
 };
 

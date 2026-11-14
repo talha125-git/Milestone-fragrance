@@ -8,6 +8,7 @@ import {
   LayoutTemplate,
   ExternalLink,
   Check,
+  BookOpen,
 } from 'lucide-react';
 
 export default function AdminHeader({
@@ -57,6 +58,8 @@ export default function AdminHeader({
         return 'Customer Reviews & Moderation';
       case 'hero':
         return 'Home Hero Banner & Imagery';
+      case 'about':
+        return 'About Us Story & Leadership';
       case 'settings':
         return 'Storefront Settings & Social Links';
       default:
@@ -102,16 +105,18 @@ export default function AdminHeader({
             type="button"
             onClick={() => setIsDropdownOpen((prev) => !prev)}
             aria-expanded={isDropdownOpen}
-            className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all shadow-xs cursor-pointer select-none ${activeTab === 'hero' || isDropdownOpen
+            className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all shadow-xs cursor-pointer select-none ${
+              activeTab === 'hero' || activeTab === 'about' || isDropdownOpen
                 ? 'bg-[#b38531] text-white shadow-md ring-2 ring-[#b38531]/25'
                 : 'bg-[#b38531] hover:bg-[#966d21] text-white hover:shadow-md'
-              }`}
+            }`}
           >
             <LayoutTemplate className="w-3.5 h-3.5" />
             <span>Frontend Setup</span>
             <ChevronDown
-              className={`w-3.5 h-3.5 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''
-                }`}
+              className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                isDropdownOpen ? 'rotate-180' : ''
+              }`}
             />
           </button>
 
@@ -130,17 +135,19 @@ export default function AdminHeader({
                     if (setActiveTab) setActiveTab('hero');
                     setIsDropdownOpen(false);
                   }}
-                  className={`w-full flex items-center justify-between p-2.5 rounded-lg text-left transition-colors cursor-pointer select-none ${activeTab === 'hero'
+                  className={`w-full flex items-center justify-between p-2.5 rounded-lg text-left transition-colors cursor-pointer select-none ${
+                    activeTab === 'hero'
                       ? 'bg-amber-50/90 text-[#966d21] font-semibold border border-amber-200/80 shadow-2xs'
                       : 'hover:bg-stone-50 text-stone-700'
-                    }`}
+                  }`}
                 >
                   <div className="flex items-center gap-2.5">
                     <div
-                      className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${activeTab === 'hero'
+                      className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
+                        activeTab === 'hero'
                           ? 'bg-[#b38531] text-white shadow-2xs'
                           : 'bg-amber-50 text-[#b38531]'
-                        }`}
+                      }`}
                     >
                       <Sparkles className="w-4 h-4" />
                     </div>
@@ -153,6 +160,46 @@ export default function AdminHeader({
                   </div>
 
                   {activeTab === 'hero' ? (
+                    <Check className="w-4 h-4 text-[#b38531] shrink-0" />
+                  ) : (
+                    <span className="text-[9px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200 px-1.5 py-0.5 rounded shrink-0">
+                      Live
+                    </span>
+                  )}
+                </Link>
+
+                {/* About Us Story Item */}
+                <Link
+                  to="/admin/frontend-setup/about"
+                  onClick={() => {
+                    if (setActiveTab) setActiveTab('about');
+                    setIsDropdownOpen(false);
+                  }}
+                  className={`w-full flex items-center justify-between p-2.5 rounded-lg text-left transition-colors cursor-pointer select-none ${
+                    activeTab === 'about'
+                      ? 'bg-amber-50/90 text-[#966d21] font-semibold border border-amber-200/80 shadow-2xs'
+                      : 'hover:bg-stone-50 text-stone-700'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <div
+                      className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
+                        activeTab === 'about'
+                          ? 'bg-[#b38531] text-white shadow-2xs'
+                          : 'bg-amber-50 text-[#b38531]'
+                      }`}
+                    >
+                      <BookOpen className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold leading-tight">About Us Story</div>
+                      <div className="text-[10px] text-stone-400 font-normal">
+                        Narrative, leadership & images
+                      </div>
+                    </div>
+                  </div>
+
+                  {activeTab === 'about' ? (
                     <Check className="w-4 h-4 text-[#b38531] shrink-0" />
                   ) : (
                     <span className="text-[9px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200 px-1.5 py-0.5 rounded shrink-0">
