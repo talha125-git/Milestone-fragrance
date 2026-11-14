@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Image as ImageIcon, RefreshCw, Upload, Check } from 'lucide-react';
+import { X, Image as ImageIcon, RefreshCw, Upload, Check, Plus, Trash2, Sparkles, Layers } from 'lucide-react';
 import { prodSignature, prodBelieve, prodGhanam, prodProfessor } from '../../assets';
 
 export default function ProductModal({
@@ -135,6 +135,189 @@ export default function ProductModal({
                     ))}
                   </div>
                 </div>
+              </div>
+            </div>
+
+            {/* Storefront Hover Image Section */}
+            <div className="p-4 rounded-xl bg-[#FAF6F0] border border-[#dfb76c]/40 space-y-3">
+              <div className="flex items-center justify-between">
+                <label className="text-[11px] font-bold uppercase tracking-wider text-stone-800 flex items-center gap-1.5">
+                  <Sparkles className="w-4 h-4 text-[#b38531]" />
+                  <span>Storefront Hover Image</span>
+                </label>
+                <span className="text-[10px] text-[#b38531] font-bold bg-[#dfb76c]/20 px-2 py-0.5 rounded-full">
+                  Crossfade on card hover
+                </span>
+              </div>
+
+              <div className="flex flex-col sm:flex-row items-center gap-4">
+                <div className="relative w-24 h-24 rounded-xl bg-white border border-stone-200 p-2 flex items-center justify-center overflow-hidden flex-shrink-0 shadow-xs">
+                  {formData.hoverImage ? (
+                    <img
+                      src={formData.hoverImage}
+                      alt="Hover Preview"
+                      className="w-full h-full object-contain"
+                    />
+                  ) : (
+                    <span className="text-[10px] text-stone-400 text-center">No hover image</span>
+                  )}
+                </div>
+
+                <div className="flex-1 w-full space-y-2 text-left">
+                  <div className="flex items-center gap-2">
+                    <label
+                      htmlFor="modal-hover-image-file"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#14120f] hover:bg-stone-800 text-[#dfb76c] text-xs font-semibold cursor-pointer shadow-xs transition-all"
+                    >
+                      <Upload className="w-3.5 h-3.5" />
+                      <span>{formData.hoverImage ? 'Change Hover Image' : 'Upload Hover Image'}</span>
+                    </label>
+                    <input
+                      id="modal-hover-image-file"
+                      type="file"
+                      accept="image/*"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        const reader = new FileReader();
+                        reader.onload = (ev) => {
+                          setFormData((prev) => ({ ...prev, hoverImage: ev.target.result }));
+                        };
+                        reader.readAsDataURL(file);
+
+                        try {
+                          const uploadData = new FormData();
+                          uploadData.append('image', file);
+                          const res = await fetch('/api/upload', { method: 'POST', body: uploadData });
+                          if (res.ok) {
+                            const json = await res.json();
+                            if (json.url) {
+                              setFormData((prev) => ({ ...prev, hoverImage: json.url }));
+                            }
+                          }
+                        } catch {}
+                      }}
+                      className="hidden"
+                    />
+
+                    {formData.hoverImage && (
+                      <button
+                        type="button"
+                        onClick={() => setFormData((prev) => ({ ...prev, hoverImage: '' }))}
+                        className="p-1.5 text-stone-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition-colors cursor-pointer"
+                        title="Remove Hover Image"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Or enter hover image URL..."
+                    value={formData.hoverImage || ''}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, hoverImage: e.target.value }))}
+                    className="w-full bg-white border border-stone-200 text-stone-900 text-xs rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-[#b38531]"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Product Details Gallery Images (Up to 6) */}
+            <div className="p-4 rounded-xl bg-stone-50 border border-stone-200/90 space-y-3">
+              <div className="flex items-center justify-between">
+                <label className="text-[11px] font-bold uppercase tracking-wider text-stone-800 flex items-center gap-1.5">
+                  <Layers className="w-4 h-4 text-[#b38531]" />
+                  <span>Gallery Photos ({formData.images?.length || 0} / 6)</span>
+                </label>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const url = window.prompt('Enter image URL:');
+                    if (url && url.trim()) {
+                      setFormData((prev) => ({
+                        ...prev,
+                        images: [...(prev.images || []), url.trim()].slice(0, 6),
+                      }));
+                    }
+                  }}
+                  disabled={(formData.images?.length || 0) >= 6}
+                  className="text-[10px] font-bold text-[#b38531] hover:underline cursor-pointer disabled:opacity-40"
+                >
+                  + Add via URL
+                </button>
+              </div>
+
+              <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                {[0, 1, 2, 3, 4, 5].map((idx) => {
+                  const img = formData.images?.[idx];
+                  return (
+                    <div
+                      key={idx}
+                      className="relative aspect-square rounded-lg bg-white border border-stone-200 p-1 flex items-center justify-center overflow-hidden group shadow-2xs"
+                    >
+                      {img ? (
+                        <>
+                          <img src={img} alt={`Gallery ${idx + 1}`} className="w-full h-full object-contain" />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setFormData((prev) => ({
+                                ...prev,
+                                images: prev.images.filter((_, i) => i !== idx),
+                              }));
+                            }}
+                            className="absolute top-0.5 right-0.5 p-1 bg-rose-600 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                          >
+                            <Trash2 className="w-2.5 h-2.5" />
+                          </button>
+                        </>
+                      ) : (
+                        <label
+                          htmlFor={`modal-gallery-${idx}`}
+                          className="w-full h-full border border-dashed border-stone-200 hover:border-[#b38531] rounded flex flex-col items-center justify-center text-stone-400 hover:text-[#b38531] cursor-pointer"
+                        >
+                          <Plus className="w-4 h-4" />
+                          <span className="text-[9px]">#{idx + 1}</span>
+                          <input
+                            id={`modal-gallery-${idx}`}
+                            type="file"
+                            accept="image/*"
+                            onChange={async (e) => {
+                              const file = e.target.files?.[0];
+                              if (!file) return;
+                              const reader = new FileReader();
+                              reader.onload = (ev) => {
+                                setFormData((prev) => {
+                                  const copy = [...(prev.images || [])];
+                                  copy[idx] = ev.target.result;
+                                  return { ...prev, images: copy.filter(Boolean) };
+                                });
+                              };
+                              reader.readAsDataURL(file);
+
+                              try {
+                                const uploadData = new FormData();
+                                uploadData.append('image', file);
+                                const res = await fetch('/api/upload', { method: 'POST', body: uploadData });
+                                if (res.ok) {
+                                  const json = await res.json();
+                                  if (json.url) {
+                                    setFormData((prev) => {
+                                      const copy = [...(prev.images || [])];
+                                      copy[idx] = json.url;
+                                      return { ...prev, images: copy.filter(Boolean) };
+                                    });
+                                  }
+                                }
+                              } catch {}
+                            }}
+                            className="hidden"
+                          />
+                        </label>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
 

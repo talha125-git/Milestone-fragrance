@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { X, ExternalLink, ArrowUpRight, LogOut } from 'lucide-react';
+import { X, ExternalLink, ArrowUpRight, LogOut, ChevronDown } from 'lucide-react';
 import { logo } from '../../assets';
 
 export default function AdminSidebar({
@@ -12,6 +12,17 @@ export default function AdminSidebar({
   onLogout,
 }) {
   const navigate = useNavigate();
+
+  // Products dropdown state (smooth transition)
+  const [productsOpen, setProductsOpen] = useState(
+    activeTab === 'products' || activeTab === 'add-product'
+  );
+
+  useEffect(() => {
+    if (activeTab === 'products' || activeTab === 'add-product') {
+      setProductsOpen(true);
+    }
+  }, [activeTab]);
 
   const handleLogoutClick = () => {
     localStorage.removeItem('milestone_admin_auth');
@@ -67,7 +78,86 @@ export default function AdminSidebar({
             </p>
             {navItems.map((item) => {
               const Icon = item.icon;
-              const isActive = activeTab === item.id;
+              const hasChildren = Array.isArray(item.children) && item.children.length > 0;
+              const isChildActive = hasChildren && item.children.some((c) => c.id === activeTab);
+              const isActive = activeTab === item.id || isChildActive;
+
+              if (hasChildren) {
+                return (
+                  <div key={item.id} className="space-y-1">
+                    <button
+                      type="button"
+                      onClick={() => setProductsOpen((prev) => !prev)}
+                      className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-medium transition-all cursor-pointer select-none ${
+                        isChildActive
+                          ? 'bg-[#dfb76c]/15 text-[#dfb76c] font-bold border border-[#dfb76c]/30'
+                          : 'text-stone-300 hover:text-white hover:bg-white/[0.06]'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <Icon className={`w-4 h-4 ${isChildActive ? 'text-[#dfb76c]' : 'text-stone-400'}`} />
+                        <span>{item.label}</span>
+                      </div>
+
+                      <div className="flex items-center gap-1.5">
+                        {item.badge !== null && (
+                          <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-white/10 text-stone-300">
+                            {item.badge}
+                          </span>
+                        )}
+                        <ChevronDown
+                          className={`w-4 h-4 text-stone-400 transition-transform duration-300 ${
+                            productsOpen ? 'rotate-180 text-[#dfb76c]' : ''
+                          }`}
+                        />
+                      </div>
+                    </button>
+
+                    {/* Smooth Dropdown Menu */}
+                    <div
+                      className={`overflow-hidden transition-all duration-300 ease-in-out pl-5 space-y-1 ${
+                        productsOpen ? 'max-h-40 opacity-100 mt-1 mb-1' : 'max-h-0 opacity-0 m-0'
+                      }`}
+                    >
+                      {item.children.map((child) => {
+                        const ChildIcon = child.icon;
+                        const isThisChildActive = activeTab === child.id;
+                        return (
+                          <Link
+                            key={child.id}
+                            to={child.path}
+                            onClick={() => {
+                              if (setActiveTab) setActiveTab(child.id);
+                              setSidebarOpen(false);
+                            }}
+                            className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs transition-all cursor-pointer select-none ${
+                              isThisChildActive
+                                ? 'bg-[#dfb76c] text-[#0d0c0a] font-bold shadow-xs'
+                                : 'text-stone-400 hover:text-white hover:bg-white/[0.04]'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2">
+                              {ChildIcon ? (
+                                <ChildIcon className={`w-3.5 h-3.5 ${isThisChildActive ? 'text-[#0d0c0a]' : 'text-stone-400'}`} />
+                              ) : (
+                                <span className={`w-1.5 h-1.5 rounded-full ${isThisChildActive ? 'bg-[#0d0c0a]' : 'bg-stone-500'}`} />
+                              )}
+                              <span>{child.label}</span>
+                            </div>
+
+                            {child.badge !== null && child.badge !== undefined && (
+                              <span className={`text-[10px] ${isThisChildActive ? 'text-[#0d0c0a]' : 'text-stone-400'}`}>
+                                {child.badge}
+                              </span>
+                            )}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              }
+
               const targetPath = item.path || `/admin/${item.id}`;
               return (
                 <Link

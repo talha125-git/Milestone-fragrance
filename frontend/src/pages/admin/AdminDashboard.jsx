@@ -21,6 +21,7 @@ import OrdersTab from './OrdersTab';
 import MessagesTab from './MessagesTab';
 import NewsletterTab from './NewsletterTab';
 import ReviewsTab from './ReviewsTab';
+import AddProductTab from './AddProductTab';
 import HeroTab from './frontend_setup/HeroTab';
 import ProductModal from './ProductModal';
 import DeleteModal from './DeleteModal';
@@ -49,6 +50,7 @@ export default function AdminDashboard({
       return 'hero';
     }
 
+    if (cleanPath === '/admin/products/add' || cleanPath === '/admin/add-product') return 'add-product';
     if (cleanPath === '/admin/products') return 'products';
     if (cleanPath === '/admin/orders') return 'orders';
     if (cleanPath === '/admin/reviews') return 'reviews';
@@ -68,6 +70,10 @@ export default function AdminDashboard({
         break;
       case 'products':
         targetPath = '/admin/products';
+        break;
+      case 'add-product':
+      case 'products/add':
+        targetPath = '/admin/products/add';
         break;
       case 'orders':
         targetPath = '/admin/orders';
@@ -411,13 +417,9 @@ export default function AdminDashboard({
     showToast(`Stock updated: ${product.name} is now ${newStatus ? 'In Stock' : 'Out of Stock'}`);
   };
 
-  // Open Add Modal
+  // Open Add Fragrance Page (Full-page experience)
   const handleOpenAddModal = () => {
-    setFormData(defaultForm);
-    setSelectedImageFile(null);
-    setImagePreview(defaultForm.image);
-    setUploadedAssetPath('');
-    setIsAddModalOpen(true);
+    navigate('/admin/products/add');
   };
 
   // Open Edit Modal
@@ -635,7 +637,16 @@ export default function AdminDashboard({
 
   const navItems = [
     { id: 'overview', path: '/admin/overview', label: 'Dashboard Overview', icon: LayoutDashboard, badge: null },
-    { id: 'products', path: '/admin/products', label: 'Fragrances Catalog', icon: Package, badge: productsList.length },
+    {
+      id: 'products-group',
+      label: 'Products',
+      icon: Package,
+      badge: productsList.length,
+      children: [
+        { id: 'products', path: '/admin/products', label: 'Fragrance Catalog', badge: productsList.length },
+        { id: 'add-product', path: '/admin/products/add', label: 'Add Fragrance', badge: null },
+      ],
+    },
     { id: 'orders', path: '/admin/orders', label: 'Customer Orders', icon: ShoppingBag, badge: orders.length },
     { id: 'reviews', path: '/admin/reviews', label: 'Customer Reviews', icon: Star, badge: reviews.length },
     { id: 'messages', path: '/admin/messages', label: 'Contact Inquiries', icon: Mail, badge: unreadMessagesCount > 0 ? `${unreadMessagesCount} new` : null },
@@ -706,6 +717,17 @@ export default function AdminDashboard({
               handleOpenEditModal={handleOpenEditModal}
               handleToggleStock={handleToggleStock}
               setDeleteCandidate={setDeleteCandidate}
+            />
+          )}
+
+          {activeTab === 'add-product' && (
+            <AddProductTab
+              onAddProduct={(newProd) => {
+                const updated = [newProd, ...productsList];
+                updateAndBroadcastProducts(updated);
+                showToast(`Fragrance "${newProd.name}" published to catalog!`);
+              }}
+              showToast={showToast}
             />
           )}
 

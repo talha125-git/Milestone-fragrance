@@ -63,13 +63,24 @@ export default function BestSellers({
                 {/* Product Image */}
                 <div
                   onClick={() => onOpenQuickView(product)}
-                  className="relative aspect-[4/3] sm:aspect-square w-full rounded overflow-hidden bg-[#FAF6F0] mb-3 flex items-center justify-center cursor-pointer group-hover:opacity-95"
+                  className="relative aspect-[4/3] sm:aspect-square w-full rounded overflow-hidden bg-[#FAF6F0] mb-3 flex items-center justify-center cursor-pointer"
                 >
                   <img
                     src={product.image}
                     alt={product.name}
-                    className="w-full h-full object-contain p-1 transition-transform duration-500 group-hover:scale-105"
+                    className={`w-full h-full object-contain p-1 transition-all duration-500 ${
+                      product.hoverImage
+                        ? 'group-hover:opacity-0 group-hover:scale-105'
+                        : 'group-hover:scale-105'
+                    }`}
                   />
+                  {product.hoverImage && (
+                    <img
+                      src={product.hoverImage}
+                      alt={`${product.name} hover view`}
+                      className="absolute inset-0 w-full h-full object-contain p-1 opacity-0 group-hover:opacity-100 transition-all duration-500 group-hover:scale-105 pointer-events-none"
+                    />
+                  )}
                   {product.inStock === false ? (
                     <span className="absolute top-2 left-2 bg-rose-600 text-white font-bold text-[9px] uppercase px-2 py-0.5 rounded shadow-sm tracking-wider">
                       Out of Stock

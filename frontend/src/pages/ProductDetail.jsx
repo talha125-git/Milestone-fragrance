@@ -52,11 +52,22 @@ export default function ProductDetail({
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState('usage');
 
+  // Collect all unique images for this fragrance (Main + Hover + Gallery up to 6)
+  const galleryImages = [
+    currentProduct?.image,
+    currentProduct?.hoverImage,
+    ...(Array.isArray(currentProduct?.images) ? currentProduct.images : []),
+  ].filter(Boolean);
+  const uniqueGalleryImages = Array.from(new Set(galleryImages));
+
+  const [activeImage, setActiveImage] = useState(currentProduct?.image);
+
   useEffect(() => {
     setSelectedSize('100ml');
     setQuantity(1);
     setAdded(false);
-  }, [currentProduct?.id]);
+    setActiveImage(currentProduct?.image);
+  }, [currentProduct?.id, currentProduct?.image]);
 
   // Dynamic price resolution for bottle sizes (100ml, 50ml, 30ml, 10ml)
   const getSizePrice = (product, size) => {
@@ -235,15 +246,42 @@ export default function ProductDetail({
                   </div>
                 )}
                 <img
-                  src={currentProduct.image}
+                  src={activeImage || currentProduct.image}
                   alt={currentProduct.name}
-                  className="w-full h-full object-contain filter drop-shadow-[0_15px_30px_rgba(0,0,0,0.2)] transition-transform duration-700 group-hover:scale-105"
+                  className="w-full h-full object-contain filter drop-shadow-[0_15px_30px_rgba(0,0,0,0.2)] transition-all duration-500 group-hover:scale-105"
                 />
               </div>
 
               {/* Pedestal Shadow */}
               <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-[85%] h-5 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.3)_0%,transparent_75%)] blur-md pointer-events-none" />
             </div>
+
+            {/* Multi-Angle Interactive Gallery Thumbnails */}
+            {uniqueGalleryImages.length > 1 && (
+              <div className="w-full max-w-[500px] mt-4 flex items-center justify-center gap-2.5 overflow-x-auto py-2 px-1">
+                {uniqueGalleryImages.map((img, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => setActiveImage(img)}
+                    className={`relative w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-[#FAF6F0] p-1.5 flex items-center justify-center overflow-hidden border-2 transition-all duration-200 cursor-pointer flex-shrink-0 group ${
+                      (activeImage || currentProduct?.image) === img
+                        ? 'border-[#dfb76c] shadow-lg shadow-[#dfb76c]/25 scale-105'
+                        : 'border-[#262018] hover:border-stone-500 opacity-60 hover:opacity-100'
+                    }`}
+                  >
+                    <img
+                      src={img}
+                      alt={`${currentProduct.name} angle ${idx + 1}`}
+                      className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
+                    />
+                    {(activeImage || currentProduct?.image) === img && (
+                      <span className="absolute bottom-1 right-1 w-2 h-2 rounded-full bg-[#dfb76c]" />
+                    )}
+                  </button>
+                ))}
+              </div>
+            )}
 
             {/* Quick Feature Badges below image */}
             <div className="grid grid-cols-3 gap-3 w-full max-w-[500px] mt-6 text-center">
@@ -634,12 +672,23 @@ export default function ProductDetail({
                 }}
                 className="group bg-[#14120f] border border-[#262018] hover:border-[#dfb76c] rounded-xl p-4 transition-all duration-300 cursor-pointer hover:shadow-xl text-left"
               >
-                <div className="aspect-square w-full bg-[#FAF6F0] rounded-lg p-3 flex items-center justify-center mb-4 overflow-hidden">
+                <div className="relative aspect-square w-full bg-[#FAF6F0] rounded-lg p-3 flex items-center justify-center mb-4 overflow-hidden">
                   <img
                     src={rel.image}
                     alt={rel.name}
-                    className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
+                    className={`w-full h-full object-contain p-1 transition-all duration-500 ${
+                      rel.hoverImage
+                        ? 'group-hover:opacity-0 group-hover:scale-105'
+                        : 'group-hover:scale-105'
+                    }`}
                   />
+                  {rel.hoverImage && (
+                    <img
+                      src={rel.hoverImage}
+                      alt={`${rel.name} hover view`}
+                      className="absolute inset-0 w-full h-full object-contain p-3 opacity-0 group-hover:opacity-100 transition-all duration-500 group-hover:scale-105 pointer-events-none"
+                    />
+                  )}
                 </div>
 
                 <span className="text-[#dfb76c] text-[10px] font-semibold uppercase tracking-wider">

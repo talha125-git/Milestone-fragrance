@@ -153,9 +153,21 @@ export default function NewArrivals({
                     <img
                       src={product.image}
                       alt={product.name}
-                      className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
+                      className={`w-full h-full object-contain p-1 transition-all duration-500 ${
+                        product.hoverImage
+                          ? 'group-hover:opacity-0 group-hover:scale-105'
+                          : 'group-hover:scale-105'
+                      }`}
                       loading="lazy"
                     />
+                    {product.hoverImage && (
+                      <img
+                        src={product.hoverImage}
+                        alt={`${product.name} hover view`}
+                        className="absolute inset-0 w-full h-full object-contain p-1 opacity-0 group-hover:opacity-100 transition-all duration-500 group-hover:scale-105 pointer-events-none"
+                        loading="lazy"
+                      />
+                    )}
 
                     {/* NEW ARRIVAL / OUT OF STOCK Badge */}
                     {product.inStock === false ? (
