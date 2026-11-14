@@ -84,7 +84,7 @@ export default function Footer({ onNavigate }) {
       name: 'YouTube',
       key: 'youtube',
       url: settings?.socialLinks?.youtube || 'https://youtube.com',
-      icon: 'M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19.1c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.43z M9.75 15.02l5.75-3.27-5.75-3.27v6.54z',
+      icon: 'M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z',
     },
   ];
 
@@ -123,7 +123,7 @@ export default function Footer({ onNavigate }) {
                   className="w-8 h-8 rounded-full border border-stone-800 hover:border-[#dfb76c] bg-[#14120f]/80 hover:bg-[#dfb76c] text-stone-400 hover:text-[#0d0c0a] flex items-center justify-center transition-all duration-200 shadow-sm hover:scale-110 focus:outline-none cursor-pointer"
                 >
                   <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
-                    <path d={social.icon} />
+                    <path fillRule="evenodd" clipRule="evenodd" d={social.icon} />
                   </svg>
                 </a>
               ))}
