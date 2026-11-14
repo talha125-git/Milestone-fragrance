@@ -15,11 +15,11 @@ export default function AdminSidebar({
 
   // Products dropdown state (smooth transition)
   const [productsOpen, setProductsOpen] = useState(
-    activeTab === 'products' || activeTab === 'add-product'
+    activeTab === 'products' || activeTab === 'add-product' || activeTab === 'edit-product'
   );
 
   useEffect(() => {
-    if (activeTab === 'products' || activeTab === 'add-product') {
+    if (activeTab === 'products' || activeTab === 'add-product' || activeTab === 'edit-product') {
       setProductsOpen(true);
     }
   }, [activeTab]);

@@ -61,6 +61,13 @@ export default function AdminDashboard({
       return 'about';
     }
 
+    if (
+      cleanPath.startsWith('/admin/products/edit') ||
+      cleanPath.startsWith('/admin/edit-product')
+    ) {
+      return 'edit-product';
+    }
+
     if (cleanPath === '/admin/products/add' || cleanPath === '/admin/add-product') return 'add-product';
     if (cleanPath === '/admin/products') return 'products';
     if (cleanPath === '/admin/orders') return 'orders';
@@ -112,6 +119,11 @@ export default function AdminDashboard({
       case 'about':
       case 'frontend-setup/about':
         targetPath = '/admin/frontend-setup/about';
+        break;
+      case 'edit-product':
+        targetPath = editingProduct
+          ? `/admin/products/edit/${editingProduct.id}`
+          : '/admin/products';
         break;
       default:
         targetPath = `/admin/${tabId}`;
@@ -461,45 +473,10 @@ export default function AdminDashboard({
     navigate('/admin/products/add');
   };
 
-  // Open Edit Modal
+  // Open Edit Fragrance Page (Full-page experience, NOT popup!)
   const handleOpenEditModal = (product) => {
     setEditingProduct(product);
-    const basePrice = Number(product.price) || 6499;
-    setFormData({
-      name: product.name || '',
-      subtitle: product.subtitle || '',
-      tagline: product.tagline || '',
-      price: basePrice,
-      originalPrice: product.originalPrice || basePrice + 1500,
-      sizePrices: product.sizePrices ? { ...product.sizePrices } : {
-        '100ml': Math.round(basePrice * 1.6),
-        '50ml': basePrice,
-        '30ml': Math.round(basePrice * 0.65),
-        '10ml': Math.round(basePrice * 0.35),
-      },
-      gender: product.gender || 'Unisex',
-      type: product.type || 'Woody',
-      concentration: product.concentration || 'Eau De Parfum',
-      size: product.size || '50ml / 1.7 fl.oz',
-      description: product.description || '',
-      topNotes: Array.isArray(product.topNotes) ? product.topNotes.join(', ') : '',
-      heartNotes: Array.isArray(product.heartNotes) ? product.heartNotes.join(', ') : '',
-      baseNotes: Array.isArray(product.baseNotes) ? product.baseNotes.join(', ') : '',
-      inStock: product.inStock !== undefined ? product.inStock : true,
-      stockQuantity: product.stockQuantity !== undefined ? product.stockQuantity : 25,
-      bestSeller: Boolean(product.bestSeller),
-      isNewArrival: Boolean(product.isNewArrival),
-      image: product.image || prodSignature,
-      assetPath: product.assetPath || '',
-      longevity: product.longevity || '12+ Hours',
-      sillage: product.sillage || 'Strong Sillage',
-      howToApply: product.howToApply || '',
-      craftStory: product.craftStory || '',
-    });
-    setSelectedImageFile(null);
-    setImagePreview(product.image || prodSignature);
-    setUploadedAssetPath(product.assetPath || '');
-    setIsEditModalOpen(true);
+    navigate(`/admin/products/edit/${product.id}`);
   };
 
   // Save New Product
@@ -674,6 +651,13 @@ export default function AdminDashboard({
   const outOfStockCount = productsList.length - inStockCount;
   const unreadMessagesCount = messages.filter((m) => !m.replied).length;
 
+  // Resolve current product being edited on full page
+  const editMatch = location.pathname.match(/\/admin\/(?:products\/edit|edit-product)\/([^/?#]+)/i);
+  const editProductId = editMatch ? decodeURIComponent(editMatch[1]) : null;
+  const currentEditProduct =
+    editingProduct ||
+    (editProductId ? productsList.find((p) => p.id?.toLowerCase() === editProductId?.toLowerCase()) : null);
+
   const navItems = [
     { id: 'overview', path: '/admin/overview', label: 'Dashboard Overview', icon: LayoutDashboard, badge: null },
     {
@@ -778,6 +762,35 @@ export default function AdminDashboard({
                 }
 
                 showToast(`Fragrance "${newProd.name}" published to catalog!`);
+              }}
+              showToast={showToast}
+            />
+          )}
+
+          {activeTab === 'edit-product' && (
+            <AddProductTab
+              editProduct={currentEditProduct}
+              isEdit={true}
+              onUpdateProduct={async (updated) => {
+                const updatedList = productsList.map((p) =>
+                  p.id === updated.id ? updated : p
+                );
+                updateAndBroadcastProducts(updatedList);
+                setEditingProduct(null);
+
+                // Save to backend database
+                try {
+                  await fetch(`/api/products/${updated.id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updated),
+                  });
+                } catch (err) {
+                  console.warn('[Products] Backend update warning:', err);
+                }
+
+                showToast(`Fragrance "${updated.name}" updated successfully!`);
+                navigate('/admin/products');
               }}
               showToast={showToast}
             />

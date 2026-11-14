@@ -229,22 +229,75 @@ export default function ProductModal({
                   <Layers className="w-4 h-4 text-[#b38531]" />
                   <span>Gallery Photos ({formData.images?.length || 0} / 6)</span>
                 </label>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const url = window.prompt('Enter image URL:');
-                    if (url && url.trim()) {
-                      setFormData((prev) => ({
-                        ...prev,
-                        images: [...(prev.images || []), url.trim()].slice(0, 6),
-                      }));
-                    }
-                  }}
-                  disabled={(formData.images?.length || 0) >= 6}
-                  className="text-[10px] font-bold text-[#b38531] hover:underline cursor-pointer disabled:opacity-40"
-                >
-                  + Add via URL
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const url = window.prompt('Enter image URL:');
+                      if (url && url.trim()) {
+                        setFormData((prev) => ({
+                          ...prev,
+                          images: [...(prev.images || []), url.trim()].slice(0, 6),
+                        }));
+                      }
+                    }}
+                    disabled={(formData.images?.length || 0) >= 6}
+                    className="text-[10px] font-bold text-stone-600 hover:text-[#b38531] cursor-pointer disabled:opacity-40"
+                  >
+                    + Add via URL
+                  </button>
+
+                  <label
+                    htmlFor="modal-gallery-multi-upload"
+                    className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#b38531] hover:bg-[#966d21] text-white text-[10px] font-bold shadow-xs cursor-pointer transition-all ${
+                      (formData.images?.length || 0) >= 6 ? 'opacity-40 pointer-events-none' : ''
+                    }`}
+                  >
+                    <Plus className="w-3 h-3" />
+                    <span>Upload Up to 6 Photos</span>
+                  </label>
+                  <input
+                    id="modal-gallery-multi-upload"
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    onChange={async (e) => {
+                      const files = Array.from(e.target.files || []);
+                      if (!files.length) return;
+                      const availableSlots = 6 - (formData.images?.length || 0);
+                      if (availableSlots <= 0) return;
+                      const toUpload = files.slice(0, availableSlots);
+                      for (const file of toUpload) {
+                        const reader = new FileReader();
+                        reader.onload = (ev) => {
+                          setFormData((prev) => ({
+                            ...prev,
+                            images: [...(prev.images || []), ev.target.result].slice(0, 6),
+                          }));
+                        };
+                        reader.readAsDataURL(file);
+
+                        try {
+                          const uploadData = new FormData();
+                          uploadData.append('image', file);
+                          const res = await fetch('/api/upload', { method: 'POST', body: uploadData });
+                          if (res.ok) {
+                            const json = await res.json();
+                            if (json.url) {
+                              setFormData((prev) => ({
+                                ...prev,
+                                images: prev.images.map((img) => (img.startsWith('data:') ? json.url : img)),
+                              }));
+                            }
+                          }
+                        } catch {}
+                      }
+                      e.target.value = '';
+                    }}
+                    className="hidden"
+                    disabled={(formData.images?.length || 0) >= 6}
+                  />
+                </div>
               </div>
 
               <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">

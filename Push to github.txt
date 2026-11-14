@@ -1,3 +1,5 @@
 git add .
-git commit -m "Fix YouTube icon SVG to display play button cutout"
+git commit -m "
+feat: add admin product management tabs and custom product data
+"
 git push -u origin main 

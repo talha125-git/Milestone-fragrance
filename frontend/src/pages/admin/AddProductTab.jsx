@@ -19,43 +19,104 @@ import {
 } from 'lucide-react';
 import { prodSignature } from '../../assets';
 
-export default function AddProductTab({ onAddProduct, showToast }) {
+export default function AddProductTab({
+  onAddProduct,
+  onUpdateProduct,
+  editProduct = null,
+  isEdit = false,
+  showToast,
+}) {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Form State
-  const [formData, setFormData] = useState({
-    name: '',
-    subtitle: 'art. 023 Edition',
-    tagline: '',
-    price: 6499,
-    originalPrice: 7999,
-    sizePrices: {
-      '100ml': 9999,
-      '50ml': 6499,
-      '30ml': 4299,
-      '10ml': 1999,
-    },
-    gender: 'Unisex',
-    type: 'Woody',
-    concentration: 'Extrait De Parfum',
-    size: '50ml / 1.7 fl.oz',
-    description: '',
-    topNotes: 'Italian Bergamot, Cardamom, Pink Pepper',
-    heartNotes: 'Smoky Cedarwood, Golden Ambergris, Incense',
-    baseNotes: 'Rich Agarwood (Oud), Bourbon Vanilla, Patchouli',
-    inStock: true,
-    stockQuantity: 25,
-    bestSeller: false,
-    isNewArrival: true,
-    image: prodSignature,
-    hoverImage: '',
-    images: [],
-    longevity: '12+ Hours',
-    sillage: 'Strong Sillage',
-    howToApply: '',
-    craftStory: '',
-  });
+  // Form State helper
+  const getInitialState = (prod) => {
+    if (!prod) {
+      return {
+        name: '',
+        subtitle: 'art. 023 Edition',
+        tagline: '',
+        price: 6499,
+        originalPrice: 7999,
+        sizePrices: {
+          '100ml': 9999,
+          '50ml': 6499,
+          '30ml': 4299,
+          '10ml': 1999,
+        },
+        gender: 'Unisex',
+        type: 'Woody',
+        concentration: 'Extrait De Parfum',
+        size: '50ml / 1.7 fl.oz',
+        description: '',
+        topNotes: 'Italian Bergamot, Cardamom, Pink Pepper',
+        heartNotes: 'Smoky Cedarwood, Golden Ambergris, Incense',
+        baseNotes: 'Rich Agarwood (Oud), Bourbon Vanilla, Patchouli',
+        inStock: true,
+        stockQuantity: 25,
+        bestSeller: false,
+        isNewArrival: true,
+        image: prodSignature,
+        hoverImage: '',
+        images: [],
+        longevity: '12+ Hours',
+        sillage: 'Strong Sillage',
+        howToApply: '',
+        craftStory: '',
+      };
+    }
+
+    const basePrice = Number(prod.price) || 6499;
+    return {
+      name: prod.name || '',
+      subtitle: prod.subtitle || 'art. 023 Edition',
+      tagline: prod.tagline || '',
+      price: basePrice,
+      originalPrice: prod.originalPrice || basePrice + 1500,
+      sizePrices: prod.sizePrices
+        ? { ...prod.sizePrices }
+        : {
+            '100ml': Math.round(basePrice * 1.6),
+            '50ml': basePrice,
+            '30ml': Math.round(basePrice * 0.65),
+            '10ml': Math.round(basePrice * 0.35),
+          },
+      gender: prod.gender || 'Unisex',
+      type: prod.type || 'Woody',
+      concentration: prod.concentration || 'Extrait De Parfum',
+      size: prod.size || '50ml / 1.7 fl.oz',
+      description: prod.description || '',
+      topNotes: Array.isArray(prod.topNotes)
+        ? prod.topNotes.join(', ')
+        : prod.topNotes || '',
+      heartNotes: Array.isArray(prod.heartNotes)
+        ? prod.heartNotes.join(', ')
+        : prod.heartNotes || '',
+      baseNotes: Array.isArray(prod.baseNotes)
+        ? prod.baseNotes.join(', ')
+        : prod.baseNotes || '',
+      inStock: prod.inStock !== undefined ? prod.inStock : true,
+      stockQuantity: prod.stockQuantity !== undefined ? prod.stockQuantity : 25,
+      bestSeller: Boolean(prod.bestSeller),
+      isNewArrival: Boolean(prod.isNewArrival),
+      image: prod.image || prodSignature,
+      hoverImage: prod.hoverImage || '',
+      images: Array.isArray(prod.images) ? [...prod.images] : [],
+      longevity: prod.longevity || '12+ Hours',
+      sillage: prod.sillage || 'Strong Sillage',
+      howToApply: prod.howToApply || '',
+      craftStory: prod.craftStory || '',
+    };
+  };
+
+  const [formData, setFormData] = useState(() => getInitialState(editProduct));
+
+  // Sync state if editProduct changes
+  React.useEffect(() => {
+    if (editProduct) {
+      setFormData(getInitialState(editProduct));
+    }
+  }, [editProduct?.id]);
 
   // Upload status helpers
   const [isUploadingMain, setIsUploadingMain] = useState(false);
@@ -161,7 +222,7 @@ export default function AddProductTab({ onAddProduct, showToast }) {
   };
 
   // Submit Handler
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.name.trim()) {
       if (showToast) showToast('Fragrance name is required', 'info');
@@ -169,6 +230,47 @@ export default function AddProductTab({ onAddProduct, showToast }) {
     }
 
     setIsSubmitting(true);
+
+    if (isEdit && editProduct) {
+      const updatedProduct = {
+        ...editProduct,
+        ...formData,
+        price: Number(formData.price) || editProduct.price || 6499,
+        originalPrice: Number(formData.originalPrice) || editProduct.originalPrice || 7999,
+        sizePrices: {
+          '100ml': Number(formData.sizePrices?.['100ml']) || Math.round(Number(formData.price) * 1.6),
+          '50ml': Number(formData.price),
+          '30ml': Number(formData.sizePrices?.['30ml']) || Math.round(Number(formData.price) * 0.65),
+          '10ml': Number(formData.sizePrices?.['10ml']) || Math.round(Number(formData.price) * 0.35),
+        },
+        stockQuantity:
+          formData.stockQuantity !== '' && !isNaN(Number(formData.stockQuantity))
+            ? Number(formData.stockQuantity)
+            : 25,
+        inStock:
+          Number(formData.stockQuantity) === 0 ? false : Boolean(formData.inStock),
+        topNotes:
+          typeof formData.topNotes === 'string'
+            ? formData.topNotes.split(',').map((s) => s.trim()).filter(Boolean)
+            : formData.topNotes,
+        heartNotes:
+          typeof formData.heartNotes === 'string'
+            ? formData.heartNotes.split(',').map((s) => s.trim()).filter(Boolean)
+            : formData.heartNotes,
+        baseNotes:
+          typeof formData.baseNotes === 'string'
+            ? formData.baseNotes.split(',').map((s) => s.trim()).filter(Boolean)
+            : formData.baseNotes,
+      };
+
+      if (onUpdateProduct) {
+        await onUpdateProduct(updatedProduct);
+      }
+      setIsSubmitting(false);
+      navigate('/admin/products');
+      return;
+    }
+
     const generatedId = formData.name
       .toLowerCase()
       .trim()
@@ -202,7 +304,7 @@ export default function AddProductTab({ onAddProduct, showToast }) {
     };
 
     if (onAddProduct) {
-      onAddProduct(newProduct);
+      await onAddProduct(newProduct);
     }
     setIsSubmitting(false);
     navigate('/admin/products');
@@ -222,10 +324,14 @@ export default function AddProductTab({ onAddProduct, showToast }) {
             <span>Back to Fragrance Catalog</span>
           </button>
           <h2 className="text-xl sm:text-2xl font-serif font-bold text-stone-900 leading-tight">
-            Add New Fragrance
+            {isEdit
+              ? `Edit Fragrance: ${formData.name || editProduct?.name || 'Perfume'}`
+              : 'Add New Fragrance'}
           </h2>
           <p className="text-xs text-stone-500 mt-1">
-            Configure olfactory pyramid, pricing, bottle sizes, stock, hover animation, and multi-angle gallery.
+            {isEdit
+              ? 'Modify olfactory formulation, bottle visuals, multi-angle gallery, and warehouse stock.'
+              : 'Configure olfactory pyramid, pricing, bottle sizes, stock, hover animation, and multi-angle gallery.'}
           </p>
         </div>
 
@@ -244,7 +350,7 @@ export default function AddProductTab({ onAddProduct, showToast }) {
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#b38531] hover:bg-[#966d21] text-white text-xs font-bold uppercase tracking-wider shadow-md hover:shadow-lg transition-all cursor-pointer disabled:opacity-50"
           >
             <Save className="w-4 h-4" />
-            <span>Publish Fragrance</span>
+            <span>{isEdit ? 'Save Changes' : 'Publish Fragrance'}</span>
           </button>
         </div>
       </div>
@@ -411,7 +517,7 @@ export default function AddProductTab({ onAddProduct, showToast }) {
                 </p>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <button
                   type="button"
                   onClick={handleAddGalleryUrl}
@@ -420,6 +526,21 @@ export default function AddProductTab({ onAddProduct, showToast }) {
                 >
                   + Add via URL
                 </button>
+
+                {formData.images?.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (window.confirm('Clear all gallery photos?')) {
+                        setFormData((prev) => ({ ...prev, images: [] }));
+                      }
+                    }}
+                    className="px-2.5 py-1.5 rounded-lg border border-rose-200 text-rose-600 hover:bg-rose-50 text-xs font-medium transition-colors cursor-pointer"
+                  >
+                    Clear All
+                  </button>
+                )}
+
                 <label
                   htmlFor="gallery-images-upload"
                   className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#b38531] hover:bg-[#966d21] text-white text-xs font-semibold shadow-xs cursor-pointer transition-all ${
@@ -427,7 +548,11 @@ export default function AddProductTab({ onAddProduct, showToast }) {
                   }`}
                 >
                   <Plus className="w-3.5 h-3.5" />
-                  <span>Upload Photos</span>
+                  <span>
+                    {isUploadingGallery
+                      ? 'Uploading Photos...'
+                      : 'Upload Photos (Select Up to 6 at Once)'}
+                  </span>
                 </label>
                 <input
                   id="gallery-images-upload"
@@ -870,7 +995,7 @@ export default function AddProductTab({ onAddProduct, showToast }) {
             className="inline-flex items-center gap-2 px-8 py-3 rounded-xl bg-[#b38531] hover:bg-[#966d21] text-white text-xs font-bold uppercase tracking-wider shadow-lg hover:shadow-xl transition-all cursor-pointer disabled:opacity-50"
           >
             <Save className="w-4 h-4" />
-            <span>Publish Fragrance to Catalog</span>
+            <span>{isEdit ? 'Save Changes to Fragrance' : 'Publish Fragrance to Catalog'}</span>
           </button>
         </div>
       </form>

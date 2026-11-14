@@ -48,6 +48,8 @@ export default function AdminHeader({
         return 'Fragrance Inventory & Catalog';
       case 'add-product':
         return 'Add New Fragrance';
+      case 'edit-product':
+        return 'Edit Fragrance Formulation & Media';
       case 'orders':
         return 'Customer Orders & Shipments';
       case 'messages':
