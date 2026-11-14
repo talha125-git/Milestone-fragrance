@@ -8,6 +8,7 @@ import {
   Users,
   Sparkles,
   Star,
+  Settings,
 } from 'lucide-react';
 import { prodSignature } from '../../assets';
 import { products as initialLocalProducts } from '../../data/products';
@@ -22,6 +23,7 @@ import MessagesTab from './MessagesTab';
 import NewsletterTab from './NewsletterTab';
 import ReviewsTab from './ReviewsTab';
 import AddProductTab from './AddProductTab';
+import SettingsTab from './SettingsTab';
 import HeroTab from './frontend_setup/HeroTab';
 import ProductModal from './ProductModal';
 import DeleteModal from './DeleteModal';
@@ -56,6 +58,7 @@ export default function AdminDashboard({
     if (cleanPath === '/admin/reviews') return 'reviews';
     if (cleanPath === '/admin/messages' || cleanPath === '/admin/inquiries') return 'messages';
     if (cleanPath === '/admin/newsletter' || cleanPath === '/admin/subscribers') return 'newsletter';
+    if (cleanPath === '/admin/settings') return 'settings';
     return 'overview';
   };
 
@@ -88,6 +91,9 @@ export default function AdminDashboard({
       case 'newsletter':
       case 'subscribers':
         targetPath = '/admin/newsletter';
+        break;
+      case 'settings':
+        targetPath = '/admin/settings';
         break;
       case 'hero':
       case 'hero-banner':
@@ -671,6 +677,7 @@ export default function AdminDashboard({
     { id: 'reviews', path: '/admin/reviews', label: 'Customer Reviews', icon: Star, badge: reviews.length },
     { id: 'messages', path: '/admin/messages', label: 'Contact Inquiries', icon: Mail, badge: unreadMessagesCount > 0 ? `${unreadMessagesCount} new` : null },
     { id: 'newsletter', path: '/admin/newsletter', label: 'VIP Subscribers', icon: Users, badge: subscribers.length },
+    { id: 'settings', path: '/admin/settings', label: 'Settings', icon: Settings, badge: null },
   ];
 
   return (
@@ -802,6 +809,10 @@ export default function AdminDashboard({
               productsList={productsList}
               showToast={showToast}
             />
+          )}
+
+          {activeTab === 'settings' && (
+            <SettingsTab showToast={showToast} />
           )}
         </main>
       </div>

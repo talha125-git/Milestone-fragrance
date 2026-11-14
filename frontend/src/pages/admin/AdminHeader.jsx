@@ -57,6 +57,8 @@ export default function AdminHeader({
         return 'Customer Reviews & Moderation';
       case 'hero':
         return 'Home Hero Banner & Imagery';
+      case 'settings':
+        return 'Storefront Settings & Social Links';
       default:
         return 'Dashboard';
     }
