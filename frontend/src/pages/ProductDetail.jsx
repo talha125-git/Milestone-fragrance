@@ -11,11 +11,14 @@ import {
   Sparkles,
   ArrowLeft,
   ChevronRight,
+  ChevronLeft,
   Droplets,
   Clock,
   Wind,
   Share2,
   Zap,
+  Eye,
+  X,
 } from 'lucide-react';
 import { products as defaultProducts } from '../data/products';
 import ProductReviews from '../components/ProductReviews';
@@ -60,14 +63,45 @@ export default function ProductDetail({
   ].filter(Boolean);
   const uniqueGalleryImages = Array.from(new Set(galleryImages));
 
-  const [activeImage, setActiveImage] = useState(currentProduct?.image);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
   useEffect(() => {
     setSelectedSize('100ml');
     setQuantity(1);
     setAdded(false);
-    setActiveImage(currentProduct?.image);
+    setCurrentImageIndex(0);
   }, [currentProduct?.id, currentProduct?.image]);
+
+  const activeImage = uniqueGalleryImages[currentImageIndex] || currentProduct?.image;
+
+  const handlePrevImage = (e) => {
+    if (e) e.stopPropagation();
+    if (uniqueGalleryImages.length <= 1) return;
+    setCurrentImageIndex((prev) =>
+      prev === 0 ? uniqueGalleryImages.length - 1 : prev - 1
+    );
+  };
+
+  const handleNextImage = (e) => {
+    if (e) e.stopPropagation();
+    if (uniqueGalleryImages.length <= 1) return;
+    setCurrentImageIndex((prev) =>
+      prev === uniqueGalleryImages.length - 1 ? 0 : prev + 1
+    );
+  };
+
+  // Keyboard navigation for full-screen lightbox
+  useEffect(() => {
+    if (!isLightboxOpen) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') setIsLightboxOpen(false);
+      if (e.key === 'ArrowLeft') handlePrevImage();
+      if (e.key === 'ArrowRight') handleNextImage();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isLightboxOpen, uniqueGalleryImages.length]);
 
   // Dynamic price resolution for bottle sizes (100ml, 50ml, 30ml, 10ml)
   const getSizePrice = (product, size) => {
@@ -216,18 +250,62 @@ export default function ProductDetail({
                   </span>
                 </div>
 
-                {/* Share Button */}
-                <button
-                  onClick={handleShare}
-                  aria-label="Share fragrance"
-                  className="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-white/90 hover:bg-white text-stone-700 hover:text-[#b38531] flex items-center justify-center transition-all shadow-md focus:outline-none cursor-pointer"
-                >
-                  <Share2 className="w-4 h-4" />
-                </button>
+                {/* Top-Right Action Buttons: Eye (Full Screen) & Share */}
+                <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsLightboxOpen(true)}
+                    aria-label="View full size image on large screen"
+                    title="View full screen"
+                    className="w-9 h-9 rounded-full bg-white/90 hover:bg-white text-stone-700 hover:text-[#b38531] flex items-center justify-center transition-all shadow-md focus:outline-none cursor-pointer"
+                  >
+                    <Eye className="w-4 h-4" />
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleShare}
+                    aria-label="Share fragrance"
+                    title="Share fragrance"
+                    className="w-9 h-9 rounded-full bg-white/90 hover:bg-white text-stone-700 hover:text-[#b38531] flex items-center justify-center transition-all shadow-md focus:outline-none cursor-pointer"
+                  >
+                    <Share2 className="w-4 h-4" />
+                  </button>
+                </div>
                 {copied && (
                   <span className="absolute top-14 right-4 z-20 text-[10px] bg-black text-[#dfb76c] px-2 py-1 rounded shadow">
                     Link Copied!
                   </span>
+                )}
+
+                {/* Left & Right Navigation Arrows */}
+                {uniqueGalleryImages.length > 1 && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={handlePrevImage}
+                      aria-label="Previous image"
+                      className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 z-10 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/90 hover:bg-white text-stone-800 hover:text-[#b38531] flex items-center justify-center shadow-lg border border-stone-200/80 transition-all hover:scale-105 active:scale-95 cursor-pointer focus:outline-none"
+                    >
+                      <ChevronLeft className="w-5 h-5 -ml-0.5" />
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleNextImage}
+                      aria-label="Next image"
+                      className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 z-10 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/90 hover:bg-white text-stone-800 hover:text-[#b38531] flex items-center justify-center shadow-lg border border-stone-200/80 transition-all hover:scale-105 active:scale-95 cursor-pointer focus:outline-none"
+                    >
+                      <ChevronRight className="w-5 h-5 -mr-0.5" />
+                    </button>
+
+                    {/* Image indicator pill */}
+                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1.5 bg-black/70 backdrop-blur-xs px-2.5 py-1 rounded-full border border-white/10 text-white text-[10px] font-semibold">
+                      <span>{currentImageIndex + 1}</span>
+                      <span className="text-stone-400">/</span>
+                      <span className="text-stone-300">{uniqueGalleryImages.length}</span>
+                    </div>
+                  </>
                 )}
 
                 {/* New Arrival Badge (Bottom-left so it never overlaps top-left badges) */}
@@ -255,33 +333,6 @@ export default function ProductDetail({
               {/* Pedestal Shadow */}
               <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-[85%] h-5 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.3)_0%,transparent_75%)] blur-md pointer-events-none" />
             </div>
-
-            {/* Multi-Angle Interactive Gallery Thumbnails */}
-            {uniqueGalleryImages.length > 1 && (
-              <div className="w-full max-w-[500px] mt-4 flex items-center justify-center gap-2.5 overflow-x-auto py-2 px-1">
-                {uniqueGalleryImages.map((img, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => setActiveImage(img)}
-                    className={`relative w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-[#FAF6F0] p-1.5 flex items-center justify-center overflow-hidden border-2 transition-all duration-200 cursor-pointer flex-shrink-0 group ${
-                      (activeImage || currentProduct?.image) === img
-                        ? 'border-[#dfb76c] shadow-lg shadow-[#dfb76c]/25 scale-105'
-                        : 'border-[#262018] hover:border-stone-500 opacity-60 hover:opacity-100'
-                    }`}
-                  >
-                    <img
-                      src={img}
-                      alt={`${currentProduct.name} angle ${idx + 1}`}
-                      className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
-                    />
-                    {(activeImage || currentProduct?.image) === img && (
-                      <span className="absolute bottom-1 right-1 w-2 h-2 rounded-full bg-[#dfb76c]" />
-                    )}
-                  </button>
-                ))}
-              </div>
-            )}
 
             {/* Quick Feature Badges below image */}
             <div className="grid grid-cols-3 gap-3 w-full max-w-[500px] mt-6 text-center">
@@ -716,6 +767,72 @@ export default function ProductDetail({
           </div>
         </div>
       </div>
+
+      {/* Full-Screen Image Lightbox Modal (Click Eye Icon) */}
+      {isLightboxOpen && (
+        <div
+          className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200"
+          onClick={() => setIsLightboxOpen(false)}
+        >
+          {/* Top Bar with Fragrance Title & Close Button */}
+          <div className="absolute top-4 sm:top-6 left-4 sm:left-8 right-4 sm:right-8 flex items-center justify-between text-white z-20">
+            <div>
+              <h4 className="text-sm sm:text-base font-serif font-bold text-white">
+                {currentProduct.name}
+              </h4>
+              <p className="text-xs text-stone-400">
+                {uniqueGalleryImages.length > 1
+                  ? `Photo ${currentImageIndex + 1} of ${uniqueGalleryImages.length}`
+                  : 'Full Screen View'}
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setIsLightboxOpen(false)}
+              className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-stone-300 hover:text-white transition-colors cursor-pointer"
+              aria-label="Close full view"
+            >
+              <X className="w-6 h-6" />
+            </button>
+          </div>
+
+          {/* Navigation Arrows in Lightbox */}
+          {uniqueGalleryImages.length > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={handlePrevImage}
+                aria-label="Previous full image"
+                className="absolute left-4 sm:left-8 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white/10 hover:bg-white/25 text-white flex items-center justify-center transition-all cursor-pointer border border-white/15"
+              >
+                <ChevronLeft className="w-6 h-6" />
+              </button>
+
+              <button
+                type="button"
+                onClick={handleNextImage}
+                aria-label="Next full image"
+                className="absolute right-4 sm:right-8 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white/10 hover:bg-white/25 text-white flex items-center justify-center transition-all cursor-pointer border border-white/15"
+              >
+                <ChevronRight className="w-6 h-6" />
+              </button>
+            </>
+          )}
+
+          {/* Main Large Image Container */}
+          <div
+            className="relative max-w-4xl max-h-[85vh] w-full flex items-center justify-center p-2"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img
+              src={activeImage}
+              alt={`${currentProduct.name} full view`}
+              className="max-h-[82vh] max-w-full object-contain filter drop-shadow-2xl animate-in zoom-in-95 duration-200"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
