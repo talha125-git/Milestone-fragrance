@@ -1,3 +1,3 @@
 git add .
-git commit -m "commited Detailed Tabs: How to Apply & The Atelier Craft in product details page "
+git commit -m "Fix YouTube icon SVG to display play button cutout"
 git push -u origin main 
