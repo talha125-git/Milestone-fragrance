@@ -305,7 +305,27 @@ export default function AdminDashboard({
         if (prodRes.ok) {
           const prodJson = await prodRes.json();
           if (prodJson.data && Array.isArray(prodJson.data) && prodJson.data.length > 0) {
-            const enriched = prodJson.data.map((p) => {
+            let localSaved = [];
+            try {
+              localSaved = JSON.parse(localStorage.getItem('milestone_products') || '[]');
+            } catch {}
+
+            const combinedMap = new Map();
+            prodJson.data.forEach((p) => combinedMap.set(p.id, p));
+            if (Array.isArray(localSaved)) {
+              localSaved.forEach((lp) => {
+                if (!combinedMap.has(lp.id)) {
+                  combinedMap.set(lp.id, lp);
+                  fetch('/api/products', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(lp),
+                  }).catch(() => {});
+                }
+              });
+            }
+
+            const enriched = Array.from(combinedMap.values()).map((p) => {
               const localMatch = initialLocalProducts.find((lp) => lp.id === p.id);
               return {
                 ...p,
@@ -722,9 +742,21 @@ export default function AdminDashboard({
 
           {activeTab === 'add-product' && (
             <AddProductTab
-              onAddProduct={(newProd) => {
-                const updated = [newProd, ...productsList];
+              onAddProduct={async (newProd) => {
+                const updated = [newProd, ...productsList.filter((p) => p.id !== newProd.id)];
                 updateAndBroadcastProducts(updated);
+
+                // Save permanently to backend database
+                try {
+                  await fetch('/api/products', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newProd),
+                  });
+                } catch (err) {
+                  console.warn('[Products] Backend sync warning:', err);
+                }
+
                 showToast(`Fragrance "${newProd.name}" published to catalog!`);
               }}
               showToast={showToast}

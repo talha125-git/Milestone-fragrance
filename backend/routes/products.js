@@ -201,6 +201,8 @@ router.post('/', (req, res) => {
       bestSeller,
       isNewArrival,
       image,
+      hoverImage,
+      images,
       longevity,
       sillage,
       howToApply,
@@ -214,7 +216,9 @@ router.post('/', (req, res) => {
       });
     }
 
-    const id = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || `prod-${Date.now()}`;
+    const id = (req.body.id && String(req.body.id).trim())
+      ? String(req.body.id).trim()
+      : (name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || `prod-${Date.now()}`);
 
     const newProduct = {
       id,
@@ -227,6 +231,8 @@ router.post('/', (req, res) => {
       rating: 5,
       reviewsCount: 1,
       image: image || '/assets/prod_signature.png',
+      hoverImage: hoverImage || '',
+      images: Array.isArray(images) ? images : [],
       gender: gender || 'Unisex',
       type: type || 'Woody',
       concentration: concentration || 'Eau De Parfum',
@@ -250,7 +256,12 @@ router.post('/', (req, res) => {
       craftStory: craftStory || '',
     };
 
-    products.push(newProduct);
+    const existingIdx = products.findIndex((p) => p.id.toLowerCase() === id.toLowerCase());
+    if (existingIdx !== -1) {
+      products[existingIdx] = newProduct;
+    } else {
+      products.push(newProduct);
+    }
     saveCustomProducts();
 
     res.status(201).json({

@@ -61,6 +61,49 @@ export default function App() {
     return products;
   });
 
+  // Permanently sync all products with backend database on load / refresh
+  useEffect(() => {
+    const syncProductsFromBackend = async () => {
+      try {
+        const res = await fetch('/api/products');
+        if (res.ok) {
+          const json = await res.json();
+          if (json.data && Array.isArray(json.data) && json.data.length > 0) {
+            let localSaved = [];
+            try {
+              localSaved = JSON.parse(localStorage.getItem('milestone_products') || '[]');
+            } catch {}
+
+            const map = new Map();
+            json.data.forEach((p) => map.set(p.id, p));
+            if (Array.isArray(localSaved)) {
+              localSaved.forEach((lp) => {
+                if (!map.has(lp.id)) map.set(lp.id, lp);
+              });
+            }
+
+            const merged = Array.from(map.values()).map((p) => {
+              const defaultMatch = products.find((dp) => dp.id === p.id);
+              return {
+                ...p,
+                image: (p.image && !p.image.startsWith('data:') && !p.image.startsWith('/productimages') && defaultMatch)
+                  ? defaultMatch.image
+                  : (p.image || defaultMatch?.image || '/productimages/prod_1794047286007_chiaroscuro_portrait_in_shadow.png'),
+              };
+            });
+
+            setAllProducts(merged);
+            localStorage.setItem('milestone_products', JSON.stringify(merged));
+          }
+        }
+      } catch (e) {
+        console.warn('Could not sync products from backend:', e);
+      }
+    };
+
+    syncProductsFromBackend();
+  }, []);
+
   const [heroSlides, setHeroSlides] = useState(() => {
     try {
       const saved = localStorage.getItem('milestone_hero_slides');

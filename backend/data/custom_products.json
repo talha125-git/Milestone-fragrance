@@ -72,5 +72,50 @@
     ],
     "bestSeller": false,
     "inStock": true
+  },
+  {
+    "id": "yaseen",
+    "name": "yaseen",
+    "subtitle": "art. 023 Edition",
+    "tagline": "khan ",
+    "description": "abcxyz",
+    "price": 6499,
+    "originalPrice": 8500,
+    "rating": 5,
+    "reviewsCount": 1,
+    "image": "/productimages/prod_1794665422517_prod_professor.png",
+    "gender": "Men",
+    "type": "Woody",
+    "concentration": "Extrait De Parfum",
+    "size": "50ml / 1.7 fl.oz",
+    "sizePrices": {
+      "100ml": 9967,
+      "50ml": 6499,
+      "30ml": 4299,
+      "10ml": 1999
+    },
+    "topNotes": [
+      "Italian Bergamot",
+      "Cardamom",
+      "Pink Pepper"
+    ],
+    "heartNotes": [
+      "Smoky Cedarwood",
+      "Golden Ambergris",
+      "Incense"
+    ],
+    "baseNotes": [
+      "Rich Agarwood (Oud)",
+      "Bourbon Vanilla",
+      "Patchouli"
+    ],
+    "bestSeller": false,
+    "isNewArrival": true,
+    "inStock": true,
+    "stockQuantity": 25,
+    "longevity": "12+ Hours",
+    "sillage": "Strong Sillage",
+    "howToApply": "",
+    "craftStory": ""
   }
 ]

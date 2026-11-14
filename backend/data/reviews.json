@@ -1,1 +1,18 @@
-[]
+[
+  {
+    "id": "rev-1794665777321",
+    "productId": "yaseen",
+    "productName": "yaseen",
+    "name": "y khan",
+    "email": "abutalhaa844@gmail.com",
+    "city": "Lahore",
+    "rating": 5,
+    "title": "xyz",
+    "comment": "good",
+    "performance": "High Sillage & Longevity",
+    "verified": true,
+    "helpful": 1,
+    "date": "Nov 14, 2026",
+    "createdAt": "2026-11-14T14:16:17.228Z"
+  }
+]
