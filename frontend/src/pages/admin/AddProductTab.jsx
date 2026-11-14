@@ -182,7 +182,14 @@ export default function AddProductTab({ onAddProduct, showToast }) {
       originalPrice: Number(formData.originalPrice) || 7999,
       rating: 5,
       reviewsCount: 0,
-      stockQuantity: Number(formData.stockQuantity) || 25,
+      stockQuantity:
+        formData.stockQuantity !== '' && !isNaN(Number(formData.stockQuantity))
+          ? Number(formData.stockQuantity)
+          : 25,
+      inStock:
+        Number(formData.stockQuantity) === 0
+          ? false
+          : Boolean(formData.inStock),
       topNotes: typeof formData.topNotes === 'string'
         ? formData.topNotes.split(',').map((s) => s.trim()).filter(Boolean)
         : formData.topNotes,
@@ -750,52 +757,101 @@ export default function AddProductTab({ onAddProduct, showToast }) {
         </div>
 
         {/* ========================================================== */}
-        {/* SECTION 5: INVENTORY, BADGES & HIGHLIGHTS                  */}
+        {/* SECTION 5: INVENTORY & STOCK QUANTITY                     */}
         {/* ========================================================== */}
-        <div className="bg-white border border-stone-200/90 rounded-2xl p-6 shadow-xs space-y-4 text-left">
-          <h3 className="text-sm font-bold uppercase tracking-wider text-stone-900 border-b border-stone-100 pb-3">
-            Inventory & Storefront Highlights
-          </h3>
+        <div className="bg-white border border-stone-200/90 rounded-2xl p-6 shadow-xs space-y-5 text-left">
+          <div className="flex items-center justify-between border-b border-stone-100 pb-3">
+            <div>
+              <h3 className="text-sm font-bold uppercase tracking-wider text-stone-900">
+                Inventory & Stock Management
+              </h3>
+              <p className="text-[11px] text-stone-500">
+                Set warehouse stock quantity and availability options.
+              </p>
+            </div>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-[#b38531] border border-amber-200">
+              Required
+            </span>
+          </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <label className="flex items-center gap-3 p-3 rounded-xl bg-stone-50 border border-stone-200 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={formData.inStock}
-                onChange={(e) => setFormData((prev) => ({ ...prev, inStock: e.target.checked }))}
-                className="w-4 h-4 text-[#b38531] rounded"
-              />
-              <div>
-                <span className="text-xs font-bold text-stone-900 block">In Stock</span>
-                <span className="text-[10px] text-stone-500">Available for customer checkout</span>
-              </div>
-            </label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div>
+              <label className="text-[11px] font-bold uppercase tracking-wider text-stone-700 block mb-1">
+                Availability Option *
+              </label>
+              <select
+                value={formData.inStock ? 'true' : 'false'}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    inStock: e.target.value === 'true',
+                  }))
+                }
+                className="w-full bg-stone-50 border border-stone-200 text-stone-900 text-xs rounded-lg px-3 py-2.5 focus:outline-none focus:border-[#b38531] cursor-pointer font-medium"
+              >
+                <option value="true">✓ In Stock (Available for Purchase)</option>
+                <option value="false">✕ Out of Stock (Mark as Sold Out)</option>
+              </select>
+            </div>
 
-            <label className="flex items-center gap-3 p-3 rounded-xl bg-stone-50 border border-stone-200 cursor-pointer">
+            <div>
+              <label className="text-[11px] font-bold uppercase tracking-wider text-stone-700 block mb-1">
+                Number of Stock / Stock Quantity (Units) *
+              </label>
               <input
-                type="checkbox"
-                checked={formData.isNewArrival}
-                onChange={(e) => setFormData((prev) => ({ ...prev, isNewArrival: e.target.checked }))}
-                className="w-4 h-4 text-[#b38531] rounded"
+                type="number"
+                min="0"
+                required
+                value={formData.stockQuantity !== undefined ? formData.stockQuantity : 25}
+                onChange={(e) => {
+                  const val = e.target.value === '' ? '' : Number(e.target.value);
+                  setFormData((prev) => ({
+                    ...prev,
+                    stockQuantity: val,
+                    inStock: val > 0 ? prev.inStock : false,
+                  }));
+                }}
+                placeholder="e.g. 25"
+                className="w-full bg-stone-50 border border-stone-200 text-stone-900 text-xs rounded-lg px-3 py-2.5 focus:outline-none focus:border-[#b38531]"
               />
-              <div>
-                <span className="text-xs font-bold text-stone-900 block">★ New Arrival</span>
-                <span className="text-[10px] text-stone-500">Feature in New Arrivals collection</span>
-              </div>
-            </label>
+              <span className="text-[10px] text-stone-400 mt-1 block">
+                Number of bottles currently in inventory. Automatically updates catalog status.
+              </span>
+            </div>
+          </div>
 
-            <label className="flex items-center gap-3 p-3 rounded-xl bg-stone-50 border border-stone-200 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={formData.bestSeller}
-                onChange={(e) => setFormData((prev) => ({ ...prev, bestSeller: e.target.checked }))}
-                className="w-4 h-4 text-[#b38531] rounded"
-              />
-              <div>
-                <span className="text-xs font-bold text-stone-900 block">Bestseller Flacon</span>
-                <span className="text-[10px] text-stone-500">Feature on homepage Best Sellers</span>
-              </div>
-            </label>
+          {/* Highlights & Badges */}
+          <div className="pt-2 border-t border-stone-100">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-stone-700 block mb-2">
+              Storefront Badges:
+            </span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <label className="flex items-center gap-3 p-3 rounded-xl bg-stone-50 border border-stone-200 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={formData.isNewArrival}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, isNewArrival: e.target.checked }))}
+                  className="w-4 h-4 text-[#b38531] rounded"
+                />
+                <div>
+                  <span className="text-xs font-bold text-stone-900 block">★ New Arrival</span>
+                  <span className="text-[10px] text-stone-500">Feature in New Arrivals collection</span>
+                </div>
+              </label>
+
+              <label className="flex items-center gap-3 p-3 rounded-xl bg-stone-50 border border-stone-200 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={formData.bestSeller}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, bestSeller: e.target.checked }))}
+                  className="w-4 h-4 text-[#b38531] rounded"
+                />
+                <div>
+                  <span className="text-xs font-bold text-stone-900 block">Bestseller Flacon</span>
+                  <span className="text-[10px] text-stone-500">Feature on homepage Best Sellers</span>
+                </div>
+              </label>
+            </div>
           </div>
         </div>
 
