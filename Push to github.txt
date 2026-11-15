@@ -1,5 +1,5 @@
 git add .
 git commit -m "
-feat: add admin product management tabs and custom product data
+feat(legal): add privacy policy, shipping policy, refund policy, and terms & conditions pages with interactive nav tabs
 "
 git push -u origin main 

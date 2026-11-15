@@ -24,6 +24,10 @@ import ProductDetail from './pages/ProductDetail';
 import Checkout from './pages/Checkout';
 import Login from './pages/Login';
 import AdminDashboard from './pages/admin';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import ShippingPolicy from './pages/ShippingPolicy';
+import RefundPolicy from './pages/RefundPolicy';
+import TermsAndConditions from './pages/TermsAndConditions';
 import { products } from './data/products';
 import { defaultHeroSlides, hydrateHeroSlides } from './data/heroSlides';
 
@@ -520,6 +524,25 @@ export default function App() {
             path="/reviews"
             element={<Reviews onSelectProduct={handleViewProduct} />}
           />
+
+          {/* Customer Care & Policies */}
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/pages/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/policies/privacy-policy" element={<PrivacyPolicy />} />
+
+          <Route path="/shipping-policy" element={<ShippingPolicy />} />
+          <Route path="/pages/shipping-policy" element={<ShippingPolicy />} />
+          <Route path="/policies/shipping-policy" element={<ShippingPolicy />} />
+
+          <Route path="/refund-policy" element={<RefundPolicy />} />
+          <Route path="/return-and-refund-policy" element={<RefundPolicy />} />
+          <Route path="/pages/refund-policy" element={<RefundPolicy />} />
+          <Route path="/policies/refund-policy" element={<RefundPolicy />} />
+
+          <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+          <Route path="/terms-of-service" element={<TermsAndConditions />} />
+          <Route path="/pages/terms-of-service" element={<TermsAndConditions />} />
+          <Route path="/policies/terms-of-service" element={<TermsAndConditions />} />
 
           <Route
             path="/checkout"

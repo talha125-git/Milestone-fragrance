@@ -53,11 +53,10 @@ export default function Footer({ onNavigate }) {
   };
 
   const customerCare = [
-    'Shipping Policy',
-    'Return Policy',
-    'FAQs',
-    'Terms & Conditions',
-    'Privacy Policy',
+    { name: 'Shipping Policy', path: '/shipping-policy' },
+    { name: 'Return & Refund Policy', path: '/refund-policy' },
+    { name: 'Terms & Conditions', path: '/terms-and-conditions' },
+    { name: 'Privacy Policy', path: '/privacy-policy' },
   ];
 
   // Exactly 4 social networks: Facebook, Instagram, TikTok, YouTube
@@ -155,15 +154,14 @@ export default function Footer({ onNavigate }) {
               Customer Care
             </h4>
             <ul className="space-y-2 text-xs sm:text-[13px]">
-              {customerCare.map((item, idx) => (
-                <li key={idx}>
-                  <a
-                    href="#customer-care"
-                    onClick={(e) => e.preventDefault()}
-                    className="text-stone-400 hover:text-white transition-colors"
+              {customerCare.map((item) => (
+                <li key={item.path}>
+                  <button
+                    onClick={() => handleLinkClick(item.path)}
+                    className="text-stone-400 hover:text-white transition-colors focus:outline-none cursor-pointer text-left"
                   >
-                    {item}
-                  </a>
+                    {item.name}
+                  </button>
                 </li>
               ))}
             </ul>
@@ -205,8 +203,29 @@ export default function Footer({ onNavigate }) {
 
         {/* Bottom Strip */}
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-stone-500">
-          <div>
-            © 2025 Milestone Fragrances. All rights reserved.
+          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-3.5 gap-y-1">
+            <span>© 2026 Milestone Fragrances. All rights reserved.</span>
+            <span className="hidden sm:inline text-stone-700">•</span>
+            <button
+              onClick={() => handleLinkClick('/privacy-policy')}
+              className="hover:text-stone-300 transition-colors cursor-pointer"
+            >
+              Privacy Policy
+            </button>
+            <span className="text-stone-700">•</span>
+            <button
+              onClick={() => handleLinkClick('/terms-and-conditions')}
+              className="hover:text-stone-300 transition-colors cursor-pointer"
+            >
+              Terms of Service
+            </button>
+            <span className="text-stone-700">•</span>
+            <button
+              onClick={() => handleLinkClick('/refund-policy')}
+              className="hover:text-stone-300 transition-colors cursor-pointer"
+            >
+              Refund Policy
+            </button>
           </div>
 
           <div className="flex items-center gap-2">
