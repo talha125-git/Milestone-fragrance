@@ -34,7 +34,9 @@ app.use(express.urlencoded({ extended: true, limit: '25mb' }));
 
 // Static images serving for product images and hero background images from public
 const publicProductimages = path.resolve(__dirname, '../frontend/public/productimages');
+const backendProductimages = path.resolve(__dirname, 'public/productimages');
 app.use('/productimages', express.static(publicProductimages));
+app.use('/productimages', express.static(backendProductimages));
 
 const publicHeroImages = path.resolve(__dirname, '../frontend/public/hero_bg_imgaes');
 app.use('/hero_bg_imgaes', express.static(publicHeroImages));

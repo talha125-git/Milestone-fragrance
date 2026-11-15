@@ -359,10 +359,13 @@ export default function AdminDashboard({
             const enriched = Array.from(combinedMap.values()).map((p) => {
               const localMatch = initialLocalProducts.find((lp) => lp.id === p.id);
               return {
+                ...localMatch,
                 ...p,
                 image: (p.image && !p.image.startsWith('data:') && !p.image.startsWith('/productimages') && localMatch)
                   ? localMatch.image
                   : (p.image || localMatch?.image || prodSignature),
+                hoverImage: p.hoverImage || localMatch?.hoverImage || '',
+                images: (Array.isArray(p.images) && p.images.length > 0) ? p.images : (localMatch?.images || []),
               };
             });
             updateAndBroadcastProducts(enriched);

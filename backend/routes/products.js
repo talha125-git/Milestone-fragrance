@@ -9,15 +9,12 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const customProductsPath = path.resolve(__dirname, '../data/custom_products.json');
 
-// Helper to save custom products
+// Helper to save all products persistently to disk
 const saveCustomProducts = () => {
   try {
-    const customList = products.filter(
-      (p) => !['signature', 'believe', 'ghanam', 'professor'].includes(p.id)
-    );
-    fs.writeFileSync(customProductsPath, JSON.stringify(customList, null, 2), 'utf-8');
+    fs.writeFileSync(customProductsPath, JSON.stringify(products, null, 2), 'utf-8');
   } catch (err) {
-    console.error('[Products] Failed to save custom products:', err);
+    console.error('[Products] Failed to save products to disk:', err);
   }
 };
 
@@ -26,11 +23,11 @@ try {
   if (fs.existsSync(customProductsPath)) {
     const raw = fs.readFileSync(customProductsPath, 'utf-8');
     const customList = JSON.parse(raw);
-    if (Array.isArray(customList)) {
+    if (Array.isArray(customList) && customList.length > 0) {
       customList.forEach((cp) => {
         const existingIdx = products.findIndex((p) => p.id === cp.id);
         if (existingIdx !== -1) {
-          products[existingIdx] = cp;
+          products[existingIdx] = { ...products[existingIdx], ...cp };
         } else {
           products.push(cp);
         }

@@ -47,10 +47,13 @@ export default function App() {
           return parsed.map((p) => {
             const defaultMatch = products.find((dp) => dp.id === p.id);
             return {
+              ...defaultMatch,
               ...p,
               image: (p.image && !p.image.startsWith('data:') && !p.image.startsWith('/productimages') && defaultMatch)
                 ? defaultMatch.image
                 : (p.image || defaultMatch?.image || '/productimages/prod_1794047286007_chiaroscuro_portrait_in_shadow.png'),
+              hoverImage: p.hoverImage || defaultMatch?.hoverImage || '',
+              images: (Array.isArray(p.images) && p.images.length > 0) ? p.images : (defaultMatch?.images || []),
             };
           });
         }
@@ -85,10 +88,13 @@ export default function App() {
             const merged = Array.from(map.values()).map((p) => {
               const defaultMatch = products.find((dp) => dp.id === p.id);
               return {
+                ...defaultMatch,
                 ...p,
                 image: (p.image && !p.image.startsWith('data:') && !p.image.startsWith('/productimages') && defaultMatch)
                   ? defaultMatch.image
                   : (p.image || defaultMatch?.image || '/productimages/prod_1794047286007_chiaroscuro_portrait_in_shadow.png'),
+                hoverImage: p.hoverImage || defaultMatch?.hoverImage || '',
+                images: (Array.isArray(p.images) && p.images.length > 0) ? p.images : (defaultMatch?.images || []),
               };
             });
 
